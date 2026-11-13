@@ -1,9 +1,8 @@
 # Pracownia Bajkowe Cuda
 
-<!-- Badges: replace OWNER/REPO once the GitHub repository exists.
-[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/OWNER/REPO/actions/workflows/codeql.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/codeql.yml)
--->
+[![CI](https://github.com/Darin2020/PracowniaBajkoweCuda/actions/workflows/ci.yml/badge.svg)](https://github.com/Darin2020/PracowniaBajkoweCuda/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/Darin2020/PracowniaBajkoweCuda/actions/workflows/codeql.yml/badge.svg)](https://github.com/Darin2020/PracowniaBajkoweCuda/actions/workflows/codeql.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Mobile-first one-page website for a custom toy-sewing **service** (not a shop). Visitors see the About, Gallery,
 Pricing and Contact sections. Registered customers chat with the owner, the owner turns conversations into orders,
