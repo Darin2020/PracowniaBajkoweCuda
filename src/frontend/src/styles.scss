@@ -1,0 +1,29 @@
+/* Global styles. Design tokens are CSS variables; components use them instead of hard-coded values. */
+:root {
+  --color-background: #fffaf5;
+  --color-text: #2b2330;
+  --color-text-muted: #5c5263;
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+  line-height: 1.5;
+}
