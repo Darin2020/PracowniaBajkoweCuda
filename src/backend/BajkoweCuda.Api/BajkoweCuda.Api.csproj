@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <UserSecretsId>bajkowecuda-api</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BajkoweCuda.Application\BajkoweCuda.Application.csproj" />
+    <ProjectReference Include="..\BajkoweCuda.Infrastructure\BajkoweCuda.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
