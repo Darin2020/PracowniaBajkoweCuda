@@ -495,10 +495,10 @@ Each phase ends with: green CI, updated README/DECISIONS, acceptance criteria de
 - [x] `docker-compose.yml` with SQL Server, Azurite, Mailpit + healthchecks. `.env.example`
 - [x] `ci.yml` (build + test both sides), `codeql.yml`, `dependabot.yml`, PR template
 - **AC:** `docker compose up -d` starts the dependencies. API returns `/health/live` 200. `ng serve` shows a placeholder page through the proxy. CI is green on the first PR.
-- **AC status (2026-11-13):** files are in place; frontend format/lint/tests/build and the backend build pass locally.
-  `docker compose up -d` verified: `sqlserver`, `azurite` and `mailpit` all report `healthy`.
-  Still to demonstrate: running the API and the backend tests locally (Windows Smart App Control blocks freshly built binaries),
-  and the first green CI run (needs the GitHub repository, §16).
+- **AC status (2026-11-15): met.** `docker compose up -d` brings `sqlserver`, `azurite` and `mailpit` to `healthy`. `ng serve` serves the
+  placeholder and proxies to the API. CI is green on `main` and on the first pull requests; its backend job runs the integration test
+  that asserts `/health/live` returns 200. Not demonstrated on the Windows dev machine: running the API and the integration tests
+  locally, because Smart App Control blocks freshly built binaries (use WSL 2 or CI for that).
 
 ### Phase 1 — Public site, i18n, SEO, container
 - [ ] Sticky top bar, anchor navigation with active-section highlight, hamburger menu
