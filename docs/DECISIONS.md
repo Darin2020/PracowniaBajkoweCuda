@@ -35,3 +35,10 @@ See `docs/PLAN.md` §2 for the full table. Summary:
 - **CI.** Actions are pinned to commit SHAs with the version in a comment (Dependabot keeps them current). `ci.yml` also validates
   the compose file. CodeQL additionally scans the workflow files (`actions` language).
 - **LICENSE** copyright holder is "Pracownia Bajkowe Cuda" (change it if a personal name is preferred).
+
+## 2026-11-15 — Dependabot does not raise TypeScript on its own
+
+- **Decision.** Dependabot ignores major and minor updates of `typescript` (patch updates still arrive).
+- **Reason.** Angular pins the supported TypeScript range (`@angular/build` 22.2 requires `>=6.0 <6.1`). The first Dependabot PR
+  bumped TypeScript to 7.0 and failed at `npm ci` with `ERESOLVE`.
+- **Consequence.** TypeScript is upgraded manually, in the same change as the Angular major/minor that allows it.
