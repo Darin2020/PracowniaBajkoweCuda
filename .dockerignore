@@ -1,0 +1,31 @@
+# Keep the build context small and free of local state. Everything the Dockerfile needs is listed explicitly there.
+.git
+.github
+.vs
+.vscode
+.idea
+.claude
+
+# Local secrets must never reach the Docker daemon.
+.env
+.env.*
+!.env.example
+
+# Build output and dependencies (rebuilt inside the image).
+**/bin
+**/obj
+**/node_modules
+**/dist
+**/.angular
+**/coverage
+**/TestResults
+
+# Not needed to build the image.
+docs
+infra
+*.md
+LICENSE
+docker-compose*.yml
+Dockerfile
+.dockerignore
+.lighthouserc.json
