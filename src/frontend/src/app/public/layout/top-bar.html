@@ -1,0 +1,55 @@
+<header class="bar">
+  <div class="bar__inner container">
+    <a class="brand" routerLink="/" (click)="closeMenu()">
+      <img class="brand__logo" src="icon.svg" alt="" width="36" height="36" />
+      <span class="brand__name">{{ siteName }}</span>
+    </a>
+
+    <button
+      type="button"
+      class="menu-toggle"
+      aria-controls="site-menu"
+      [attr.aria-expanded]="menuOpen()"
+      (click)="toggleMenu()"
+    >
+      <span class="visually-hidden" i18n="@@nav.menuToggle">Menu</span>
+      <svg aria-hidden="true" viewBox="0 0 24 24" width="24" height="24">
+        @if (menuOpen()) {
+          <path d="M6 6l12 12M18 6L6 18" />
+        } @else {
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        }
+      </svg>
+    </button>
+
+    <div id="site-menu" class="menu" [class.menu--open]="menuOpen()">
+      <nav aria-label="Main" i18n-aria-label="@@nav.mainLabel">
+        <ul class="nav-list">
+          @for (item of navItems; track item.id) {
+            <li>
+              <a
+                class="nav-link"
+                routerLink="/"
+                [fragment]="item.id"
+                [class.nav-link--active]="activeId() === item.id"
+                [attr.aria-current]="activeId() === item.id ? 'location' : null"
+                (click)="closeMenu()"
+                >{{ item.label }}</a
+              >
+            </li>
+          }
+        </ul>
+      </nav>
+
+      <app-language-switcher />
+
+      <a
+        class="button button--primary sign-in"
+        routerLink="/login"
+        (click)="closeMenu()"
+        i18n="@@nav.signIn"
+        >Sign in</a
+      >
+    </div>
+  </div>
+</header>

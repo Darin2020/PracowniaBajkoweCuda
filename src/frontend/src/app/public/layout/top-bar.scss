@@ -1,0 +1,144 @@
+// Wide enough for the longest menu (German, Spanish) to fit on one line next to the languages.
+$desktop: 70rem;
+
+:host {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: block;
+}
+
+.bar {
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-background);
+}
+
+.bar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: var(--top-bar-height);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-height: 2.75rem;
+  color: var(--color-text);
+  font-family: var(--font-heading);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.brand__logo {
+  flex: none;
+}
+
+.menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 0;
+  border-radius: var(--radius-small);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+
+  svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-width: 2;
+  }
+
+  &:hover {
+    background: var(--color-surface-tinted);
+  }
+}
+
+/* Narrow screens: the menu is a panel under the bar, opened by the hamburger button. */
+.menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  display: none;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem var(--gutter) 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-background);
+  box-shadow: var(--shadow-soft);
+}
+
+.menu--open {
+  display: flex;
+}
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding-inline: 0.75rem;
+  border-radius: var(--radius-small);
+  color: var(--color-text);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    background: var(--color-surface-tinted);
+    color: var(--color-text);
+  }
+}
+
+.nav-link--active {
+  color: var(--color-primary);
+  box-shadow: inset 0.25rem 0 0 var(--color-primary);
+}
+
+.sign-in {
+  align-self: flex-start;
+}
+
+@media (min-width: $desktop) {
+  .menu-toggle {
+    display: none;
+  }
+
+  .menu {
+    position: static;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .nav-list {
+    flex-direction: row;
+    gap: 0.25rem;
+  }
+
+  .nav-link--active {
+    box-shadow: inset 0 -0.1875rem 0 var(--color-primary);
+  }
+
+  .sign-in {
+    align-self: center;
+  }
+}

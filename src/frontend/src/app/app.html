@@ -1,6 +1,12 @@
-<main class="placeholder">
-  <h1>{{ name }}</h1>
-  <p>Custom-sewn toys, made to order. The site is under construction.</p>
+<a class="skip-link" [routerLink]="[]" fragment="main" i18n="@@app.skipToContent"
+  >Skip to content</a
+>
+
+<app-top-bar />
+
+<main id="main" tabindex="-1">
+  <router-outlet />
 </main>
 
-<router-outlet />
+<app-footer />
+<app-cookie-notice />

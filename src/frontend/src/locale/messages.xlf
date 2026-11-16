@@ -1,0 +1,638 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="en" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="app.skipToContent" datatype="html">
+        <source>Skip to content</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.html</context>
+          <context context-type="linenumber">2,7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.heading" datatype="html">
+        <source>Toys with a story</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about.ts</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.paragraph1" datatype="html">
+        <source>Every toy starts with a conversation. Tell us who it is for and what it should look like, send a drawing or a photo, and we will turn the idea into a soft friend.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about.ts</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.paragraph2" datatype="html">
+        <source>Each toy is sewn by hand in a small home studio, from safe, certified fabrics and fillings. No two are the same.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about.ts</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.paragraph3" datatype="html">
+        <source>You follow your order from the first sketch to the finished toy, with photos along the way.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about.ts</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="about.photoAlt" datatype="html">
+        <source>Placeholder illustration of the maker at her sewing table</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="gallery.bearRose" datatype="html">
+        <source>Placeholder illustration: a rose plush bear</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/gallery.ts</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="gallery.bunnyMint" datatype="html">
+        <source>Placeholder illustration: a mint plush bunny</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/gallery.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="gallery.catHoney" datatype="html">
+        <source>Placeholder illustration: a honey-coloured plush cat</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/gallery.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="gallery.bearSky" datatype="html">
+        <source>Placeholder illustration: a sky-blue plush bear</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/gallery.ts</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="gallery.bunnyLilac" datatype="html">
+        <source>Placeholder illustration: a lilac plush bunny</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/gallery.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="gallery.catCoral" datatype="html">
+        <source>Placeholder illustration: a coral plush cat</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/gallery.ts</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.placeholderNotice" datatype="html">
+        <source>This page is a placeholder. The final text is being prepared and will be reviewed by a lawyer before the service opens.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.topicsHeading" datatype="html">
+        <source>What this document will cover</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.privacy.title" datatype="html">
+        <source>Privacy policy</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.privacy.description" datatype="html">
+        <source>How Pracownia Bajkowe Cuda collects, uses and protects your personal data.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.privacy.intro" datatype="html">
+        <source>We collect only the data we need to talk to you and to make your order.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.privacy.topic1" datatype="html">
+        <source>Who the data controller is and how to contact them.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.privacy.topic2" datatype="html">
+        <source>Which data we collect (account, chat messages, pictures, orders) and for what purposes.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.privacy.topic3" datatype="html">
+        <source>The legal basis for each purpose.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.privacy.topic4" datatype="html">
+        <source>How long we keep the data, including order records.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.privacy.topic5" datatype="html">
+        <source>Who processes data on our behalf: Microsoft Azure (hosting and email), Google and Meta (sign-in).</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.privacy.topic6" datatype="html">
+        <source>Your rights: access, correction, deletion, data export and complaint to a supervisory authority.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.privacy.topic7" datatype="html">
+        <source>How to export your data and delete your account.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.terms.title" datatype="html">
+        <source>Terms of service</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.terms.description" datatype="html">
+        <source>The rules for ordering a custom-sewn toy from Pracownia Bajkowe Cuda.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.terms.intro" datatype="html">
+        <source>These terms describe how an order is agreed, paid for and delivered.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.terms.topic1" datatype="html">
+        <source>Who provides the service and how to contact us.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.terms.topic2" datatype="html">
+        <source>How an order is made: you describe the toy in the chat and we create the order.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.terms.topic3" datatype="html">
+        <source>Prices in euro and payment by the instructions sent in the chat.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.terms.topic4" datatype="html">
+        <source>Production and delivery times.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.terms.topic5" datatype="html">
+        <source>Withdrawal rules for made-to-order items.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.terms.topic6" datatype="html">
+        <source>Complaints and what happens if something is wrong with the toy.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.cookies.title" datatype="html">
+        <source>Cookie information</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.cookies.description" datatype="html">
+        <source>Which cookies the Pracownia Bajkowe Cuda website uses and why.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.cookies.intro" datatype="html">
+        <source>This site uses only strictly necessary cookies. There are no analytics or advertising cookies.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.cookies.topic1" datatype="html">
+        <source>Sign-in session cookie: keeps you signed in.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">56</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.cookies.topic2" datatype="html">
+        <source>Security cookie: protects forms against forged requests.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.cookies.topic3" datatype="html">
+        <source>Language cookie: remembers the language you chose.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="legal.cookies.topic4" datatype="html">
+        <source>How to delete or block cookies in your browser, and what stops working if you do.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/legal.ts</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="pricing.small.name" datatype="html">
+        <source>Small toy</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/pricing.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="pricing.small.description" datatype="html">
+        <source>Up to 20 cm. A simple shape with embroidered details.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/pricing.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="pricing.medium.name" datatype="html">
+        <source>Medium toy</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/pricing.ts</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="pricing.medium.description" datatype="html">
+        <source>20 to 40 cm. Clothes, accessories or movable limbs.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/pricing.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="pricing.large.name" datatype="html">
+        <source>Large or complex toy</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/pricing.ts</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="pricing.large.description" datatype="html">
+        <source>Over 40 cm, or a detailed character with many elements.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/pricing.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="pricing.drawing.name" datatype="html">
+        <source>Toy from a child&apos;s drawing</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/pricing.ts</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="pricing.drawing.description" datatype="html">
+        <source>We recreate the drawing as faithfully as we can, colours and quirks included.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/pricing.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="pricing.note" datatype="html">
+        <source>These are price ranges. The final price depends on the size, materials and details, and is agreed with you in the chat before we start.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/pricing.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="site.tagline" datatype="html">
+        <source>Hand-sewn toys, made to order</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/site.ts</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="site.description" datatype="html">
+        <source>Pracownia Bajkowe Cuda sews soft toys to order: from a drawing, a photo or just an idea. Write to us and we will agree on every detail together.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/site.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="contact.cta" datatype="html">
+        <source>Order a toy — write to us</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/landing/landing-page.html</context>
+          <context context-type="linenumber">10,13</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/landing/landing-page.html</context>
+          <context context-type="linenumber">68,71</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="gallery.heading" datatype="html">
+        <source>Gallery</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/landing/landing-page.html</context>
+          <context context-type="linenumber">26,27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="gallery.lead" datatype="html">
+        <source> A few of the toys we have made. Tap a picture to see it larger. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/landing/landing-page.html</context>
+          <context context-type="linenumber">28,30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="pricing.heading" datatype="html">
+        <source>Pricing</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/landing/landing-page.html</context>
+          <context context-type="linenumber">37,38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="pricing.from" datatype="html">
+        <source>from <x id="INTERPOLATION" equiv-text="{{ item.priceFrom | currency: currency : &apos;symbol&apos; : &apos;1.0-0&apos; }}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/landing/landing-page.html</context>
+          <context context-type="linenumber">49,50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="contact.heading" datatype="html">
+        <source>Contact</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/landing/landing-page.html</context>
+          <context context-type="linenumber">62,63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="contact.lead" datatype="html">
+        <source> The quickest way to order is the chat: describe your idea, attach a picture and we will reply with a price and a timeline. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/landing/landing-page.html</context>
+          <context context-type="linenumber">64,67</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="contact.email" datatype="html">
+        <source>Email</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/landing/landing-page.html</context>
+          <context context-type="linenumber">73,75</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="contact.phone" datatype="html">
+        <source>Phone</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/landing/landing-page.html</context>
+          <context context-type="linenumber">79,81</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="contact.social" datatype="html">
+        <source>Social media</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/landing/landing-page.html</context>
+          <context context-type="linenumber">85,86</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="gallery.carouselLabel" datatype="html">
+        <source>Gallery of finished toys</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/landing/landing-page.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cookieNotice.label" datatype="html">
+        <source>Cookies</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/layout/cookie-notice.ts</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cookieNotice.text" datatype="html">
+        <source>This site uses only the cookies it needs to work: sign-in, security and your language choice.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/layout/cookie-notice.ts</context>
+          <context context-type="linenumber">27,29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cookieNotice.more" datatype="html">
+        <source>Cookie information</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/layout/cookie-notice.ts</context>
+          <context context-type="linenumber">29,31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="cookieNotice.dismiss" datatype="html">
+        <source> Got it </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/layout/cookie-notice.ts</context>
+          <context context-type="linenumber">32,34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="footer.legalLabel" datatype="html">
+        <source>Legal</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/layout/footer.ts</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="language.label" datatype="html">
+        <source>Language</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/layout/language-switcher.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="nav.menuToggle" datatype="html">
+        <source>Menu</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/layout/top-bar.html</context>
+          <context context-type="linenumber">15,16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="nav.mainLabel" datatype="html">
+        <source>Main</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/layout/top-bar.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="nav.signIn" datatype="html">
+        <source>Sign in</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/layout/top-bar.html</context>
+          <context context-type="linenumber">51,54</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="nav.about" datatype="html">
+        <source>About</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/layout/top-bar.ts</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="nav.gallery" datatype="html">
+        <source>Gallery</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/layout/top-bar.ts</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="nav.pricing" datatype="html">
+        <source>Pricing</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/layout/top-bar.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="nav.contact" datatype="html">
+        <source>Contact</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/layout/top-bar.ts</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="comingSoon.text" datatype="html">
+        <source> Sign-in and the chat are not open yet. Until then, please write to us by email. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/pages/coming-soon-page.ts</context>
+          <context context-type="linenumber">16,19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="message.backHome" datatype="html">
+        <source>Back to the home page</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/pages/coming-soon-page.ts</context>
+          <context context-type="linenumber">21,25</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/pages/not-found-page.ts</context>
+          <context context-type="linenumber">14,18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="comingSoon.title" datatype="html">
+        <source>Accounts are coming soon</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/pages/coming-soon-page.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="notFound.text" datatype="html">
+        <source>The page you are looking for does not exist or has been moved.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/pages/not-found-page.ts</context>
+          <context context-type="linenumber">13,14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="notFound.title" datatype="html">
+        <source>Page not found</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/pages/not-found-page.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="carousel.previous" datatype="html">
+        <source>Previous image</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/carousel/carousel.ts</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="carousel.next" datatype="html">
+        <source>Next image</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/carousel/carousel.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="carousel.slideLabel" datatype="html">
+        <source>Image <x id="INDEX" equiv-text="position + 1"/> of <x id="TOTAL" equiv-text="total"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/carousel/carousel.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="carousel.open" datatype="html">
+        <source>View fullscreen: <x id="DESCRIPTION" equiv-text="alt"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/carousel/carousel.ts</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="carousel.goTo" datatype="html">
+        <source>Go to image <x id="INDEX" equiv-text="position + 1"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/carousel/carousel.ts</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="viewer.label" datatype="html">
+        <source>Image viewer</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/image-viewer/image-viewer.ts</context>
+          <context context-type="linenumber">26,27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="viewer.previous" datatype="html">
+        <source> Previous </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/image-viewer/image-viewer.ts</context>
+          <context context-type="linenumber">43,45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="viewer.close" datatype="html">
+        <source> Close </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/image-viewer/image-viewer.ts</context>
+          <context context-type="linenumber">51,52</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="viewer.next" datatype="html">
+        <source>Next</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/image-viewer/image-viewer.ts</context>
+          <context context-type="linenumber">53,55</context>
+        </context-group>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

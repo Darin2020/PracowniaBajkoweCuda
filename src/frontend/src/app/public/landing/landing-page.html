@@ -1,0 +1,94 @@
+<section id="about" class="section about" aria-labelledby="about-heading">
+  <div class="container about__grid">
+    <div class="about__text">
+      <p class="eyebrow">{{ site.tagline }}</p>
+      <h1 id="about-heading">{{ about.heading }}</h1>
+      @for (paragraph of about.paragraphs; track $index) {
+        <p>{{ paragraph }}</p>
+      }
+      <a class="button button--primary" routerLink="/chat" i18n="@@contact.cta"
+        >Order a toy — write to us</a
+      >
+    </div>
+    <img
+      class="about__photo"
+      [ngSrc]="about.photo.src"
+      [width]="about.photo.width"
+      [height]="about.photo.height"
+      [alt]="about.photo.alt"
+      sizes="(min-width: 62rem) 26rem, 80vw"
+    />
+  </div>
+</section>
+
+<section id="gallery" class="section" aria-labelledby="gallery-heading">
+  <div class="container">
+    <h2 id="gallery-heading" i18n="@@gallery.heading">Gallery</h2>
+    <p class="section__lead" i18n="@@gallery.lead">
+      A few of the toys we have made. Tap a picture to see it larger.
+    </p>
+    <app-carousel [items]="gallery" [label]="galleryLabel" (opened)="viewer.open($event)" />
+    <app-image-viewer #viewer [items]="gallery" />
+  </div>
+</section>
+
+<section id="pricing" class="section section--tinted" aria-labelledby="pricing-heading">
+  <div class="container">
+    <h2 id="pricing-heading" i18n="@@pricing.heading">Pricing</h2>
+    <ul class="packages">
+      @for (item of packages; track item.id) {
+        <li class="package">
+          <h3 class="package__name">{{ item.name }}</h3>
+          <p class="package__description">{{ item.description }}</p>
+          <p class="package__price">
+            @if (item.priceTo) {
+              {{ item.priceFrom | currency: currency : 'symbol' : '1.0-0' }} –
+              {{ item.priceTo | currency: currency : 'symbol' : '1.0-0' }}
+            } @else {
+              <ng-container i18n="@@pricing.from"
+                >from {{ item.priceFrom | currency: currency : 'symbol' : '1.0-0' }}</ng-container
+              >
+            }
+          </p>
+        </li>
+      }
+    </ul>
+    <p class="pricing__note">{{ pricingNote }}</p>
+  </div>
+</section>
+
+<section id="contact" class="section" aria-labelledby="contact-heading">
+  <div class="container contact">
+    <h2 id="contact-heading" i18n="@@contact.heading">Contact</h2>
+    <p class="section__lead" i18n="@@contact.lead">
+      The quickest way to order is the chat: describe your idea, attach a picture and we will reply
+      with a price and a timeline.
+    </p>
+    <a class="button button--primary" routerLink="/chat" i18n="@@contact.cta"
+      >Order a toy — write to us</a
+    >
+
+    <dl class="contact__details">
+      <div>
+        <dt i18n="@@contact.email">Email</dt>
+        <dd>
+          <a [href]="'mailto:' + site.email">{{ site.email }}</a>
+        </dd>
+      </div>
+      <div>
+        <dt i18n="@@contact.phone">Phone</dt>
+        <dd>
+          <a [href]="site.phoneHref">{{ site.phone }}</a>
+        </dd>
+      </div>
+      <div>
+        <dt i18n="@@contact.social">Social media</dt>
+        <dd class="contact__socials">
+          @for (social of site.socials; track social.name) {
+            <a [href]="social.url" rel="noopener noreferrer" target="_blank">{{ social.name }}</a>
+          }
+        </dd>
+      </div>
+    </dl>
+  </div>
+</section>
