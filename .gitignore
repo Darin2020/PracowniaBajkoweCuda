@@ -505,6 +505,7 @@ npm-debug.log*
 .eslintcache
 
 # Test results
+.lighthouseci/
 TestResults/
 playwright-report/
 test-results/
