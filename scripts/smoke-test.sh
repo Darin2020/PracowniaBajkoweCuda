@@ -26,9 +26,13 @@ expect_status() {
   if [ "$actual" = "$expected" ]; then pass "$path -> $expected"; else fail "$path -> $actual (expected $expected)"; fi
 }
 
+# The response is read completely before it is searched. Piping curl straight into `grep --quiet`
+# is a race: grep exits at the first match, curl then fails with a broken pipe, and with `pipefail`
+# that turns a successful match into a failure.
 expect_contains() {
-  local path="$1" needle="$2"
-  if body "$path" | grep --quiet --fixed-strings -- "$needle"; then
+  local path="$1" needle="$2" content
+  content="$(body "$path")"
+  if grep --quiet --fixed-strings -- "$needle" <<<"$content"; then
     pass "$path contains \"$needle\""
   else
     fail "$path does not contain \"$needle\""
@@ -36,8 +40,9 @@ expect_contains() {
 }
 
 expect_header() {
-  local path="$1" pattern="$2"
-  if headers "$path" | grep --quiet --ignore-case --extended-regexp -- "$pattern"; then
+  local path="$1" pattern="$2" content
+  content="$(headers "$path")"
+  if grep --quiet --ignore-case --extended-regexp -- "$pattern" <<<"$content"; then
     pass "$path has header matching /$pattern/"
   else
     fail "$path has no header matching /$pattern/"
