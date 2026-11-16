@@ -24,7 +24,7 @@ RUN npm run build
 # ---------------------------------------------------------------------------------------------
 # 2. Backend: restore (cached while the project files do not change), optional tests, publish.
 # ---------------------------------------------------------------------------------------------
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:11.0 AS build
 WORKDIR /src
 ENV DOTNET_NOLOGO=true \
     DOTNET_CLI_TELEMETRY_OPTOUT=true
