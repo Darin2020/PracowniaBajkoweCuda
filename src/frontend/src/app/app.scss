@@ -1,18 +1,31 @@
-.placeholder {
-  display: grid;
-  place-content: center;
-  gap: 0.5rem;
+:host {
+  display: flex;
+  flex-direction: column;
   min-height: 100dvh;
-  padding: 1.5rem;
-  text-align: center;
+}
 
-  h1 {
-    margin: 0;
-    font-size: clamp(1.75rem, 6vw, 3rem);
+main {
+  flex: 1;
+
+  &:focus {
+    outline: none;
   }
+}
 
-  p {
-    margin: 0;
-    color: var(--color-text-muted);
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-small);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+
+  &:focus {
+    transform: translateY(0);
   }
 }

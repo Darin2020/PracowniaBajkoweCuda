@@ -1,6 +1,6 @@
 # Local development dependencies. Copy `.env.example` to `.env` first.
-#   docker compose up -d      SQL Server, Azurite, Mailpit
-# The application image itself is added in Phase 1 under the `app` profile.
+#   docker compose up -d                        SQL Server, Azurite, Mailpit
+#   docker compose --profile app up -d --build  the same + the application image on http://localhost:8080
 name: bajkowecuda
 
 services:
@@ -54,6 +54,42 @@ services:
       timeout: 3s
       retries: 6
       start_period: 5s
+    restart: unless-stopped
+
+  # The application image (API + prerendered Angular site). Only started with `--profile app`.
+  app:
+    profiles: ["app"]
+    build:
+      context: .
+      args:
+        APP_VERSION: ${APP_VERSION:-local}
+        PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:8080}
+    image: bajkowecuda-app:local
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      # Not read by the API yet; wired now so later phases only add code (docs/PLAN.md §14).
+      ConnectionStrings__Sql: Server=sqlserver,1433;Database=BajkoweCuda;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True
+      Email__Provider: Smtp
+      Email__Smtp__Host: mailpit
+      Email__Smtp__Port: "1025"
+    ports:
+      - "127.0.0.1:${APP_PORT:-8080}:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      azurite:
+        condition: service_healthy
+      mailpit:
+        condition: service_healthy
+    # Hardening that mirrors production: read-only root file system, no extra privileges.
+    # (No healthcheck here: the chiseled image has no shell or curl. Use /health/live from outside.)
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     restart: unless-stopped
 
 volumes:

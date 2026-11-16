@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+# Smoke test for a running instance of the application image.
+#
+#   scripts/smoke-test.sh [base-url]        default: http://localhost:8080
+#
+# Checks what a deployment must get right before anything else: the liveness probe, the language
+# redirect, one prerendered page per locale (with content in the HTML itself), the client-side
+# fallback, the API 404 and the security headers. Used by CI and, later, by the deployment pipeline.
+set -euo pipefail
+
+BASE_URL="${1:-http://localhost:8080}"
+BASE_URL="${BASE_URL%/}"
+failures=0
+
+pass() { printf '  ok    %s\n' "$1"; }
+fail() { printf '  FAIL  %s\n' "$1"; failures=$((failures + 1)); }
+
+# status <path> -> HTTP status code (redirects are not followed)
+status() { curl --silent --output /dev/null --write-out '%{http_code}' "$BASE_URL$1"; }
+body() { curl --silent "$BASE_URL$1"; }
+headers() { curl --silent --output /dev/null --dump-header - "$BASE_URL$1" | tr -d '\r'; }
+
+expect_status() {
+  local path="$1" expected="$2" actual
+  actual="$(status "$path")"
+  if [ "$actual" = "$expected" ]; then pass "$path -> $expected"; else fail "$path -> $actual (expected $expected)"; fi
+}
+
+expect_contains() {
+  local path="$1" needle="$2"
+  if body "$path" | grep --quiet --fixed-strings -- "$needle"; then
+    pass "$path contains \"$needle\""
+  else
+    fail "$path does not contain \"$needle\""
+  fi
+}
+
+expect_header() {
+  local path="$1" pattern="$2"
+  if headers "$path" | grep --quiet --ignore-case --extended-regexp -- "$pattern"; then
+    pass "$path has header matching /$pattern/"
+  else
+    fail "$path has no header matching /$pattern/"
+  fi
+}
+
+echo "Smoke test against $BASE_URL"
+
+echo "Health"
+expect_status /health/live 200
+expect_contains /health/live Healthy
+
+echo "Language redirect"
+expect_status / 302
+expect_header / '^location: /en/$'
+
+echo "Prerendered landing page per locale (content must be in the HTML, not rendered by JavaScript)"
+expect_contains /en/ '<html lang="en"'
+expect_contains /en/ 'Toys with a story'
+expect_contains /de/ '<html lang="de"'
+expect_contains /de/ 'Spielzeug mit Geschichte'
+expect_contains /fr/ '<html lang="fr"'
+expect_contains /fr/ 'Des jouets qui ont une histoire'
+expect_contains /es/ '<html lang="es"'
+expect_contains /es/ 'Juguetes con historia'
+expect_contains /pl/ '<html lang="pl"'
+expect_contains /pl/ 'Zabawki z historią'
+
+echo "SEO"
+expect_contains /pl/ '<link rel="canonical"'
+expect_contains /pl/ 'hreflang="x-default"'
+expect_contains /pl/ 'application/ld+json'
+expect_contains /pl/privacy 'Polityka prywatności'
+expect_status /robots.txt 200
+expect_contains /robots.txt 'Sitemap:'
+expect_status /sitemap.xml 200
+
+echo "Client-side fallback and API"
+expect_status /de/chat 200
+expect_contains /de/chat '<app-root'
+expect_status /de/missing-file.js 404
+expect_status /api/does-not-exist 404
+
+echo "Headers"
+expect_header /en/ "^content-security-policy: .*script-src 'self';"
+expect_header /en/ '^x-content-type-options: nosniff$'
+expect_header /en/ '^cache-control: no-cache$'
+
+if [ "$failures" -gt 0 ]; then
+  echo "Smoke test FAILED: $failures check(s)."
+  exit 1
+fi
+
+echo "Smoke test passed."

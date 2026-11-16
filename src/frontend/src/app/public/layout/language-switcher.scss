@@ -1,0 +1,33 @@
+.languages__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.languages__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border-radius: var(--radius-small);
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  text-transform: uppercase;
+
+  &:hover {
+    background: var(--color-surface-tinted);
+    color: var(--color-text);
+  }
+}
+
+.languages__link--current {
+  background: var(--color-surface-tinted);
+  color: var(--color-primary);
+}

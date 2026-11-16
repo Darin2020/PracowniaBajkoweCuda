@@ -501,14 +501,18 @@ Each phase ends with: green CI, updated README/DECISIONS, acceptance criteria de
   locally, because Smart App Control blocks freshly built binaries (use WSL 2 or CI for that).
 
 ### Phase 1 — Public site, i18n, SEO, container
-- [ ] Sticky top bar, anchor navigation with active-section highlight, hamburger menu
-- [ ] About, Gallery (carousel + fullscreen viewer), Pricing, Contact, Footer. Content in typed content files. Placeholder images and texts
-- [ ] `@angular/localize` with 5 locales, language switcher, initial translations (`needs-review`)
-- [ ] Static prerendering of landing + legal pages, meta/canonical/hreflang/OG/JSON-LD, `sitemap.xml`, `robots.txt`
-- [ ] Legal placeholder pages + cookie information notice
-- [ ] ASP.NET Core static hosting per locale, `/` language redirect, CSR fallback, cache headers, security headers (CSP etc.)
-- [ ] Multi-stage `Dockerfile`, `app` profile in compose, Trivy in CI, Lighthouse CI
+- [x] Sticky top bar, anchor navigation with active-section highlight, hamburger menu
+- [x] About, Gallery (carousel + fullscreen viewer), Pricing, Contact, Footer. Content in typed content files. Placeholder images and texts
+- [x] `@angular/localize` with 5 locales, language switcher, initial translations (`needs-review`)
+- [x] Static prerendering of landing + legal pages, meta/canonical/hreflang/OG/JSON-LD, `sitemap.xml`, `robots.txt`
+- [x] Legal placeholder pages + cookie information notice
+- [x] ASP.NET Core static hosting per locale, `/` language redirect, CSR fallback, cache headers, security headers (CSP etc.)
+- [x] Multi-stage `Dockerfile`, `app` profile in compose, Trivy in CI, Lighthouse CI
 - **AC:** `docker compose --profile app up` serves `/pl/`, `/de/`… with content visible in *view-source*. Lighthouse mobile ≥ 90 in all 4 categories. No CSP violations.
+- **AC status (2026-11-15): met locally.** `docker compose --profile app up` serves all five locales with the content in the HTML
+  itself (checked by `scripts/smoke-test.sh`). Lighthouse mobile on `/en/`, `/pl/` and `/de/privacy`: performance 98–99,
+  accessibility 100, best practices 100, SEO 100. No console errors, so no CSP violations. Still to confirm: the new CI job
+  (image build, Trivy, Lighthouse) on GitHub. Content, prices, contact details and images are placeholders (§16).
 
 ### Phase 2 — Azure + CD (deploy early)
 - [ ] Bicep modules for §10 (DB/Storage/ACS can be included now even though they are not used yet)
