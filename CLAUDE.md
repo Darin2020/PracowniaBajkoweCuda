@@ -23,13 +23,25 @@ Record the decisions you make along the way in `docs/DECISIONS.md` (short ADR-st
 
 ## Commands (keep this section current once the projects exist)
 ```bash
-docker compose up -d                       # SQL Server, Azurite, Mailpit (+ app with --profile app)
+docker compose up -d                       # SQL Server, Azurite, Mailpit
+docker compose --profile app up -d --build # + the application image on http://localhost:8080
+scripts/smoke-test.sh http://localhost:8080 # checks a running instance (redirect, pages per locale, headers)
 dotnet build BajkoweCuda.sln
 dotnet test --solution BajkoweCuda.sln     # Microsoft.Testing.Platform runner (see global.json)
 dotnet run --project src/backend/BajkoweCuda.Api   # API on http://localhost:5080
 cd src/frontend && npm ci && npm start     # ng serve on :4200 with proxy (/api, /hubs, /health) to the API
 cd src/frontend && npm test && npm run lint && npm run format:check
+cd src/frontend && npm run build           # all 5 locales, prerendered, + robots.txt / sitemap.xml
+cd src/frontend && npm run i18n:extract    # after changing UI text: re-extract and merge src/locale/*.xlf
+npx @lhci/cli@0.16.1 autorun               # Lighthouse CI against http://localhost:8080 (.lighthouserc.json)
 dotnet ef migrations add <Name> -p src/backend/BajkoweCuda.Infrastructure -s src/backend/BajkoweCuda.Api
+```
+
+On the owner's Windows machine Smart App Control blocks freshly built .NET binaries, so `dotnet test` and `dotnet run`
+do not work there. Build with `dotnet build`, run the backend tests in a container, and run the application itself with
+`docker compose --profile app up -d --build`:
+```bash
+docker run --rm -v "${PWD}:/src:ro" -w /src -v bajkowecuda-nuget:/root/.nuget/packages mcr.microsoft.com/dotnet/sdk:10.0 dotnet test --solution BajkoweCuda.sln --artifacts-path /tmp/artifacts
 ```
 
 ## Rules
