@@ -165,3 +165,11 @@ region (every database call across regions), or one shared environment. The owne
   before the first deployment with this layout.
 - If the quota is raised later, separate environments are a small change: the app module only references the
   environment by name and resource group (`containerAppsEnvironmentName`, `sharedResourceGroup`).
+
+## 2026-11-17 — Accepted npm advisories need a review date
+
+`npm audit --audit-level=high` started failing every build on GHSA-fc5q-39xc-vjpf (picomatch ReDoS, high) with no
+patched version available. picomatch is used only by build and test tooling with patterns from this repository, so the
+owner accepted it temporarily. CI now runs `npm run audit` (`src/frontend/scripts/audit.mjs`): high and critical
+advisories fail the build unless listed in `src/frontend/audit-allowlist.json` with a reason and a `reviewBy` date.
+After that date the build fails again; an entry that is no longer reported is flagged for removal.

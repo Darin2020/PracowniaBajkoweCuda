@@ -87,7 +87,8 @@ jobs:
         run: npm run build
 
       - name: Audit
-        run: npm audit --audit-level=high
+        # High and critical advisories fail the build unless accepted, with a review date, in audit-allowlist.json.
+        run: npm run audit
 
   image:
     name: Docker image (build + Trivy + smoke test + Lighthouse)
