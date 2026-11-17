@@ -56,6 +56,30 @@ services:
       start_period: 5s
     restart: unless-stopped
 
+  # Applies the database migrations and exits, like the migration job in Azure. Only with `--profile app`.
+  migrate:
+    profiles: ["app"]
+    # Same build as `app` (the second build is a cache hit), so `up --build` never tries to pull this image.
+    build:
+      context: .
+      args:
+        APP_VERSION: ${APP_VERSION:-local}
+    image: bajkowecuda-app:local
+    command: ["migrate"]
+    environment:
+      ConnectionStrings__Sql: Server=sqlserver,1433;Database=BajkoweCuda;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: "no"
+
   # The application image (API + prerendered Angular site). Only started with `--profile app`.
   app:
     profiles: ["app"]
@@ -68,14 +92,16 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       # Public origin used in canonical URLs, robots.txt and sitemap.xml.
       PublicBaseUrl: ${PUBLIC_BASE_URL:-http://localhost:8080}
-      # Not read by the API yet; wired now so later phases only add code (docs/PLAN.md §14).
       ConnectionStrings__Sql: Server=sqlserver,1433;Database=BajkoweCuda;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True
+      # Not read by the API yet; wired now so later phases only add code (docs/PLAN.md §14).
       Email__Provider: Smtp
       Email__Smtp__Host: mailpit
       Email__Smtp__Port: "1025"
     ports:
       - "127.0.0.1:${APP_PORT:-8080}:8080"
     depends_on:
+      migrate:
+        condition: service_completed_successfully
       sqlserver:
         condition: service_healthy
       azurite:

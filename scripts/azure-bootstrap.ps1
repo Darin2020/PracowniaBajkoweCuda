@@ -13,7 +13,11 @@
          so only jobs of this repository that run in the matching GitHub environment can sign in as them:
            - staging identity: deploys the shared registry and staging; reads prod (registry cleanup).
            - production identity: deploys prod. Its GitHub environment requires a reviewer.
-      4. Stores the identifiers the workflows need as GitHub secrets (identifiers, not credentials;
+      4. Per environment, sets up who administers the Azure SQL server: an Entra group
+         (sg-bajkowecuda-sql-admins-<env>) with the signed-in user and a migration identity
+         (id-bajkowecuda-migrator-<env>) as members. The migration job runs as that identity; the application's
+         own identity only gets read/write access to the data, never the schema.
+      5. Stores the identifiers the workflows need as GitHub secrets (identifiers, not credentials;
          kept as secrets so they are masked in the public logs).
 
     The application itself is deployed by the CD workflow, not by this script. See docs/RUNBOOK.md.
@@ -120,23 +124,65 @@ function Grant-Role {
     }
 }
 
+function Add-GroupMember {
+    param([string] $GroupId, [string] $MemberId)
+
+    # A new identity can take a moment to appear in the directory, hence the retries.
+    foreach ($attempt in 1..6) {
+        try {
+            $isMember = Invoke-Az ad group member check --group $GroupId --member-id $MemberId --query value --output tsv
+            if ($isMember -ne 'true') {
+                Invoke-Az ad group member add --group $GroupId --member-id $MemberId --output none
+            }
+            return
+        }
+        catch {
+            if ($attempt -eq 6) { throw "Could not add $MemberId to group ${GroupId}: $_" }
+            Start-Sleep -Seconds 10
+        }
+    }
+}
+
+function New-SqlAdministrators {
+    # The SQL administrators of one environment: an Entra group with the signed-in user and the migration identity.
+    # Returns the group's object id, which the templates set as the server's Entra administrator.
+    param([string] $EnvironmentName, [string] $ResourceGroup, [string] $OwnerObjectId)
+
+    $groupName = "sg-$Project-sql-admins-$EnvironmentName"
+    $groupId = Invoke-Az ad group list --display-name $groupName --query '[0].id' --output tsv
+    if ([string]::IsNullOrWhiteSpace($groupId)) {
+        $groupId = Invoke-Az ad group create --display-name $groupName --mail-nickname $groupName `
+            --description "Entra administrators of the $EnvironmentName Azure SQL server of $Project" --query id --output tsv
+    }
+
+    $migratorName = "id-$Project-migrator-$EnvironmentName"
+    Invoke-Az identity create --name $migratorName --resource-group $ResourceGroup --location $Location `
+        --tags "project=$Project" "environment=$EnvironmentName" --output none
+    $migrator = Invoke-Az identity show --name $migratorName --resource-group $ResourceGroup --output json | ConvertFrom-Json
+
+    Add-GroupMember -GroupId $groupId -MemberId $OwnerObjectId
+    Add-GroupMember -GroupId $groupId -MemberId $migrator.principalId
+
+    return $groupId
+}
+
 $account = Invoke-Az account show --output json | ConvertFrom-Json
 $SubscriptionId = $account.id
 Write-Host "Subscription: $($account.name)"
 Write-Host "Repository:   $Repository"
 Write-Host "Region:       $Location"
 
-Write-Host "`n[1/4] Registering resource providers..."
+Write-Host "`n[1/5] Registering resource providers..."
 foreach ($provider in $Providers) {
     Invoke-Az provider register --namespace $provider --output none
 }
 
-Write-Host "[2/4] Creating resource groups..."
+Write-Host "[2/5] Creating resource groups..."
 foreach ($group in @($SharedGroup, $StagingGroup, $ProdGroup)) {
     Invoke-Az group create --name $group --location $Location --tags "project=$Project" --output none
 }
 
-Write-Host "[3/4] Creating deployment identities and role assignments..."
+Write-Host "[3/5] Creating deployment identities and role assignments..."
 $staging = New-DeploymentIdentity -Name "id-$Project-github-staging" -GitHubEnvironment 'staging'
 $production = New-DeploymentIdentity -Name "id-$Project-github-prod" -GitHubEnvironment 'production'
 
@@ -156,14 +202,24 @@ Grant-Role -PrincipalId $production.principalId -Role 'Role Based Access Control
 Grant-Role -PrincipalId $production.principalId -Role 'Contributor' -ResourceGroup $SharedGroup
 Grant-Role -PrincipalId $production.principalId -Role 'Role Based Access Control Administrator' -ResourceGroup $SharedGroup
 
-Write-Host "[4/4] Storing identifiers as GitHub secrets..."
-# The signed-in user becomes the Entra administrator of the SQL servers.
-$sqlAdminObjectId = Invoke-Az ad signed-in-user show --query id --output tsv
+Write-Host "[4/5] Setting up the SQL administrators groups and migration identities..."
+$ownerObjectId = Invoke-Az ad signed-in-user show --query id --output tsv
+$stagingSqlAdmins = New-SqlAdministrators -EnvironmentName 'staging' -ResourceGroup $StagingGroup -OwnerObjectId $ownerObjectId
+$prodSqlAdmins = New-SqlAdministrators -EnvironmentName 'prod' -ResourceGroup $ProdGroup -OwnerObjectId $ownerObjectId
 
+Write-Host "[5/5] Storing identifiers as GitHub secrets..."
 Invoke-Gh secret set AZURE_TENANT_ID --repo $Repository --body $account.tenantId
 Invoke-Gh secret set AZURE_SUBSCRIPTION_ID --repo $Repository --body $SubscriptionId
-Invoke-Gh secret set SQL_ADMIN_OBJECT_ID --repo $Repository --body $sqlAdminObjectId
 Invoke-Gh secret set AZURE_CLIENT_ID --repo $Repository --env staging --body $staging.clientId
 Invoke-Gh secret set AZURE_CLIENT_ID --repo $Repository --env production --body $production.clientId
+Invoke-Gh secret set SQL_ADMIN_OBJECT_ID --repo $Repository --env staging --body $stagingSqlAdmins
+Invoke-Gh secret set SQL_ADMIN_OBJECT_ID --repo $Repository --env production --body $prodSqlAdmins
+
+# Earlier versions stored the signed-in user as a repository-wide SQL_ADMIN_OBJECT_ID; the per-environment
+# secrets above replace it.
+$repositorySecrets = Invoke-Gh-Output secret list --repo $Repository --json name --jq '.[].name'
+if ($repositorySecrets -contains 'SQL_ADMIN_OBJECT_ID') {
+    Invoke-Gh secret delete SQL_ADMIN_OBJECT_ID --repo $Repository
+}
 
 Write-Host "`nDone. Next: merge to main (or run the CD workflow manually) to deploy staging."

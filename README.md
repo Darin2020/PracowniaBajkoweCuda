@@ -184,6 +184,9 @@ flowchart LR
   managed identity for the registry, storage, Key Vault and SQL.
 - **Build once, promote.** The image is identified by its digest after the build; the public origin and the
   "do not index" switch are configuration, so staging and production run the same bytes.
+- **Schema first, then code.** A Container Apps job runs the image's `migrate` command (EF Core) before the new
+  revision goes live. It runs as a separate identity in the SQL administrators group; the app's own identity can
+  only read and write data.
 - **Infrastructure as code** in [`infra/`](infra/): Container Apps, Azure SQL, Blob Storage, Key Vault,
   Communication Services Email, Log Analytics + Application Insights, and a cost budget per environment.
 - Setup, rollback and operations: [docs/RUNBOOK.md](docs/RUNBOOK.md).

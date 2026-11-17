@@ -1,6 +1,8 @@
 name: Deploy environment
 description: >
-  Deploys infra/main.bicep with one image digest to one environment, waits until that build serves traffic
+  Deploys infra/main.bicep with one image digest to one environment in two passes: the first updates the
+  infrastructure and the migration job to the new image while the app keeps running the current one, then the job
+  migrates the database, and the second pass rolls the app out. Then it waits until the new build serves traffic
   and runs the smoke test. The caller must be logged in to Azure (azure/login) already.
 
 inputs:
@@ -20,24 +22,93 @@ inputs:
     description: Name of the shared container registry.
     required: true
   sql-admin-object-id:
-    description: Object id of the Entra principal that administers the SQL server.
+    description: Object id of the Entra group that administers the SQL server.
     required: true
 
 outputs:
   app-url:
     description: Public URL of the deployed application.
-    value: ${{ steps.deploy.outputs.app-url }}
+    value: ${{ steps.roll-out.outputs.app-url }}
 
 runs:
   using: composite
   steps:
-    - name: Deploy Bicep
-      id: deploy
+    # The app keeps its current image during the first pass, so new code never runs against the old schema.
+    # On the very first deployment there is no app yet, and the new image is used for both.
+    - name: Find the running image
+      id: current
+      shell: bash
+      env:
+        RESOURCE_GROUP: ${{ inputs.resource-group }}
+        NEW_IMAGE: ${{ inputs.image }}
+        NEW_VERSION: ${{ inputs.version }}
+      run: |
+        set -euo pipefail
+        app="$(az containerapp list --resource-group "$RESOURCE_GROUP" --query '[0]' --output json)"
+        image="$(jq --raw-output '.properties.template.containers[0].image // empty' <<<"${app:-null}")"
+        version="$(jq --raw-output '.properties.template.containers[0].env[]? | select(.name == "APP_VERSION") | .value' <<<"${app:-null}")"
+        if [ -z "$image" ] || [ -z "$version" ]; then
+          image="$NEW_IMAGE"
+          version="$NEW_VERSION"
+        fi
+        echo "image=$image" >> "$GITHUB_OUTPUT"
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+        echo "Running now: $image ($version)"
+
+    - name: Deploy infrastructure and the migration job
+      id: infrastructure
       shell: bash
       env:
         RESOURCE_GROUP: ${{ inputs.resource-group }}
         PARAMETERS_FILE: ${{ inputs.parameters-file }}
         # Read by the .bicepparam file (readEnvironmentVariable).
+        CONTAINER_IMAGE: ${{ steps.current.outputs.image }}
+        APP_VERSION: ${{ steps.current.outputs.version }}
+        MIGRATION_IMAGE: ${{ inputs.image }}
+        MIGRATION_VERSION: ${{ inputs.version }}
+        REGISTRY_NAME: ${{ inputs.registry-name }}
+        SQL_ADMIN_OBJECT_ID: ${{ inputs.sql-admin-object-id }}
+      run: |
+        set -euo pipefail
+        job="$(az deployment group create \
+          --resource-group "$RESOURCE_GROUP" \
+          --name "infra-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+          --parameters "$PARAMETERS_FILE" \
+          --query properties.outputs.migrationJobName.value \
+          --output tsv)"
+        echo "migration-job=$job" >> "$GITHUB_OUTPUT"
+
+    - name: Migrate the database
+      shell: bash
+      env:
+        RESOURCE_GROUP: ${{ inputs.resource-group }}
+        JOB: ${{ steps.infrastructure.outputs.migration-job }}
+      run: |
+        set -euo pipefail
+        execution="$(az containerapp job start --resource-group "$RESOURCE_GROUP" --name "$JOB" --query name --output tsv)"
+        echo "Started $JOB execution $execution"
+        # The job itself times out after 15 minutes; wait a little longer than that.
+        for attempt in $(seq 1 100); do
+          status="$(az containerapp job execution show --resource-group "$RESOURCE_GROUP" --name "$JOB" \
+            --job-execution-name "$execution" --query properties.status --output tsv)"
+          case "$status" in
+            Succeeded) echo "Migration succeeded."; exit 0 ;;
+            Failed|Stopped|Degraded)
+              echo "Migration $status. Logs: Log Analytics workspace log-bajkowecuda-shared, table ContainerAppConsoleLogs_CL,"
+              echo "filter ContainerJobName_s == \"$JOB\" (docs/RUNBOOK.md). The app still runs the previous build."
+              exit 1 ;;
+          esac
+          sleep 10
+        done
+        echo "Migration did not finish in time (last status: $status)."
+        exit 1
+
+    - name: Roll out the app
+      id: roll-out
+      shell: bash
+      env:
+        RESOURCE_GROUP: ${{ inputs.resource-group }}
+        PARAMETERS_FILE: ${{ inputs.parameters-file }}
         CONTAINER_IMAGE: ${{ inputs.image }}
         APP_VERSION: ${{ inputs.version }}
         REGISTRY_NAME: ${{ inputs.registry-name }}
@@ -58,7 +129,7 @@ runs:
     - name: Wait for the new build to serve traffic
       shell: bash
       env:
-        APP_URL: ${{ steps.deploy.outputs.app-url }}
+        APP_URL: ${{ steps.roll-out.outputs.app-url }}
         EXPECTED_VERSION: ${{ inputs.version }}
       run: |
         set -euo pipefail
@@ -76,6 +147,6 @@ runs:
     - name: Smoke test
       shell: bash
       env:
-        APP_URL: ${{ steps.deploy.outputs.app-url }}
+        APP_URL: ${{ steps.roll-out.outputs.app-url }}
         EXPECTED_VERSION: ${{ inputs.version }}
       run: bash scripts/smoke-test.sh "$APP_URL"

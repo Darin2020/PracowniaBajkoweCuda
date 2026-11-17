@@ -7,7 +7,7 @@
 # The base URL must be the public origin the instance is configured with (PublicBaseUrl):
 # the canonical URLs are compared against it.
 #
-# Checks what a deployment must get right before anything else: the liveness probe, the language
+# Checks what a deployment must get right before anything else: the liveness and readiness probes, the language
 # redirect, one prerendered page per locale (with content in the HTML itself), the client-side
 # fallback, the API 404 and the security headers. Used by CI and, later, by the deployment pipeline.
 set -euo pipefail
@@ -68,6 +68,9 @@ echo "Smoke test against $BASE_URL"
 echo "Health and version"
 expect_status /health/live 200
 expect_contains /health/live Healthy
+# Readiness opens a database connection with the app's own credentials: in Azure this proves that the migration
+# job created the managed identity's database user.
+expect_status /health/ready 200
 expect_status /api/version 200
 if [ -n "${EXPECTED_VERSION:-}" ]; then
   expect_contains /api/version "\"version\":\"$EXPECTED_VERSION\""

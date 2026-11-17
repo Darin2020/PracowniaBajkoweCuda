@@ -4,7 +4,7 @@ param serverName string
 param location string
 param tags object
 
-@description('Object id of the Entra principal that administers the server.')
+@description('Object id of the Entra principal that administers the server: the sg-bajkowecuda-sql-admins-<env> group.')
 param adminObjectId string
 
 @allowed(['User', 'Group', 'Application'])
@@ -31,6 +31,19 @@ resource server 'Microsoft.Sql/servers@2023-08-01-preview' = {
       principalType: adminPrincipalType
       tenantId: tenant().tenantId
     }
+  }
+}
+
+// The administrator in the server properties above is only applied when the server is created; this child
+// resource keeps it current on every deployment (for example when it moves from a user to a group).
+resource entraAdmin 'Microsoft.Sql/servers/administrators@2023-08-01-preview' = {
+  parent: server
+  name: 'ActiveDirectory'
+  properties: {
+    administratorType: 'ActiveDirectory'
+    login: 'bajkowecuda-sql-admin'
+    sid: adminObjectId
+    tenantId: tenant().tenantId
   }
 }
 

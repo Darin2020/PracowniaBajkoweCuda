@@ -173,3 +173,33 @@ patched version available. picomatch is used only by build and test tooling with
 owner accepted it temporarily. CI now runs `npm run audit` (`src/frontend/scripts/audit.mjs`): high and critical
 advisories fail the build unless listed in `src/frontend/audit-allowlist.json` with a reason and a `reviewBy` date.
 After that date the build fails again; an entry that is no longer reported is flagged for removal.
+
+## 2026-11-17 — Phase 3: database, migrations and SQL access
+
+**Owner's decisions**
+- **SQL access through a group and a migration identity.** Each SQL server's Entra administrator is the group
+  `sg-bajkowecuda-sql-admins-<env>` (the owner + `id-bajkowecuda-migrator-<env>`), created by
+  `scripts/azure-bootstrap.ps1`. The migration job runs as the migrator; the app identity gets a database user with
+  `db_datareader` + `db_datawriter` only, so the running app cannot change the schema. Rejected: making the app
+  identity the server administrator (simpler, but full server rights for the internet-facing process).
+- **Phase 3 is delivered in several PRs** (database → auth API + email → 2FA/admin/audit/deletion → OAuth → Angular),
+  each deployed to staging.
+
+**Implementation**
+- **`ApplicationUser` lives in Infrastructure** (`Identity/`), not in Domain: it derives from ASP.NET Core Identity and
+  the Domain layer has no framework dependencies. Domain entities will refer to users by id.
+- **The app user is created with `CREATE USER ... WITH SID = <client id>, TYPE = E`**, not `FROM EXTERNAL PROVIDER`:
+  the latter, run by a managed identity, needs Microsoft Graph permissions on the SQL server's own identity
+  (Directory Readers), which a personal tenant would have to grant by hand.
+- **Migrations run from the application image** (`dotnet BajkoweCuda.Api.dll migrate`), as a Container Apps job in
+  Azure, as a one-shot `migrate` service in docker compose, and as a step of the CI image job. One image, no separate
+  migration bundle.
+- **Two-pass deployment:** the first Bicep pass updates the infrastructure and the job to the new image while the app
+  keeps the running image, the job migrates, the second pass rolls the app out. New code never meets the old schema.
+  Rollback consequence: migrations must stay compatible with the previous image (RUNBOOK §3).
+- **The migrator and the SQL administrators group are created by the bootstrap script**, not by Bicep: Bicep cannot
+  add group members without Microsoft Graph permissions, which the deployment identities do not have.
+- **`/health/ready`** checks the database and is used only by the smoke test, never by container probes, so the
+  serverless database can pause.
+- **Integration tests use Testcontainers** (SQL Server 2025), one container per test run, a fresh database per test.
+  Tests that need it carry the trait `Category=Database`; the optional test run inside the Docker build skips them.

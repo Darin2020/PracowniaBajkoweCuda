@@ -29,9 +29,10 @@ and the GitHub environments `staging` and `production` (the latter with a requir
 ```
 
 The script is idempotent and creates nothing that costs money: resource providers, three resource groups,
-two deployment identities with federated credentials (OIDC) and the GitHub secrets the workflows read
-(`AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `SQL_ADMIN_OBJECT_ID`, and `AZURE_CLIENT_ID` per environment).
-These are identifiers, not credentials: GitHub never holds an Azure secret.
+two deployment identities with federated credentials (OIDC), per environment an Entra group
+`sg-bajkowecuda-sql-admins-<env>` (you + the migration identity `id-bajkowecuda-migrator-<env>`), and the GitHub
+secrets the workflows read (`AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`; per environment `AZURE_CLIENT_ID` and
+`SQL_ADMIN_OBJECT_ID`, the group). These are identifiers, not credentials: GitHub never holds an Azure secret.
 
 Then deploy for the first time: merge to `main`, or run **Actions → CD → Run workflow**. The first run creates
 the registry, pushes the image and creates every resource of the environment (about 10 minutes).
@@ -41,11 +42,40 @@ the registry, pushes the image and creates every resource of the environment (ab
 Nothing to do: every merge to `main` runs CI, then CD.
 
 1. **Build and push** the image to the registry.
-2. **Staging**: Bicep deployment, wait until `/api/version` reports the new commit, smoke test.
+2. **Staging**, in this order:
+   1. Bicep deployment with the new image for the migration job only; the app keeps running the current image.
+   2. The job `caj-bajkowecuda-migrate-<env>` runs `migrate`: EF Core migrations, then it makes sure the app identity
+      has a database user with `db_datareader` + `db_datawriter`. If it fails, the deployment stops and the app
+      still runs the previous build.
+   3. Bicep deployment with the new image for the app, wait until `/api/version` reports the new commit, smoke test
+      (including `/health/ready`, which opens a database connection as the app identity).
 3. **Production**: waits for approval (**Actions → the CD run → Review deployments**), then the same steps
    with the same image digest.
 
 Check what is running: `https://<app>/api/version` returns the git commit.
+
+### Database access
+
+Who can do what on the Azure SQL servers (Entra authentication only, no SQL passwords):
+
+| Principal | Access |
+|---|---|
+| Group `sg-bajkowecuda-sql-admins-<env>`: you and `id-bajkowecuda-migrator-<env>` | Server administrator |
+| App identity `id-bajkowecuda-<env>` | Database user, read and write data only (created by the migration job) |
+
+To query the database yourself: allow your IP address on the server (**SQL server → Networking**, remove the rule
+afterwards), then connect with Entra authentication, e.g. `sqlcmd -S <server>.database.windows.net -d BajkoweCuda
+--authentication-method ActiveDirectoryDefault` after `az login`.
+
+Run a migration by hand (normally the pipeline does it):
+
+```bash
+az containerapp job start -g rg-bajkowecuda-<env> -n caj-bajkowecuda-migrate-<env>
+az containerapp job execution list -g rg-bajkowecuda-<env> -n caj-bajkowecuda-migrate-<env> -o table
+```
+
+Migration logs: workspace `log-bajkowecuda-shared`, table `ContainerAppConsoleLogs_CL`,
+filter `ContainerJobName_s == "caj-bajkowecuda-migrate-<env>"`.
 
 ## 3. Roll back
 
@@ -69,8 +99,9 @@ az acr manifest list-metadata --registry <registry> --name bajkowecuda --orderby
 
 **Permanent: revert the commit** on `main` (`git revert`), which builds and deploys a new image.
 
-Database changes are not rolled back by any of these. From Phase 3 on, migrations must stay backwards
-compatible with the previous image for exactly this reason.
+Database changes are not rolled back by any of these: redeploying an older digest runs that image's migrations,
+which finds nothing to apply and leaves the newer schema in place. Migrations must therefore stay backwards
+compatible with the previous image (expand first, remove old columns in a later release).
 
 ## 4. Costs and budget
 
@@ -98,8 +129,5 @@ delete the database, deploy, then import. Do it before real data exists, or plan
 
 ## 6. Not automated yet
 
-- **Database access for the app identity.** The SQL servers accept Entra identities only and their administrator is
-  the person who ran the bootstrap. Before the app first uses the database (Phase 3) the app identity must be added
-  as a database user (`CREATE USER [id-bajkowecuda-<env>] FROM EXTERNAL PROVIDER`).
-- **Migration job, alerts, availability test, restore drill**: later phases (docs/PLAN.md §15).
+- **Alerts, availability test, restore drill**: later phases (docs/PLAN.md §15).
 - **Custom domain and email domain**: Phase 8, once a domain exists.
