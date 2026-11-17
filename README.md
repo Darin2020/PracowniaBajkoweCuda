@@ -12,7 +12,8 @@ The project is also a portfolio piece for **Docker, Azure and CI/CD**: one conta
 and a build-once / promote pipeline.
 
 > **Status:** Phase 1 (public site, i18n, SEO, container) is done: the prerendered one-page site in five languages
-> runs from the Docker image. Accounts, chat and orders come next. Texts, prices, contact details and pictures are
+> runs from the Docker image. Phase 2 (Azure infrastructure and continuous deployment) is in progress.
+> Accounts, chat and orders come next. Texts, prices, contact details and pictures are
 > **placeholders**. The roadmap and the full specification are in [docs/PLAN.md](docs/PLAN.md); decisions are logged
 > in [docs/DECISIONS.md](docs/DECISIONS.md).
 
@@ -78,7 +79,9 @@ src/frontend                             Angular workspace
   src/locale                             translations (XLIFF) for de, fr, es, pl
 tests/                                   unit and integration tests
 scripts/smoke-test.sh                    checks a running instance (used by CI)
-docs/                                    PLAN.md, DECISIONS.md
+infra/                                   Bicep: shared.bicep (registry), main.bicep (one environment), modules/
+scripts/azure-bootstrap.ps1              one-time Azure + GitHub OIDC setup
+docs/                                    PLAN.md, DECISIONS.md, RUNBOOK.md
 .github/                                 workflows, Dependabot, PR template
 Dockerfile                               multi-stage build of the single image
 docker-compose.yml                       local SQL Server, Azurite, Mailpit (+ the app with --profile app)
@@ -148,8 +151,9 @@ docker run --rm -v "${PWD}:/src:ro" -w /src -v bajkowecuda-nuget:/root/.nuget/pa
   `src/locale/messages.{de,fr,es,pl}.xlf`: existing translations are kept, new messages are marked `state="new"`
   and must be translated (the build fails on a missing translation).
 - The initial translations are machine-made and marked `state="needs-review-translation"` until a person checks them.
-- The public origin used in canonical URLs, `robots.txt` and `sitemap.xml` comes from the `PUBLIC_BASE_URL`
-  build argument (default `https://example.com`).
+- The public origin used in canonical URLs, `robots.txt` and `sitemap.xml` is **not** part of the build. The build
+  writes a placeholder and the API replaces it at startup from the `PublicBaseUrl` setting, so one image serves
+  every environment.
 
 ## CI
 
@@ -159,8 +163,30 @@ docker run --rm -v "${PWD}:/src:ro" -w /src -v bajkowecuda-nuget:/root/.nuget/pa
 | [`codeql.yml`](.github/workflows/codeql.yml) | PR, push to `main`, weekly | CodeQL for C#, JavaScript/TypeScript and GitHub Actions |
 | [`dependabot.yml`](.github/dependabot.yml) | weekly | NuGet, npm, GitHub Actions, Dockerfile and docker-compose image updates |
 
+| [`cd.yml`](.github/workflows/cd.yml) | after CI passes on `main`, or manually | Build and push the image once → deploy staging (Bicep, wait for the new version, smoke test) → **manual approval** → deploy production with the same image digest. A manual run can redeploy an earlier digest (rollback) |
+| [`infra-ci.yml`](.github/workflows/infra-ci.yml) | PR touching `infra/` | Bicep build + lint, then a what-if against staging |
+| [`cleanup.yml`](.github/workflows/cleanup.yml) | weekly | Deletes old registry images, never one that an environment is running |
+
 Actions are pinned to commit SHAs and every workflow declares minimal `permissions`.
-The deployment pipeline (staging → approval → production) arrives in Phase 2.
+
+## Deployment
+
+```mermaid
+flowchart LR
+    merge["Merge to main"] --> ci["CI"]
+    ci --> build["Build image once<br/>push to registry"]
+    build --> staging["Staging<br/>Bicep + smoke test"]
+    staging --> approval{"Manual<br/>approval"}
+    approval --> prod["Production<br/>same image digest"]
+```
+
+- **No cloud secrets in GitHub.** Workflows sign in to Azure with OIDC federated credentials; the application uses a
+  managed identity for the registry, storage, Key Vault and SQL.
+- **Build once, promote.** The image is identified by its digest after the build; the public origin and the
+  "do not index" switch are configuration, so staging and production run the same bytes.
+- **Infrastructure as code** in [`infra/`](infra/): Container Apps, Azure SQL, Blob Storage, Key Vault,
+  Communication Services Email, Log Analytics + Application Insights, and a cost budget per environment.
+- Setup, rollback and operations: [docs/RUNBOOK.md](docs/RUNBOOK.md).
 
 ## License
 

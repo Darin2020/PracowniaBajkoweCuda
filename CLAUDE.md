@@ -35,7 +35,9 @@ cd src/frontend && npm run build           # all 5 locales, prerendered, + robot
 cd src/frontend && npm run i18n:extract    # after changing UI text: re-extract and merge src/locale/*.xlf
 npx @lhci/cli@0.16.1 autorun               # Lighthouse CI against http://localhost:8080 (.lighthouserc.json)
 dotnet ef migrations add <Name> -p src/backend/BajkoweCuda.Infrastructure -s src/backend/BajkoweCuda.Api
+az bicep build --file infra/main.bicep --stdout   # compile-check the infrastructure (also infra/shared.bicep)
 ```
+Deployment is done by `.github/workflows/cd.yml` only (never by hand); operations are in `docs/RUNBOOK.md`.
 
 On the owner's Windows machine Smart App Control blocks freshly built .NET binaries, so `dotnet test` and `dotnet run`
 do not work there. Build with `dotnet build`, run the backend tests in a container, and run the application itself with
