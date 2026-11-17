@@ -35,8 +35,8 @@ public sealed partial class DatabaseMigrator(AppDbContext db, IOptions<DatabaseO
     }
 
     /// <summary>
-    /// Both values end up in SQL. The name is additionally quoted with QUOTENAME, but only plain identity names
-    /// are accepted in the first place.
+    /// Both values end up in DDL statements, which cannot take parameters: only plain identity names and GUIDs are
+    /// accepted, so nothing can break out of the bracketed identifier.
     /// </summary>
     internal static (string Name, Guid ClientId) Validate(DatabaseOptions settings)
     {
@@ -61,13 +61,14 @@ public sealed partial class DatabaseMigrator(AppDbContext db, IOptions<DatabaseO
     /// </summary>
     private async Task EnsureAppUserAsync(string name, Guid clientId, CancellationToken cancellationToken)
     {
+        // DDL cannot take parameters, so the statements are built here from the validated name (letters, digits,
+        // '-' and '_' only) and run through sp_executesql; the existence checks do use parameters.
         await db.Database.ExecuteSqlRawAsync(
             """
-            DECLARE @sid varbinary(16) = CAST(CAST(@clientId AS uniqueidentifier) AS varbinary(16));
             IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = @name)
-                EXEC(N'CREATE USER ' + QUOTENAME(@name) + N' WITH SID = ' + CONVERT(nvarchar(34), @sid, 1) + N', TYPE = E');
+                EXEC sys.sp_executesql @statement;
             """,
-            [Parameter("@name", name), Parameter("@clientId", clientId.ToString())],
+            [Parameter("@name", name), Parameter("@statement", CreateUserStatement(name, clientId))],
             cancellationToken);
 
         foreach (var role in AppUserRoles)
@@ -75,15 +76,24 @@ public sealed partial class DatabaseMigrator(AppDbContext db, IOptions<DatabaseO
             await db.Database.ExecuteSqlRawAsync(
                 """
                 IF IS_ROLEMEMBER(@role, @name) = 0
-                    EXEC(N'ALTER ROLE ' + QUOTENAME(@role) + N' ADD MEMBER ' + QUOTENAME(@name));
+                    EXEC sys.sp_executesql @statement;
                 """,
-                [Parameter("@role", role), Parameter("@name", name)],
+                [Parameter("@role", role), Parameter("@name", name), Parameter("@statement", AddRoleMemberStatement(role, name))],
                 cancellationToken);
         }
     }
 
+    /// <summary>
+    /// <c>CREATE USER [name] WITH SID = 0x..., TYPE = E</c> (Azure SQL only). The SID is the client id in the byte
+    /// order SQL Server uses for <c>uniqueidentifier</c>, which is the order of <see cref="Guid.ToByteArray()"/>.
+    /// </summary>
+    internal static string CreateUserStatement(string name, Guid clientId) =>
+        $"CREATE USER [{name}] WITH SID = 0x{Convert.ToHexString(clientId.ToByteArray())}, TYPE = E";
+
+    internal static string AddRoleMemberStatement(string role, string name) => $"ALTER ROLE [{role}] ADD MEMBER [{name}]";
+
     private static Microsoft.Data.SqlClient.SqlParameter Parameter(string name, string value) =>
-        new(name, System.Data.SqlDbType.NVarChar, 128) { Value = value };
+        new(name, System.Data.SqlDbType.NVarChar, -1) { Value = value };
 
     [GeneratedRegex("^[A-Za-z0-9_-]{1,128}$")]
     private static partial Regex IdentityName();
