@@ -104,3 +104,48 @@ See `docs/PLAN.md` §2 for the full table. Summary:
 **Local workflow on the owner's machine**
 - Windows Smart App Control blocks freshly built .NET binaries, so backend tests run in the `dotnet/sdk:10.0`
   container and the application runs through `docker compose --profile app`. Nothing in the repository depends on this.
+
+## 2026-11-16 — Phase 2: Azure and continuous deployment
+
+**Owner's decisions**
+- Region `polandcentral`. Both databases start on the free serverless offer (`sqlUseFreeOffer`); production can move
+  to Basic (DTU) later (see docs/RUNBOOK.md §4 for what that takes).
+- **The public origin is set when the app starts, not at build time** (deviation from PLAN §7, approved by the owner).
+  Reason: one image digest is promoted from staging to production, and their origins differ. The Angular build writes a
+  placeholder origin (`https://public-base-url.invalid`); the API replaces it in HTML, `robots.txt` and `sitemap.xml`
+  when it serves them (`PublicSiteFiles`), from the `PublicBaseUrl` setting. The app refuses to start with an invalid value.
+  This closes the open issue recorded in the Phase 1 entry.
+
+**Application**
+- **`Seo:NoIndex`** (staging) adds `X-Robots-Tag: noindex, nofollow` to every response and serves a `robots.txt` that
+  disallows everything.
+- **`/api/version`** is anonymous: the pipeline polls it to know when the new revision serves traffic, and the
+  repository is public anyway.
+- **Logging:** Serilog to the console (JSON outside Development), enriched with app version and environment; trace ids
+  come from the current activity. OpenTelemetry to Application Insights is enabled only when its connection string is set.
+  Probe requests to `/health` are not logged.
+- **Forwarded headers** are enabled through `ASPNETCORE_FORWARDEDHEADERS_ENABLED` in the Container App, not in code:
+  the app is only reachable through the ingress, so the proxy address does not need to be pinned.
+
+**Infrastructure**
+- **Two Bicep entry points:** `shared.bicep` (registry) and `main.bicep` (one environment), plus a module per resource
+  type. Run-specific values reach the `.bicepparam` files through environment variables.
+- **No secrets anywhere:** the app uses a user-assigned managed identity for the registry, storage, Key Vault and SQL.
+  Storage has shared-key access disabled, SQL is Entra-only, the registry has no admin user.
+- **Budget notifications go to the subscription Owners** (`contactRoles`) instead of an Action Group with an email
+  address, so no personal address is stored in the repository or in GitHub.
+- **Exactly one replica** (`maxReplicas: 1`): SignalR and the outbox worker run in-process (PLAN §10).
+- **Deferred to the phase that needs them:** the migration job (Phase 3, with the first migration), alerts and the
+  availability test (Phase 7), ZAP scan (Phase 6). The database user for the app identity is a documented manual step.
+
+**Pipeline**
+- **`cd.yml` runs after CI succeeds on `main`** (`workflow_run`), or manually with an optional image digest for rollback.
+  The digest, never a tag, identifies the image after the build.
+- **Two deployment identities.** The staging one deploys the shared registry and staging and can read production; the
+  production one can only be used from the `production` GitHub environment, which requires a reviewer. Pull requests
+  therefore cannot reach production resources. Both need "Role Based Access Control Administrator" because the templates
+  create role assignments.
+- **Identifiers are stored as GitHub secrets** (tenant, subscription, client ids, SQL admin object id). They are not
+  credentials, but secrets are masked in the logs of this public repository.
+- **Registry cleanup never deletes an image that an environment is running**, and stops if it cannot tell.
+- **Dependabot ignores major versions of the `dotnet/sdk` and `dotnet/aspnet` images**: the project is pinned to .NET 10.

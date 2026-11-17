@@ -2,6 +2,10 @@
 # Smoke test for a running instance of the application image.
 #
 #   scripts/smoke-test.sh [base-url]        default: http://localhost:8080
+#   EXPECTED_VERSION=<git sha> scripts/smoke-test.sh https://...   also checks which build is running
+#
+# The base URL must be the public origin the instance is configured with (PublicBaseUrl):
+# the canonical URLs are compared against it.
 #
 # Checks what a deployment must get right before anything else: the liveness probe, the language
 # redirect, one prerendered page per locale (with content in the HTML itself), the client-side
@@ -39,6 +43,16 @@ expect_contains() {
   fi
 }
 
+expect_not_contains() {
+  local path="$1" needle="$2" content
+  content="$(body "$path")"
+  if grep --quiet --fixed-strings -- "$needle" <<<"$content"; then
+    fail "$path contains \"$needle\""
+  else
+    pass "$path does not contain \"$needle\""
+  fi
+}
+
 expect_header() {
   local path="$1" pattern="$2" content
   content="$(headers "$path")"
@@ -51,9 +65,13 @@ expect_header() {
 
 echo "Smoke test against $BASE_URL"
 
-echo "Health"
+echo "Health and version"
 expect_status /health/live 200
 expect_contains /health/live Healthy
+expect_status /api/version 200
+if [ -n "${EXPECTED_VERSION:-}" ]; then
+  expect_contains /api/version "\"version\":\"$EXPECTED_VERSION\""
+fi
 
 echo "Language redirect"
 expect_status / 302
@@ -72,13 +90,19 @@ expect_contains /pl/ '<html lang="pl"'
 expect_contains /pl/ 'Zabawki z historią'
 
 echo "SEO"
-expect_contains /pl/ '<link rel="canonical"'
+expect_contains /pl/ "<link rel=\"canonical\" href=\"$BASE_URL/pl/\""
 expect_contains /pl/ 'hreflang="x-default"'
 expect_contains /pl/ 'application/ld+json'
 expect_contains /pl/privacy 'Polityka prywatności'
 expect_status /robots.txt 200
-expect_contains /robots.txt 'Sitemap:'
+expect_contains /robots.txt 'User-agent:'
 expect_status /sitemap.xml 200
+expect_contains /sitemap.xml "<loc>$BASE_URL/en/</loc>"
+
+echo "The build-time placeholder origin must never reach a visitor"
+expect_not_contains /pl/ 'public-base-url.invalid'
+expect_not_contains /sitemap.xml 'public-base-url.invalid'
+expect_not_contains /robots.txt 'public-base-url.invalid'
 
 echo "Client-side fallback and API"
 expect_status /de/chat 200

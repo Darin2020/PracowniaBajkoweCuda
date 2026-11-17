@@ -63,10 +63,11 @@ services:
       context: .
       args:
         APP_VERSION: ${APP_VERSION:-local}
-        PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:8080}
     image: bajkowecuda-app:local
     environment:
       ASPNETCORE_ENVIRONMENT: Production
+      # Public origin used in canonical URLs, robots.txt and sitemap.xml.
+      PublicBaseUrl: ${PUBLIC_BASE_URL:-http://localhost:8080}
       # Not read by the API yet; wired now so later phases only add code (docs/PLAN.md §14).
       ConnectionStrings__Sql: Server=sqlserver,1433;Database=BajkoweCuda;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True
       Email__Provider: Smtp

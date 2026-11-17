@@ -517,9 +517,14 @@ Each phase ends with: green CI, updated README/DECISIONS, acceptance criteria de
 ### Phase 2 — Azure + CD (deploy early)
 - [ ] Bicep modules for §10 (DB/Storage/ACS can be included now even though they are not used yet)
 - [ ] OIDC federation, GitHub Environments, `infra-ci.yml`, `cd.yml` (build once → staging → approval → prod), smoke tests, `cleanup.yml`
-- [ ] App Insights + Serilog wired up. `/api/version`. Staging noindex
-- [ ] `docs/RUNBOOK.md` (first version: setup from zero, deploy, rollback)
+- [x] App Insights + Serilog wired up. `/api/version`. Staging noindex
+- [x] `docs/RUNBOOK.md` (first version: setup from zero, deploy, rollback)
 - **AC:** a merge to `main` deploys the public site to staging automatically and to production after approval. Rollback documented and tested once. Budget alert exists.
+- **Status (2026-11-16): bootstrapped, not deployed yet.** `scripts/azure-bootstrap.ps1` has run: resource groups,
+  deployment identities with federated credentials, role assignments and the GitHub secrets exist. An Azure what-if of
+  `shared.bicep` and of `main.bicep` for staging succeeds (registry + 17 resources to create). No deployment has run yet:
+  the first two items stay open until `cd.yml` has deployed staging and production. Scope notes: the migration job moves
+  to Phase 3 (with the first migration), alerts to Phase 7, the ZAP scan to Phase 6.
 
 ### Phase 3 — Accounts & security baseline
 - [ ] Domain/Infrastructure: `ApplicationUser`, EF Core DbContext, first migration, migration Job in CD

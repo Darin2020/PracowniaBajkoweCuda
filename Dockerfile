@@ -16,9 +16,7 @@ RUN npm ci --no-audit --no-fund
 
 COPY src/frontend/ ./
 
-# Public origin baked into canonical / hreflang / Open Graph URLs, robots.txt and sitemap.xml.
-ARG PUBLIC_BASE_URL=https://example.com
-ENV PUBLIC_BASE_URL=${PUBLIC_BASE_URL}
+# Absolute URLs are written with a placeholder origin; the API swaps in the real one at startup (PublicBaseUrl).
 RUN npm run build
 
 # ---------------------------------------------------------------------------------------------

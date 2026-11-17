@@ -1,0 +1,87 @@
+name: Cleanup
+
+# Weekly housekeeping of the container registry. Old Container App revisions need no job:
+# the app keeps only the last few inactive revisions (maxInactiveRevisions in the Bicep template).
+
+on:
+  schedule:
+    - cron: "17 3 * * 0"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Only list what would be deleted.
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cleanup
+  cancel-in-progress: false
+
+jobs:
+  registry:
+    name: Delete old images
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: staging
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      SHARED_RESOURCE_GROUP: rg-bajkowecuda-shared
+      IMAGE_REPOSITORY: bajkowecuda
+      # An image is deleted only if it is older than this, not among the newest ones, and not deployed anywhere.
+      KEEP_NEWEST: "15"
+      KEEP_DAYS: "30"
+      # Scheduled runs delete; a manual run lists only, unless dry_run is switched off.
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+    steps:
+      - uses: azure/login@053f7285eb20bf5469ef084617b0b24d3cec53fc # v3.1.0
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Delete images that are old, not recent and not deployed
+        run: |
+          set -euo pipefail
+          registry="$(az acr list --resource-group "$SHARED_RESOURCE_GROUP" --query '[0].name' --output tsv)"
+          if [ -z "$registry" ]; then echo "No registry yet."; exit 0; fi
+
+          # Digests that an environment is running right now must survive, whatever their age.
+          # If an environment cannot be read, stop: deleting without knowing what is deployed is not safe.
+          deployed=""
+          for environment in staging prod; do
+            if az containerapp show --resource-group "rg-bajkowecuda-$environment" --name "ca-bajkowecuda-$environment" --output none 2>/dev/null; then
+              image="$(az containerapp show --resource-group "rg-bajkowecuda-$environment" --name "ca-bajkowecuda-$environment" \
+                --query 'properties.template.containers[0].image' --output tsv)"
+              deployed="$deployed ${image##*@}"
+            elif az group show --name "rg-bajkowecuda-$environment" --output none 2>/dev/null; then
+              echo "No app in $environment yet."
+            else
+              echo "Cannot read the $environment resource group. Refusing to delete anything."; exit 1
+            fi
+          done
+          echo "Deployed digests:$deployed"
+
+          cutoff="$(date --utc --date "$KEEP_DAYS days ago" +%s)"
+          position=0
+          deleted=0
+          while IFS=$'\t' read -r digest updated; do
+            [ -n "$digest" ] || continue
+            position=$((position + 1))
+            if [ "$position" -le "$KEEP_NEWEST" ]; then continue; fi
+            if [ "$(date --utc --date "$updated" +%s)" -ge "$cutoff" ]; then continue; fi
+            case " $deployed " in *" $digest "*) echo "keep (deployed)  $digest"; continue ;; esac
+            if [ "$DRY_RUN" = "true" ]; then
+              echo "would delete     $digest  ($updated)"
+            else
+              echo "delete           $digest  ($updated)"
+              az acr repository delete --name "$registry" --image "$IMAGE_REPOSITORY@$digest" --yes --output none
+            fi
+            deleted=$((deleted + 1))
+          done < <(az acr manifest list-metadata --registry "$registry" --name "$IMAGE_REPOSITORY" \
+            --orderby time_desc --query '[].[digest, lastUpdateTime]' --output tsv 2>/dev/null || true)
+          echo "Images seen: $position. Selected for deletion: $deleted. Dry run: $DRY_RUN."
