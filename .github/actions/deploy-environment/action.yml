@@ -33,6 +33,18 @@ outputs:
 runs:
   using: composite
   steps:
+    # az downloads the Bicep CLI from GitHub on first use. When that download hiccups, `az deployment` only says
+    # "Expecting value: line 1 column 1"; installing it up front, with retries, fails clearly or not at all.
+    - name: Install the Bicep CLI
+      shell: bash
+      run: |
+        for attempt in 1 2 3 4 5; do
+          if az bicep install --only-show-errors && az bicep version --only-show-errors; then exit 0; fi
+          echo "Bicep CLI install failed (attempt $attempt), retrying..."
+          sleep $((attempt * 10))
+        done
+        echo "Could not install the Bicep CLI."; exit 1
+
     # The app keeps its current image during the first pass, so new code never runs against the old schema.
     # On the very first deployment there is no app yet, and the new image is used for both.
     - name: Find the running image
