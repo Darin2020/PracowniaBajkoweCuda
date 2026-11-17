@@ -1,7 +1,8 @@
 // Writes robots.txt and sitemap.xml into the built site (dist/frontend/browser), after `ng build`.
 //
-// The public origin comes from the PUBLIC_BASE_URL environment variable (default: https://example.com),
-// the same variable the prerenderer uses for canonical and hreflang URLs.
+// The URLs use a placeholder origin: the image is built once and promoted through every environment,
+// so the API replaces the placeholder with the real public origin when it serves these files.
+// Keep the placeholder in step with src/app/core/public-base-url.ts.
 import { existsSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -23,8 +24,7 @@ const PRIVATE_ROUTES = [
   'admin',
 ];
 
-const baseUrl =
-  (process.env.PUBLIC_BASE_URL ?? '').trim().replace(/\/+$/, '') || 'https://example.com';
+const baseUrl = 'https://public-base-url.invalid';
 const outDir = join(import.meta.dirname, '..', 'dist', 'frontend', 'browser');
 
 if (!existsSync(outDir)) {
@@ -81,4 +81,4 @@ const sitemap = [
 writeFileSync(join(outDir, 'robots.txt'), robots);
 writeFileSync(join(outDir, 'sitemap.xml'), sitemap);
 
-console.log(`robots.txt and sitemap.xml written for ${baseUrl} (${urls.length} URLs).`);
+console.log(`robots.txt and sitemap.xml written (${urls.length} URLs).`);

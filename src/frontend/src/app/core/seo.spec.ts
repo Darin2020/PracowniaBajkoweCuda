@@ -1,6 +1,6 @@
 import { LOCALE_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { PUBLIC_BASE_URL, normalizeBaseUrl } from './public-base-url';
+import { PUBLIC_BASE_URL } from './public-base-url';
 import { Seo } from './seo';
 
 describe('Seo', () => {
@@ -98,15 +98,5 @@ describe('Seo', () => {
     expect(head().querySelector('link[rel="alternate"]')).toBeNull();
     expect(head().querySelector('script#structured-data')).toBeNull();
     expect(head().querySelector('meta[name="description"]')).toBeNull();
-  });
-});
-
-describe('normalizeBaseUrl', () => {
-  it('strips trailing slashes', () => {
-    expect(normalizeBaseUrl('https://toys.test//')).toBe('https://toys.test');
-  });
-
-  it.each([undefined, '', '   '])('falls back to the placeholder origin for %j', (value) => {
-    expect(normalizeBaseUrl(value)).toBe('https://example.com');
   });
 });

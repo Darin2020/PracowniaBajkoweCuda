@@ -21,8 +21,12 @@ internal static class PublicSiteExtensions
         "application/xml",
     ];
 
-    public static IServiceCollection AddPublicSite(this IServiceCollection services)
+    public static IServiceCollection AddPublicSite(this IServiceCollection services, IConfiguration configuration)
     {
+        // Validated here, at startup: a deployment with a wrong public origin must fail, not serve wrong canonical URLs.
+        services.AddSingleton(PublicSiteOptions.FromConfiguration(configuration));
+        services.AddSingleton<PublicSiteFiles>();
+
         services.AddResponseCompression(options =>
         {
             options.EnableForHttps = true;
@@ -39,9 +43,18 @@ internal static class PublicSiteExtensions
     /// <summary>Serves the prerendered Angular site from <c>wwwroot</c>: language redirect, pages, assets.</summary>
     public static IApplicationBuilder UsePublicSite(this IApplicationBuilder app)
     {
+        var options = app.ApplicationServices.GetRequiredService<PublicSiteOptions>();
+        var files = app.ApplicationServices.GetRequiredService<PublicSiteFiles>();
+
         app.UseResponseCompression();
+
+        if (options.NoIndex)
+        {
+            app.UseMiddleware<NoIndexMiddleware>();
+        }
+
         app.UseMiddleware<LocalizedSiteMiddleware>();
-        app.UseStaticFiles(new StaticFileOptions { OnPrepareResponse = StaticAssetCaching.Apply });
+        app.UseStaticFiles(new StaticFileOptions { FileProvider = files, OnPrepareResponse = StaticAssetCaching.Apply });
 
         return app;
     }
