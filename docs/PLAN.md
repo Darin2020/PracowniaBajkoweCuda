@@ -531,7 +531,7 @@ Each phase ends with: green CI, updated README/DECISIONS, acceptance criteria de
   to Phase 3 (with the first migration), alerts to Phase 7, the ZAP scan to Phase 6.
 
 ### Phase 3 — Accounts & security baseline
-- [ ] Domain/Infrastructure: `ApplicationUser`, EF Core DbContext, first migration, migration Job in CD
+- [x] Domain/Infrastructure: `ApplicationUser`, EF Core DbContext, first migration, migration Job in CD
 - [ ] BFF cookie auth, antiforgery, `/api/auth/*`, `/api/account/*`, ProblemDetails error codes
 - [ ] Email outbox + dispatcher + SMTP/ACS senders + localized transactional templates
 - [ ] Google + Facebook login (config-gated), account linking rules, complete-profile step
