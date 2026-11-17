@@ -73,6 +73,10 @@ function Invoke-Gh {
     Invoke-Native -Tool 'gh' -Arguments @($args) -Label "gh $($args[0]) $($args[1]) $($args[2])" | Out-Null
 }
 
+function Invoke-Gh-Output {
+    Invoke-Native -Tool 'gh' -Arguments @($args) -Label "gh $($args -join ' ')"
+}
+
 function New-DeploymentIdentity {
     param([string] $Name, [string] $GitHubEnvironment)
 
@@ -80,12 +84,18 @@ function New-DeploymentIdentity {
     $identity = Invoke-Az identity show --name $Name --resource-group $SharedGroup --output json | ConvertFrom-Json
 
     # Only a job of this repository that runs in this GitHub environment can exchange its token for this identity.
+    # The subject must match the token exactly. GitHub's subject prefix is either "repo:owner/name" or, for
+    # repositories with immutable subjects, "repo:owner@ownerId/name@repoId" (it does not change if the repository
+    # is renamed or transferred). The repository reports the prefix it uses; it is read rather than guessed.
+    $prefix = Invoke-Gh-Output api "repos/$Repository/actions/oidc/customization/sub" --jq '.sub_claim_prefix // empty'
+    if ([string]::IsNullOrWhiteSpace($prefix)) { $prefix = "repo:$Repository" }
+
     Invoke-Az identity federated-credential create `
         --name "github-$GitHubEnvironment" `
         --identity-name $Name `
         --resource-group $SharedGroup `
         --issuer 'https://token.actions.githubusercontent.com' `
-        --subject "repo:${Repository}:environment:$GitHubEnvironment" `
+        --subject "${prefix}:environment:$GitHubEnvironment" `
         --audiences 'api://AzureADTokenExchange' `
         --output none
 
