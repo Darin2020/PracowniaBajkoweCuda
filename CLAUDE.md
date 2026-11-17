@@ -31,6 +31,7 @@ dotnet test --solution BajkoweCuda.sln     # Microsoft.Testing.Platform runner (
 dotnet run --project src/backend/BajkoweCuda.Api   # API on http://localhost:5080
 cd src/frontend && npm ci && npm start     # ng serve on :4200 with proxy (/api, /hubs, /health) to the API
 cd src/frontend && npm test && npm run lint && npm run format:check
+cd src/frontend && npm run audit           # npm audit; accepted advisories with a review date: audit-allowlist.json
 cd src/frontend && npm run build           # all 5 locales, prerendered, + robots.txt / sitemap.xml
 cd src/frontend && npm run i18n:extract    # after changing UI text: re-extract and merge src/locale/*.xlf
 npx @lhci/cli@0.16.1 autorun               # Lighthouse CI against http://localhost:8080 (.lighthouserc.json)

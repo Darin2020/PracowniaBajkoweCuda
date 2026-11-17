@@ -79,7 +79,7 @@ src/frontend                             Angular workspace
   src/locale                             translations (XLIFF) for de, fr, es, pl
 tests/                                   unit and integration tests
 scripts/smoke-test.sh                    checks a running instance (used by CI)
-infra/                                   Bicep: shared.bicep (registry), main.bicep (one environment), modules/
+infra/                                   Bicep: shared.bicep (registry, Container Apps env), main.bicep (one environment), modules/
 scripts/azure-bootstrap.ps1              one-time Azure + GitHub OIDC setup
 docs/                                    PLAN.md, DECISIONS.md, RUNBOOK.md
 .github/                                 workflows, Dependabot, PR template

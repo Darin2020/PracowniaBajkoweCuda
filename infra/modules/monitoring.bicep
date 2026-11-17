@@ -1,4 +1,5 @@
-// Log Analytics workspace (container logs) + workspace-based Application Insights (traces, metrics, logs).
+// Workspace-based Application Insights of one environment (requests, traces, metrics, logs).
+// Container console logs go to the shared environment's workspace (shared.bicep).
 
 param environmentName string
 param location string

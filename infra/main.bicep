@@ -19,8 +19,11 @@ param appVersion string
 @description('Name of the shared container registry (output of shared.bicep).')
 param registryName string
 
-@description('Resource group of the shared container registry.')
-param registryResourceGroup string = 'rg-bajkowecuda-shared'
+@description('Resource group of the shared resources (registry, Container Apps environment).')
+param sharedResourceGroup string = 'rg-bajkowecuda-shared'
+
+@description('Name of the shared Container Apps environment (output of shared.bicep).')
+param containerAppsEnvironmentName string = 'cae-bajkowecuda-shared'
 
 @description('Object id of the Entra user or group that administers the SQL server.')
 param sqlAdminObjectId string
@@ -83,7 +86,7 @@ module identity 'modules/identity.bicep' = {
 // The registry lives in the shared resource group, so the role assignment is deployed there.
 module registryAccess 'modules/registry-pull.bicep' = {
   name: 'registry-pull-${environmentName}'
-  scope: resourceGroup(registryResourceGroup)
+  scope: resourceGroup(sharedResourceGroup)
   params: {
     registryName: registryName
     principalId: identity.outputs.principalId
@@ -144,7 +147,8 @@ module app 'modules/container-app.bicep' = {
     registryLoginServer: registryAccess.outputs.registryLoginServer
     identityId: identity.outputs.id
     identityClientId: identity.outputs.clientId
-    logAnalyticsWorkspaceName: monitoring.outputs.workspaceName
+    containerAppsEnvironmentName: containerAppsEnvironmentName
+    sharedResourceGroup: sharedResourceGroup
     applicationInsightsConnectionString: monitoring.outputs.applicationInsightsConnectionString
     minReplicas: minReplicas
     noIndex: noIndex
