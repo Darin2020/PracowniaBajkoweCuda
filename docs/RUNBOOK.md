@@ -13,7 +13,10 @@ Infrastructure is described in `infra/` (Bicep); the pipeline is `.github/workfl
 | Search engines | blocked (`X-Robots-Tag`, `robots.txt`) | allowed |
 | Deployed | automatically after CI passes on `main` | after approval in the `production` GitHub environment |
 
-The container registry is shared (`rg-bajkowecuda-shared`). The image is **built once**; the same digest goes to
+The container registry and the Container Apps environment `cae-bajkowecuda-shared` are shared
+(`rg-bajkowecuda-shared`): the subscription allows one Container Apps environment per region, so both apps run in it.
+Everything else (identity, database, storage, Key Vault, email, Application Insights, budget) is per environment.
+The image is **built once**; the same digest goes to
 staging and then to production. The public origin is configuration (`PublicBaseUrl`), not part of the image.
 
 ## 1. Set up from zero
@@ -88,7 +91,7 @@ delete the database, deploy, then import. Do it before real data exists, or plan
 |---|---|
 | Change texts, prices, pictures | Edit `src/frontend/src/app/content/`, run `npm run i18n:extract`, translate, merge |
 | Change the public address (custom domain) | Set `publicBaseUrl` in the environment's `.bicepparam`, merge. Pages, `robots.txt` and `sitemap.xml` follow |
-| Read logs | Log Analytics workspace `log-bajkowecuda-<env>`, table `ContainerAppConsoleLogs_CL`; traces in Application Insights `appi-bajkowecuda-<env>` |
+| Read logs | Application logs and traces: Application Insights `appi-bajkowecuda-<env>`. Container console logs: workspace `log-bajkowecuda-shared`, table `ContainerAppConsoleLogs_CL`, filter `ContainerAppName_s == "ca-bajkowecuda-<env>"`; or Container App → Log stream |
 | Preview infrastructure changes | Open a PR that touches `infra/`: the *Infrastructure CI* workflow runs a what-if against staging (see its job log) |
 | Clean the registry | Weekly *Cleanup* workflow; it never deletes an image that staging or production is running |
 | Add a secret | `az keyvault secret set --vault-name <vault> ...`; the app identity can read secrets, nobody else is granted access by the templates |

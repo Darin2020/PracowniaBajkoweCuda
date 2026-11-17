@@ -1,5 +1,5 @@
-// Container Apps environment (Consumption) and the application: API, SignalR hub and the prerendered site
-// in one container (docs/PLAN.md §4).
+// The application: API, SignalR hub and the prerendered site in one container (docs/PLAN.md §4).
+// It runs in the shared Container Apps environment of shared.bicep.
 
 param environmentName string
 param location string
@@ -16,7 +16,11 @@ param identityId string
 @description('Client id of the application managed identity (selects it in DefaultAzureCredential).')
 param identityClientId string
 
-param logAnalyticsWorkspaceName string
+@description('Name of the shared Container Apps environment.')
+param containerAppsEnvironmentName string
+
+@description('Resource group of the shared Container Apps environment.')
+param sharedResourceGroup string
 
 @secure()
 param applicationInsightsConnectionString string
@@ -39,30 +43,9 @@ param emailSenderAddress string
 var appName = 'ca-bajkowecuda-${environmentName}'
 var containerPort = 8080
 
-resource workspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
-  name: logAnalyticsWorkspaceName
-}
-
-resource environment 'Microsoft.App/managedEnvironments@2024-03-01' = {
-  name: 'cae-bajkowecuda-${environmentName}'
-  location: location
-  tags: tags
-  properties: {
-    appLogsConfiguration: {
-      destination: 'log-analytics'
-      logAnalyticsConfiguration: {
-        customerId: workspace.properties.customerId
-        sharedKey: workspace.listKeys().primarySharedKey
-      }
-    }
-    workloadProfiles: [
-      {
-        name: 'Consumption'
-        workloadProfileType: 'Consumption'
-      }
-    ]
-    zoneRedundant: false
-  }
+resource environment 'Microsoft.App/managedEnvironments@2024-03-01' existing = {
+  name: containerAppsEnvironmentName
+  scope: resourceGroup(sharedResourceGroup)
 }
 
 // The default address is known from the environment's domain, so the app can be told its own public origin.

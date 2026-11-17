@@ -399,7 +399,8 @@ One resource group per environment (`rg-bajkowecuda-staging`, `rg-bajkowecuda-pr
 |---|---|---|
 | Log Analytics workspace + Application Insights | ✓ | ✓ |
 | Container Registry | shared, **Basic** (one registry for both, e.g. in a `rg-bajkowecuda-shared` group) | |
-| Container Apps environment (Consumption) + Container App | min replicas **0** | min replicas **1** (the chat worker and SignalR need a running instance, no cold start) |
+| Container Apps environment (Consumption) | shared, one for both in `rg-bajkowecuda-shared` (the subscription allows one per region; see DECISIONS 2026-11-17) | |
+| Container App | min replicas **0** | min replicas **1** (the chat worker and SignalR need a running instance, no cold start) |
 | User-assigned Managed Identity | ✓ (AcrPull, Key Vault Secrets User, Storage Blob Data Contributor, SQL access) | ✓ |
 | Azure SQL logical server (Entra admin) + database | **Free offer** serverless DB, auto-pause when the free limit is reached | **Basic (DTU)** tier: small fixed monthly price, always on, no auto-pause cold starts. Alternative: free offer with *continue billing* + budget alert. Owner decides (see §16) |
 | Storage account (blob containers `attachments`, `order-photos`; shared key disabled) | ✓ | ✓ + soft delete |

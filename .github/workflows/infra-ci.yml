@@ -57,6 +57,7 @@ jobs:
       SHARED_RESOURCE_GROUP: rg-bajkowecuda-shared
       RESOURCE_GROUP: rg-bajkowecuda-staging
       APP_NAME: ca-bajkowecuda-staging
+      ENVIRONMENT_NAME: cae-bajkowecuda-shared
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -81,6 +82,11 @@ jobs:
           REGISTRY_NAME="$(az acr list --resource-group "$SHARED_RESOURCE_GROUP" --query '[0].name' --output tsv)"
           if [ -z "$REGISTRY_NAME" ]; then
             echo "The shared registry does not exist yet: nothing to compare against. Run the CD workflow first."
+            exit 0
+          fi
+          if ! az containerapp env show --resource-group "$SHARED_RESOURCE_GROUP" --name "$ENVIRONMENT_NAME" \
+            --query id --output tsv > /dev/null 2>&1; then
+            echo "The shared Container Apps environment does not exist yet (see the shared what-if above). Run the CD workflow first."
             exit 0
           fi
           CONTAINER_IMAGE="$(az containerapp show --resource-group "$RESOURCE_GROUP" --name "$APP_NAME" \

@@ -149,3 +149,19 @@ See `docs/PLAN.md` §2 for the full table. Summary:
   credentials, but secrets are masked in the logs of this public repository.
 - **Registry cleanup never deletes an image that an environment is running**, and stops if it cannot tell.
 - **Dependabot ignores major versions of the `dotnet/sdk` and `dotnet/aspnet` images**: the project is pinned to .NET 10.
+
+## 2026-11-17 — One Container Apps environment for staging and production
+
+**Deviation from PLAN §10, approved by the owner.** The first production deployment failed with
+`MaxNumberOfRegionalEnvironmentsInSubExceeded`: the subscription may have only one Container Apps environment per
+region. The options were a quota increase request (days, may be refused for a new subscription), production in another
+region (every database call across regions), or one shared environment. The owner chose the shared environment.
+- `shared.bicep` now also creates `cae-bajkowecuda-shared` (Consumption) and its Log Analytics workspace
+  `log-bajkowecuda-shared`. `main.bicep` places `ca-bajkowecuda-<env>` in it; the app keeps its own identity, database,
+  storage, Key Vault, email, Application Insights and budget.
+- What is shared: container console and system logs (one workspace; filter by app name) and the environment settings.
+  Application telemetry stays per environment in Application Insights. A Consumption environment has no fixed cost.
+- An existing app cannot move to another environment, so the staging app and its old environment were deleted once
+  before the first deployment with this layout.
+- If the quota is raised later, separate environments are a small change: the app module only references the
+  environment by name and resource group (`containerAppsEnvironmentName`, `sharedResourceGroup`).
