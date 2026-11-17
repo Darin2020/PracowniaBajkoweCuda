@@ -24,28 +24,31 @@ Record the decisions you make along the way in `docs/DECISIONS.md` (short ADR-st
 ## Commands (keep this section current once the projects exist)
 ```bash
 docker compose up -d                       # SQL Server, Azurite, Mailpit
-docker compose --profile app up -d --build # + the application image on http://localhost:8080
-scripts/smoke-test.sh http://localhost:8080 # checks a running instance (redirect, pages per locale, headers)
+docker compose --profile app up -d --build # + `migrate` (one-shot) and the application image on http://localhost:8080
+scripts/smoke-test.sh http://localhost:8080 # checks a running instance (health/ready, redirect, pages per locale, headers)
 dotnet build BajkoweCuda.sln
-dotnet test --solution BajkoweCuda.sln     # Microsoft.Testing.Platform runner (see global.json)
-dotnet run --project src/backend/BajkoweCuda.Api   # API on http://localhost:5080
+dotnet test --solution BajkoweCuda.sln     # Microsoft.Testing.Platform runner (see global.json); DB tests need Docker
+dotnet run --project src/backend/BajkoweCuda.Api   # API on http://localhost:5080 (needs ConnectionStrings:Sql in user-secrets)
+dotnet run --project src/backend/BajkoweCuda.Api -- migrate   # apply EF Core migrations and exit
 cd src/frontend && npm ci && npm start     # ng serve on :4200 with proxy (/api, /hubs, /health) to the API
 cd src/frontend && npm test && npm run lint && npm run format:check
 cd src/frontend && npm run audit           # npm audit; accepted advisories with a review date: audit-allowlist.json
 cd src/frontend && npm run build           # all 5 locales, prerendered, + robots.txt / sitemap.xml
 cd src/frontend && npm run i18n:extract    # after changing UI text: re-extract and merge src/locale/*.xlf
 npx @lhci/cli@0.16.1 autorun               # Lighthouse CI against http://localhost:8080 (.lighthouserc.json)
-dotnet ef migrations add <Name> -p src/backend/BajkoweCuda.Infrastructure -s src/backend/BajkoweCuda.Api
+dotnet ef migrations add <Name> -p src/backend/BajkoweCuda.Infrastructure -s src/backend/BajkoweCuda.Infrastructure -o Persistence/Migrations
 az bicep build --file infra/main.bicep --stdout   # compile-check the infrastructure (also infra/shared.bicep)
 ```
 Deployment is done by `.github/workflows/cd.yml` only (never by hand); operations are in `docs/RUNBOOK.md`.
 
 On the owner's Windows machine Smart App Control blocks freshly built .NET binaries, so `dotnet test` and `dotnet run`
 do not work there. Build with `dotnet build`, run the backend tests in a container, and run the application itself with
-`docker compose --profile app up -d --build`:
+`docker compose --profile app up -d --build`. The Docker socket lets Testcontainers start SQL Server for the DB tests:
 ```bash
-docker run --rm -v "${PWD}:/src:ro" -w /src -v bajkowecuda-nuget:/root/.nuget/packages mcr.microsoft.com/dotnet/sdk:10.0 dotnet test --solution BajkoweCuda.sln --artifacts-path /tmp/artifacts
+docker run --rm -v "${PWD}:/src:ro" -w /src -v bajkowecuda-nuget:/root/.nuget/packages -v //var/run/docker.sock:/var/run/docker.sock -e TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal mcr.microsoft.com/dotnet/sdk:10.0 dotnet test --solution BajkoweCuda.sln --artifacts-path /tmp/artifacts
 ```
+Adding a migration works the same way: copy the repository inside the container (`cp -r /src /work`, delete `bin`/`obj`,
+`dotnet restore`), install `dotnet-ef` 10.0.x, run the `dotnet ef` command above and copy `Persistence/Migrations` back.
 
 ## Rules
 - **Secrets never go into the repo.** Locally: `dotnet user-secrets` / `.env` (git-ignored, with `.env.example` committed). Azure: Key Vault + Managed Identity.

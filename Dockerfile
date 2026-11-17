@@ -42,9 +42,11 @@ COPY src/backend/ src/backend/
 COPY tests/ tests/
 
 # CI runs the tests in its own job; pass RUN_TESTS=true to run them as part of the image build.
+# Tests that need a SQL Server container (Testcontainers) are skipped here: there is no Docker inside a build.
 ARG RUN_TESTS=false
 RUN if [ "$RUN_TESTS" = "true" ]; then \
-      dotnet test --solution BajkoweCuda.sln --configuration Release --no-restore; \
+      dotnet test --solution BajkoweCuda.sln --configuration Release --no-restore \
+        --filter-not-trait "Category=Database"; \
     fi
 
 RUN dotnet publish src/backend/BajkoweCuda.Api/BajkoweCuda.Api.csproj \

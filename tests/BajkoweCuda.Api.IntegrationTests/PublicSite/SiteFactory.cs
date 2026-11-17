@@ -51,12 +51,22 @@ public sealed class SiteFactory : WebApplicationFactory<Program>
 
     public static string Sitemap(string origin = PublicOrigin) => $"<urlset><url><loc>{origin}/en/</loc></url></urlset>";
 
+    /// <summary>
+    /// A database that refuses connections at once. The app needs a connection string to start; tests that do not
+    /// use the database never open it.
+    /// </summary>
+    public const string UnreachableDatabase =
+        "Server=127.0.0.1,1;Database=Unused;Connect Timeout=2;ConnectRetryCount=0;TrustServerCertificate=True";
+
     public HttpClient CreateSiteClient() => CreateSiteClient(this);
 
     /// <summary>The same site with extra configuration, for example <c>Seo:NoIndex</c>.</summary>
-    public HttpClient CreateSiteClient(params (string Key, string Value)[] settings)
-    {
-        var factory = WithWebHostBuilder(builder =>
+    public HttpClient CreateSiteClient(params (string Key, string Value)[] settings) =>
+        CreateSiteClient(WithSettings(settings));
+
+    /// <summary>The same application with extra configuration, for tests that also need its services.</summary>
+    public WebApplicationFactory<Program> WithSettings(params (string Key, string Value)[] settings) =>
+        WithWebHostBuilder(builder =>
         {
             foreach (var (key, value) in settings)
             {
@@ -64,14 +74,12 @@ public sealed class SiteFactory : WebApplicationFactory<Program>
             }
         });
 
-        return CreateSiteClient(factory);
-    }
-
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseWebRoot(_webRoot);
         builder.UseSetting("PublicBaseUrl", PublicOrigin);
         builder.UseSetting("APP_VERSION", AppVersion);
+        builder.UseSetting("ConnectionStrings:Sql", UnreachableDatabase);
     }
 
     protected override void Dispose(bool disposing)

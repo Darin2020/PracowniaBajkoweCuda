@@ -1,7 +1,14 @@
+using BajkoweCuda.Api.Database;
 using BajkoweCuda.Api.Health;
 using BajkoweCuda.Api.Hosting;
 using BajkoweCuda.Api.Observability;
 using BajkoweCuda.Api.Security;
+using BajkoweCuda.Infrastructure.Persistence;
+
+if (MigrateCommand.IsRequested(args))
+{
+    return await MigrateCommand.RunAsync(args);
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +16,8 @@ builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
 builder.AddObservability();
 builder.Services.AddProblemDetails();
-builder.Services.AddHealthChecks();
+builder.Services.AddPersistence(builder.Configuration);
+builder.Services.AddHealth();
 builder.Services.AddPublicSite(builder.Configuration);
 
 var app = builder.Build();
@@ -32,4 +40,6 @@ app.UsePublicSite();
 app.MapHealthEndpoints();
 app.MapVersionEndpoint();
 
-app.Run();
+await app.RunAsync();
+
+return 0;

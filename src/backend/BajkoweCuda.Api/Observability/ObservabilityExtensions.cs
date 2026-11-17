@@ -18,7 +18,8 @@ internal static class ObservabilityExtensions
     /// (server side only; there is no browser telemetry).
     /// Rule for callers: never log message bodies, full email addresses, tokens or file contents.
     /// </summary>
-    public static WebApplicationBuilder AddObservability(this WebApplicationBuilder builder)
+    public static TBuilder AddObservability<TBuilder>(this TBuilder builder)
+        where TBuilder : IHostApplicationBuilder
     {
         var version = AppVersion.FromConfiguration(builder.Configuration);
         var environment = builder.Environment;
@@ -35,6 +36,8 @@ internal static class ObservabilityExtensions
                     .MinimumLevel.Information()
                     .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                     .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+                    // Every SQL command would otherwise be an Information event; failures are still logged.
+                    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
                     .Enrich.FromLogContext()
                     .Enrich.WithProperty("AppVersion", version.Value)
                     .Enrich.WithProperty("Environment", environment.EnvironmentName);

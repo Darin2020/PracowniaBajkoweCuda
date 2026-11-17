@@ -16,6 +16,16 @@ param containerImage string
 @description('Version shown by /api/version and in the logs: the git commit the image was built from.')
 param appVersion string
 
+@description('''Image of the migration job. The pipeline deploys twice: first with the new image here and the
+running image in containerImage (the schema is migrated before new code runs), then with the new image in both.''')
+param migrationImage string = containerImage
+
+@description('Version (git commit) of migrationImage.')
+param migrationVersion string = appVersion
+
+@description('Name of the migration identity, created by scripts/azure-bootstrap.ps1 in this resource group.')
+param migratorIdentityName string = 'id-bajkowecuda-migrator-${environmentName}'
+
 @description('Name of the shared container registry (output of shared.bicep).')
 param registryName string
 
@@ -25,12 +35,12 @@ param sharedResourceGroup string = 'rg-bajkowecuda-shared'
 @description('Name of the shared Container Apps environment (output of shared.bicep).')
 param containerAppsEnvironmentName string = 'cae-bajkowecuda-shared'
 
-@description('Object id of the Entra user or group that administers the SQL server.')
+@description('Object id of the Entra group that administers the SQL server (sg-bajkowecuda-sql-admins-<env>).')
 param sqlAdminObjectId string
 
 @description('Type of the SQL administrator principal.')
 @allowed(['User', 'Group', 'Application'])
-param sqlAdminPrincipalType string = 'User'
+param sqlAdminPrincipalType string = 'Group'
 
 @description('true: free serverless database (auto-pauses when the monthly free limit is used up). false: Basic (DTU) tier.')
 param sqlUseFreeOffer bool = true
@@ -162,6 +172,27 @@ module app 'modules/container-app.bicep' = {
   }
 }
 
+module migrationJob 'modules/migration-job.bicep' = {
+  name: 'migration-job'
+  params: {
+    environmentName: environmentName
+    location: location
+    tags: tags
+    containerImage: migrationImage
+    appVersion: migrationVersion
+    registryLoginServer: registryAccess.outputs.registryLoginServer
+    containerAppsEnvironmentName: containerAppsEnvironmentName
+    sharedResourceGroup: sharedResourceGroup
+    appIdentityId: identity.outputs.id
+    appIdentityName: identity.outputs.name
+    appIdentityClientId: identity.outputs.clientId
+    migratorIdentityName: migratorIdentityName
+    applicationInsightsConnectionString: monitoring.outputs.applicationInsightsConnectionString
+    sqlServerFqdn: sql.outputs.serverFqdn
+    sqlDatabaseName: sql.outputs.databaseName
+  }
+}
+
 module budget 'modules/budget.bicep' = {
   name: 'budget'
   params: {
@@ -175,6 +206,7 @@ module budget 'modules/budget.bicep' = {
 output appUrl string = app.outputs.url
 
 output appName string = app.outputs.name
+output migrationJobName string = migrationJob.outputs.name
 output identityName string = identity.outputs.name
 output sqlServerFqdn string = sql.outputs.serverFqdn
 output keyVaultName string = keyVault.outputs.name
