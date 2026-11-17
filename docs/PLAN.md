@@ -516,15 +516,18 @@ Each phase ends with: green CI, updated README/DECISIONS, acceptance criteria de
   (image build, Trivy, Lighthouse) on GitHub. Content, prices, contact details and images are placeholders (§16).
 
 ### Phase 2 — Azure + CD (deploy early)
-- [ ] Bicep modules for §10 (DB/Storage/ACS can be included now even though they are not used yet)
-- [ ] OIDC federation, GitHub Environments, `infra-ci.yml`, `cd.yml` (build once → staging → approval → prod), smoke tests, `cleanup.yml`
+- [x] Bicep modules for §10 (DB/Storage/ACS can be included now even though they are not used yet)
+- [x] OIDC federation, GitHub Environments, `infra-ci.yml`, `cd.yml` (build once → staging → approval → prod), smoke tests, `cleanup.yml`
 - [x] App Insights + Serilog wired up. `/api/version`. Staging noindex
 - [x] `docs/RUNBOOK.md` (first version: setup from zero, deploy, rollback)
 - **AC:** a merge to `main` deploys the public site to staging automatically and to production after approval. Rollback documented and tested once. Budget alert exists.
-- **Status (2026-11-16): bootstrapped, not deployed yet.** `scripts/azure-bootstrap.ps1` has run: resource groups,
-  deployment identities with federated credentials, role assignments and the GitHub secrets exist. An Azure what-if of
-  `shared.bicep` and of `main.bicep` for staging succeeds (registry + 17 resources to create). No deployment has run yet:
-  the first two items stay open until `cd.yml` has deployed staging and production. Scope notes: the migration job moves
+- **AC status (2026-11-17): met.** CD run for `63b2dcb` built the image once and deployed it
+  to staging and, after approval, to production. Both run in the shared Container Apps environment (subscription quota:
+  one per region, see DECISIONS 2026-11-17). Checked: `/api/version` shows the commit, `/` redirects by language,
+  canonical URLs use each environment's own address, staging sends `X-Robots-Tag: noindex` and a disallow-all
+  `robots.txt`, production does not. Budgets exist (staging 10, production 20). Rollback tested: *CD → Run workflow*
+  with the digest of `162f60f` rolled staging and, after approval, production back (checked with `/api/version`);
+  the same with the digest of `63b2dcb` rolled them forward again. Scope notes: the migration job moves
   to Phase 3 (with the first migration), alerts to Phase 7, the ZAP scan to Phase 6.
 
 ### Phase 3 — Accounts & security baseline
