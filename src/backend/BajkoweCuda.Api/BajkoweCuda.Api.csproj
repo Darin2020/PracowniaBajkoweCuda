@@ -5,6 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Formatting.Compact" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BajkoweCuda.Application\BajkoweCuda.Application.csproj" />
     <ProjectReference Include="..\BajkoweCuda.Infrastructure\BajkoweCuda.Infrastructure.csproj" />
   </ItemGroup>
