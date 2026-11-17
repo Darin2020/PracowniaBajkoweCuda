@@ -59,6 +59,13 @@ updates:
     commit-message:
       prefix: chore
       include: scope
+    ignore:
+      # The project is pinned to .NET 10 LTS (global.json, TargetFramework). A newer major of the SDK or
+      # runtime image cannot build it, so it is raised by hand together with the target framework.
+      - dependency-name: dotnet/sdk
+        update-types: ["version-update:semver-major"]
+      - dependency-name: dotnet/aspnet
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: docker-compose
     directory: /

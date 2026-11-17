@@ -1,0 +1,178 @@
+name: CD
+
+# Build once, promote the same image digest: staging automatically, production after manual approval.
+# Azure login uses OIDC (federated credentials): there are no cloud secrets in GitHub.
+# Setup and operations: docs/RUNBOOK.md.
+
+on:
+  # After a successful CI run on main.
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  # Manual run: deploy the current commit, or roll back to an image that is already in the registry.
+  workflow_dispatch:
+    inputs:
+      image_digest:
+        description: "Rollback: digest (sha256:...) of an image already in the registry. Empty: build this commit."
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+# One deployment at a time; a newer run waits instead of cancelling a deployment in progress.
+concurrency:
+  group: cd
+  cancel-in-progress: false
+
+env:
+  SHARED_RESOURCE_GROUP: rg-bajkowecuda-shared
+  IMAGE_REPOSITORY: bajkowecuda
+
+jobs:
+  build:
+    name: Build and push image
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: staging
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      image: ${{ steps.image.outputs.image }}
+      version: ${{ steps.image.outputs.version }}
+      registry-name: ${{ steps.registry.outputs.name }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - uses: azure/login@053f7285eb20bf5469ef084617b0b24d3cec53fc # v3.1.0
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy shared resources (container registry)
+        id: registry
+        run: |
+          set -euo pipefail
+          outputs="$(az deployment group create \
+            --resource-group "$SHARED_RESOURCE_GROUP" \
+            --name "shared-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+            --template-file infra/shared.bicep \
+            --query properties.outputs \
+            --output json)"
+          echo "name=$(jq --raw-output .registryName.value <<<"$outputs")" >> "$GITHUB_OUTPUT"
+          echo "login-server=$(jq --raw-output .registryLoginServer.value <<<"$outputs")" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to the registry
+        env:
+          REGISTRY_NAME: ${{ steps.registry.outputs.name }}
+        run: az acr login --name "$REGISTRY_NAME"
+
+      - name: Build and push
+        if: inputs.image_digest == ''
+        env:
+          LOGIN_SERVER: ${{ steps.registry.outputs.login-server }}
+        run: |
+          set -euo pipefail
+          version="$(git rev-parse HEAD)"
+          repository="$LOGIN_SERVER/$IMAGE_REPOSITORY"
+          docker build --build-arg "APP_VERSION=$version" --tag "$repository:$version" --tag "$repository:latest" .
+          docker push --all-tags "$repository"
+
+      # The digest, not a tag, identifies the image from here on: exactly these bytes go to every environment.
+      - name: Resolve image digest and version
+        id: image
+        env:
+          LOGIN_SERVER: ${{ steps.registry.outputs.login-server }}
+          REQUESTED_DIGEST: ${{ inputs.image_digest }}
+        run: |
+          set -euo pipefail
+          repository="$LOGIN_SERVER/$IMAGE_REPOSITORY"
+          if [ -n "$REQUESTED_DIGEST" ]; then
+            if ! [[ "$REQUESTED_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+              echo "image_digest must look like sha256:<64 hex characters>."; exit 1
+            fi
+            image="$repository@$REQUESTED_DIGEST"
+            docker pull --quiet "$image"
+          else
+            image="$(docker inspect --format '{{index .RepoDigests 0}}' "$repository:$(git rev-parse HEAD)")"
+          fi
+          version="$(docker inspect --format '{{index .Config.Labels "org.opencontainers.image.revision"}}' "$image")"
+          echo "image=$image" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "### Image" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`$image\` (version \`$version\`)" >> "$GITHUB_STEP_SUMMARY"
+
+  staging:
+    name: Deploy to staging
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: staging
+      url: ${{ steps.deploy.outputs.app-url }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - uses: azure/login@053f7285eb20bf5469ef084617b0b24d3cec53fc # v3.1.0
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy and smoke test
+        id: deploy
+        uses: ./.github/actions/deploy-environment
+        with:
+          resource-group: rg-bajkowecuda-staging
+          parameters-file: infra/main.staging.bicepparam
+          image: ${{ needs.build.outputs.image }}
+          version: ${{ needs.build.outputs.version }}
+          registry-name: ${{ needs.build.outputs.registry-name }}
+          sql-admin-object-id: ${{ secrets.SQL_ADMIN_OBJECT_ID }}
+
+  production:
+    name: Deploy to production
+    needs: [build, staging]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # The `production` environment has a required reviewer: the job waits here for approval.
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.app-url }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - uses: azure/login@053f7285eb20bf5469ef084617b0b24d3cec53fc # v3.1.0
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy and smoke test
+        id: deploy
+        uses: ./.github/actions/deploy-environment
+        with:
+          resource-group: rg-bajkowecuda-prod
+          parameters-file: infra/main.prod.bicepparam
+          image: ${{ needs.build.outputs.image }}
+          version: ${{ needs.build.outputs.version }}
+          registry-name: ${{ needs.build.outputs.registry-name }}
+          sql-admin-object-id: ${{ secrets.SQL_ADMIN_OBJECT_ID }}

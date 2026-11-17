@@ -1,0 +1,81 @@
+name: Deploy environment
+description: >
+  Deploys infra/main.bicep with one image digest to one environment, waits until that build serves traffic
+  and runs the smoke test. The caller must be logged in to Azure (azure/login) already.
+
+inputs:
+  resource-group:
+    description: Resource group of the environment.
+    required: true
+  parameters-file:
+    description: Path of the .bicepparam file of the environment.
+    required: true
+  image:
+    description: "Full image reference pinned by digest: <registry>/<repository>@sha256:..."
+    required: true
+  version:
+    description: Version (git commit) the image was built from.
+    required: true
+  registry-name:
+    description: Name of the shared container registry.
+    required: true
+  sql-admin-object-id:
+    description: Object id of the Entra principal that administers the SQL server.
+    required: true
+
+outputs:
+  app-url:
+    description: Public URL of the deployed application.
+    value: ${{ steps.deploy.outputs.app-url }}
+
+runs:
+  using: composite
+  steps:
+    - name: Deploy Bicep
+      id: deploy
+      shell: bash
+      env:
+        RESOURCE_GROUP: ${{ inputs.resource-group }}
+        PARAMETERS_FILE: ${{ inputs.parameters-file }}
+        # Read by the .bicepparam file (readEnvironmentVariable).
+        CONTAINER_IMAGE: ${{ inputs.image }}
+        APP_VERSION: ${{ inputs.version }}
+        REGISTRY_NAME: ${{ inputs.registry-name }}
+        SQL_ADMIN_OBJECT_ID: ${{ inputs.sql-admin-object-id }}
+      run: |
+        set -euo pipefail
+        app_url="$(az deployment group create \
+          --resource-group "$RESOURCE_GROUP" \
+          --name "main-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+          --parameters "$PARAMETERS_FILE" \
+          --query properties.outputs.appUrl.value \
+          --output tsv)"
+        echo "app-url=$app_url" >> "$GITHUB_OUTPUT"
+        echo "Deployed to $app_url"
+
+    # A new revision takes a moment to start (and staging may be scaled to zero), so wait for the new build
+    # to answer before judging it.
+    - name: Wait for the new build to serve traffic
+      shell: bash
+      env:
+        APP_URL: ${{ steps.deploy.outputs.app-url }}
+        EXPECTED_VERSION: ${{ inputs.version }}
+      run: |
+        set -euo pipefail
+        for attempt in $(seq 1 60); do
+          body="$(curl --silent --max-time 10 "$APP_URL/api/version" || true)"
+          if grep --quiet --fixed-strings "\"version\":\"$EXPECTED_VERSION\"" <<<"$body"; then
+            echo "Version $EXPECTED_VERSION is live."
+            exit 0
+          fi
+          sleep 5
+        done
+        echo "Version $EXPECTED_VERSION did not go live within 5 minutes. Last answer: $body"
+        exit 1
+
+    - name: Smoke test
+      shell: bash
+      env:
+        APP_URL: ${{ steps.deploy.outputs.app-url }}
+        EXPECTED_VERSION: ${{ inputs.version }}
+      run: bash scripts/smoke-test.sh "$APP_URL"

@@ -103,7 +103,6 @@ jobs:
         run: >
           docker build
           --build-arg "APP_VERSION=$APP_VERSION"
-          --build-arg PUBLIC_BASE_URL=http://localhost:8080
           --tag bajkowecuda:ci .
 
       - name: Trivy (fail on HIGH/CRITICAL with a fix available)
@@ -118,7 +117,7 @@ jobs:
       # Same restrictions as production: read-only root file system, no capabilities.
       - name: Start container
         run: |
-          docker run --detach --name app --read-only --tmpfs /tmp --cap-drop ALL --security-opt no-new-privileges --publish 8080:8080 bajkowecuda:ci
+          docker run --detach --name app --read-only --tmpfs /tmp --cap-drop ALL --security-opt no-new-privileges --env PublicBaseUrl=http://localhost:8080 --publish 8080:8080 bajkowecuda:ci
           for attempt in $(seq 1 30); do
             if curl --silent --fail --output /dev/null http://localhost:8080/health/live; then exit 0; fi
             sleep 1

@@ -1,0 +1,95 @@
+name: Infrastructure CI
+
+# Checks Bicep changes before they are merged: compile + lint, then a what-if against staging
+# that shows what the deployment would change, without changing anything.
+
+on:
+  pull_request:
+    paths:
+      - infra/**
+      - .github/workflows/infra-ci.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: infra-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Bicep build and lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      # The .bicepparam files read these; any value will do to compile them.
+      CONTAINER_IMAGE: example.azurecr.io/bajkowecuda@sha256:0000000000000000000000000000000000000000000000000000000000000000
+      APP_VERSION: validate
+      REGISTRY_NAME: crexample
+      SQL_ADMIN_OBJECT_ID: 00000000-0000-0000-0000-000000000000
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Build and lint
+        run: |
+          set -euo pipefail
+          az bicep install
+          for template in infra/shared.bicep infra/main.bicep; do
+            az bicep build --file "$template" --stdout > /dev/null
+            az bicep lint --file "$template"
+          done
+          for parameters in infra/main.staging.bicepparam infra/main.prod.bicepparam; do
+            az bicep build-params --file "$parameters" --stdout > /dev/null
+          done
+
+  what-if:
+    name: What-if against staging
+    needs: validate
+    # Secrets are not available to pull requests from forks or from Dependabot.
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: staging
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      SHARED_RESOURCE_GROUP: rg-bajkowecuda-shared
+      RESOURCE_GROUP: rg-bajkowecuda-staging
+      APP_NAME: ca-bajkowecuda-staging
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: azure/login@053f7285eb20bf5469ef084617b0b24d3cec53fc # v3.1.0
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Shared resources
+        run: |
+          az deployment group what-if \
+            --resource-group "$SHARED_RESOURCE_GROUP" \
+            --template-file infra/shared.bicep
+
+      # The image and version currently deployed are reused, so the what-if shows infrastructure changes only.
+      - name: Staging environment
+        env:
+          SQL_ADMIN_OBJECT_ID: ${{ secrets.SQL_ADMIN_OBJECT_ID }}
+        run: |
+          set -euo pipefail
+          REGISTRY_NAME="$(az acr list --resource-group "$SHARED_RESOURCE_GROUP" --query '[0].name' --output tsv)"
+          if [ -z "$REGISTRY_NAME" ]; then
+            echo "The shared registry does not exist yet: nothing to compare against. Run the CD workflow first."
+            exit 0
+          fi
+          CONTAINER_IMAGE="$(az containerapp show --resource-group "$RESOURCE_GROUP" --name "$APP_NAME" \
+            --query 'properties.template.containers[0].image' --output tsv 2>/dev/null || true)"
+          APP_VERSION="$(az containerapp show --resource-group "$RESOURCE_GROUP" --name "$APP_NAME" \
+            --query "properties.template.containers[0].env[?name=='APP_VERSION'].value | [0]" --output tsv 2>/dev/null || true)"
+          export REGISTRY_NAME
+          export CONTAINER_IMAGE="${CONTAINER_IMAGE:-mcr.microsoft.com/dotnet/samples:aspnetapp}"
+          export APP_VERSION="${APP_VERSION:-what-if}"
+          az deployment group what-if \
+            --resource-group "$RESOURCE_GROUP" \
+            --parameters infra/main.staging.bicepparam
