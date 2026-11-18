@@ -1,7 +1,7 @@
 namespace BajkoweCuda.Api.Hosting;
 
 /// <summary>Per-environment settings of the public site (docs/PLAN.md §14).</summary>
-internal sealed class PublicSiteOptions
+public sealed class PublicSiteOptions
 {
     public const string PublicBaseUrlKey = "PublicBaseUrl";
     public const string NoIndexKey = "Seo:NoIndex";
