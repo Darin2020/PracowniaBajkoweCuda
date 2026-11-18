@@ -263,7 +263,9 @@ After that date the build fails again; an entry that is no longer reported is fl
   factor. Without it the answer is `403 auth.mfa_required`, so the frontend can send an admin to the 2FA setup.
   `Features:RequireAdminMfa=false` is accepted in Development only; the app refuses to start with it elsewhere.
 - **2FA is TOTP for everybody who wants it, mandatory for admins.** Enabling it with a first valid code turns the
-  current session into an `amr=mfa` session (keeping its sign-in time) and returns 10 recovery codes. Between the
+  current session into an `amr=mfa` session (keeping its sign-in time) and returns 10 recovery codes. A recovery code
+  signs in through its own endpoint, `POST 2fa/recovery-login` (not a flag on `2fa/login`: CodeQL rightly dislikes a
+  request value choosing the verification method). Between the
   password and the code, Identity's two-factor cookie is `__Host-bc.2fa` (SameSite=Strict, 5 minutes).
 - **Audit log** (`AuditLog` table, bigint identity as order and paging cursor): registration, email confirmation,
   sign-ins and failed sign-ins (unknown addresses are stored masked), 2FA changes, password reset/change, failed

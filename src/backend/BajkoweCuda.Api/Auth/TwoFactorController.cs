@@ -93,7 +93,7 @@ public sealed partial class TwoFactorController(
     [HttpPost("login")]
     [AllowAnonymous]
     [EnableRateLimiting(RateLimiting.Auth)]
-    public async Task<IActionResult> Login(TwoFactorLoginRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Login(TwoFactorCodeRequest request, CancellationToken cancellationToken)
     {
         // Who passed the password step is kept in the short-lived two-factor cookie.
         var user = await signIn.GetTwoFactorAuthenticationUserAsync();
@@ -102,17 +102,34 @@ public sealed partial class TwoFactorController(
             return AuthErrors.InvalidCredentials.ToResult();
         }
 
-        var result = request.IsRecoveryCode
-            ? await signIn.TwoFactorRecoveryCodeSignInAsync(request.Code.Trim())
-            : await signIn.TwoFactorAuthenticatorSignInAsync(AuthenticatorCode(request.Code), isPersistent: true, rememberClient: false);
+        var result = await signIn.TwoFactorAuthenticatorSignInAsync(AuthenticatorCode(request.Code), isPersistent: true, rememberClient: false);
+        return await FinishSecondFactorAsync(user, result, "authenticator", cancellationToken);
+    }
 
+    /// <summary>The second step with a one-time recovery code instead of the authenticator app.</summary>
+    [HttpPost("recovery-login")]
+    [AllowAnonymous]
+    [EnableRateLimiting(RateLimiting.Auth)]
+    public async Task<IActionResult> RecoveryLogin(TwoFactorCodeRequest request, CancellationToken cancellationToken)
+    {
+        var user = await signIn.GetTwoFactorAuthenticationUserAsync();
+        if (user is null || user.IsDeleted)
+        {
+            return AuthErrors.InvalidCredentials.ToResult();
+        }
+
+        var result = await signIn.TwoFactorRecoveryCodeSignInAsync(request.Code.Trim());
+        return await FinishSecondFactorAsync(user, result, "recovery_code", cancellationToken);
+    }
+
+    private async Task<IActionResult> FinishSecondFactorAsync(ApplicationUser user, Microsoft.AspNetCore.Identity.SignInResult result, string method, CancellationToken cancellationToken)
+    {
         if (!result.Succeeded)
         {
-            await audit.WriteAsync(AuditActions.TwoFactorLoginFailed, user.Id, details: new { lockedOut = result.IsLockedOut }, cancellationToken: cancellationToken);
+            await audit.WriteAsync(AuditActions.TwoFactorLoginFailed, user.Id, details: new { method, lockedOut = result.IsLockedOut }, cancellationToken: cancellationToken);
             return AuthErrors.InvalidTwoFactorCode.ToResult();
         }
 
-        var method = request.IsRecoveryCode ? "recovery_code" : "authenticator";
         await audit.WriteAsync(AuditActions.LoginSucceeded, user.Id, details: new { method }, cancellationToken: cancellationToken);
         return Ok(await this.CompleteSignInAsync(signIn, users, user, logger));
     }

@@ -111,7 +111,7 @@ public sealed class AdminAndTwoFactorTests(AuthApp app) : IClassFixture<AuthApp>
         {
             (await AuthApp.PostAsync(client, "/api/auth/logout", new { })).Dispose();
             (await AuthApp.LoginAsync(client, email)).Dispose();
-            using var login = await AuthApp.PostAsync(client, "/api/auth/2fa/login", new { code, isRecoveryCode = true });
+            using var login = await AuthApp.PostAsync(client, "/api/auth/2fa/recovery-login", new { code });
             login.StatusCode.ShouldBe(attempt == 0 ? HttpStatusCode.OK : HttpStatusCode.BadRequest);
         }
     }

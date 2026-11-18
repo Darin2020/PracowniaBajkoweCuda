@@ -71,18 +71,9 @@ public sealed class UpdateAccountRequest
 
 public sealed class TwoFactorCodeRequest
 {
-    /// <summary>The 6-digit code of the authenticator app (spaces and dashes are ignored).</summary>
+    /// <summary>The 6-digit code of the authenticator app (spaces and dashes are ignored), or a recovery code.</summary>
     [Required, MaxLength(32)]
     public string Code { get; init; } = string.Empty;
-}
-
-public sealed class TwoFactorLoginRequest
-{
-    /// <summary>The authenticator code, or a recovery code when <see cref="IsRecoveryCode"/> is set.</summary>
-    [Required, MaxLength(32)]
-    public string Code { get; init; } = string.Empty;
-
-    public bool IsRecoveryCode { get; init; }
 }
 
 /// <summary>Re-authentication before deleting the account (§8.6).</summary>

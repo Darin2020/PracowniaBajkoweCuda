@@ -24,6 +24,7 @@ public sealed class AuthorizationMatrixTests(SiteFactory factory) : IClassFixtur
         "POST api/auth/forgot-password",
         "POST api/auth/reset-password",
         "POST api/auth/2fa/login",
+        "POST api/auth/2fa/recovery-login",
     ];
 
     [Fact]
