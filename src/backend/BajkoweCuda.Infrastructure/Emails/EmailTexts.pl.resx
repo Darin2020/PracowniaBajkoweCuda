@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Texts of the transactional emails. English is the source; the other languages need review (docs/DECISIONS.md). -->
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Common_Signature" xml:space="preserve"><value>Pracownia Bajkowe Cuda</value></data>
+  <data name="Common_IgnoreIfNotYou" xml:space="preserve"><value>Jeśli to nie Ty, możesz zignorować tę wiadomość.</value></data>
+  <data name="Common_LinkFallback" xml:space="preserve"><value>Jeśli przycisk nie działa, skopiuj ten link do przeglądarki:</value></data>
+  <data name="ConfirmEmail_Subject" xml:space="preserve"><value>Potwierdź swój adres e-mail</value></data>
+  <data name="ConfirmEmail_Heading" xml:space="preserve"><value>Witamy w Pracowni Bajkowe Cuda</value></data>
+  <data name="ConfirmEmail_Body" xml:space="preserve"><value>Potwierdź swój adres e-mail, aby móc porozmawiać z nami na czacie o swojej zabawce.</value></data>
+  <data name="ConfirmEmail_Action" xml:space="preserve"><value>Potwierdź adres e-mail</value></data>
+  <data name="AlreadyRegistered_Subject" xml:space="preserve"><value>Masz już konto</value></data>
+  <data name="AlreadyRegistered_Heading" xml:space="preserve"><value>Masz już konto</value></data>
+  <data name="AlreadyRegistered_Body" xml:space="preserve"><value>Ktoś, prawdopodobnie Ty, próbował zarejestrować się tym adresem e-mail, ale konto już istnieje. Zaloguj się albo ustaw nowe hasło, jeśli go nie pamiętasz.</value></data>
+  <data name="AlreadyRegistered_Action" xml:space="preserve"><value>Ustaw nowe hasło</value></data>
+  <data name="ResetPassword_Subject" xml:space="preserve"><value>Zresetuj hasło</value></data>
+  <data name="ResetPassword_Heading" xml:space="preserve"><value>Zresetuj hasło</value></data>
+  <data name="ResetPassword_Body" xml:space="preserve"><value>Otrzymaliśmy prośbę o zresetowanie hasła do Twojego konta. Link jest ważny przez 24 godziny.</value></data>
+  <data name="ResetPassword_Action" xml:space="preserve"><value>Ustaw nowe hasło</value></data>
+  <data name="PasswordChanged_Subject" xml:space="preserve"><value>Twoje hasło zostało zmienione</value></data>
+  <data name="PasswordChanged_Heading" xml:space="preserve"><value>Twoje hasło zostało zmienione</value></data>
+  <data name="PasswordChanged_Body" xml:space="preserve"><value>Hasło do Twojego konta zostało właśnie zmienione. Jeśli to nie Ty, natychmiast zresetuj hasło i skontaktuj się z nami.</value></data>
+</root>

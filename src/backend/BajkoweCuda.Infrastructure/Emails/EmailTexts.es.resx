@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Texts of the transactional emails. English is the source; the other languages need review (docs/DECISIONS.md). -->
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Common_Signature" xml:space="preserve"><value>Pracownia Bajkowe Cuda</value></data>
+  <data name="Common_IgnoreIfNotYou" xml:space="preserve"><value>Si no lo has solicitado, puedes ignorar este correo.</value></data>
+  <data name="Common_LinkFallback" xml:space="preserve"><value>Si el botón no funciona, copia este enlace en tu navegador:</value></data>
+  <data name="ConfirmEmail_Subject" xml:space="preserve"><value>Confirma tu dirección de correo</value></data>
+  <data name="ConfirmEmail_Heading" xml:space="preserve"><value>Te damos la bienvenida a Pracownia Bajkowe Cuda</value></data>
+  <data name="ConfirmEmail_Body" xml:space="preserve"><value>Confirma tu dirección de correo para poder hablar con nosotros sobre tu juguete.</value></data>
+  <data name="ConfirmEmail_Action" xml:space="preserve"><value>Confirmar dirección de correo</value></data>
+  <data name="AlreadyRegistered_Subject" xml:space="preserve"><value>Ya tienes una cuenta</value></data>
+  <data name="AlreadyRegistered_Heading" xml:space="preserve"><value>Ya tienes una cuenta</value></data>
+  <data name="AlreadyRegistered_Body" xml:space="preserve"><value>Alguien, probablemente tú, ha intentado registrarse con esta dirección de correo, pero ya tiene una cuenta. Inicia sesión o elige una nueva contraseña si la has olvidado.</value></data>
+  <data name="AlreadyRegistered_Action" xml:space="preserve"><value>Elegir una nueva contraseña</value></data>
+  <data name="ResetPassword_Subject" xml:space="preserve"><value>Restablece tu contraseña</value></data>
+  <data name="ResetPassword_Heading" xml:space="preserve"><value>Restablece tu contraseña</value></data>
+  <data name="ResetPassword_Body" xml:space="preserve"><value>Hemos recibido una solicitud para restablecer la contraseña de tu cuenta. El enlace es válido durante 24 horas.</value></data>
+  <data name="ResetPassword_Action" xml:space="preserve"><value>Elegir una nueva contraseña</value></data>
+  <data name="PasswordChanged_Subject" xml:space="preserve"><value>Tu contraseña ha cambiado</value></data>
+  <data name="PasswordChanged_Heading" xml:space="preserve"><value>Tu contraseña ha cambiado</value></data>
+  <data name="PasswordChanged_Body" xml:space="preserve"><value>Se acaba de cambiar la contraseña de tu cuenta. Si no has sido tú, restablece tu contraseña de inmediato y ponte en contacto con nosotros.</value></data>
+</root>

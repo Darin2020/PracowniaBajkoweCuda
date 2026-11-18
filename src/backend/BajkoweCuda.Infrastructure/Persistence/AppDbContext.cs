@@ -1,3 +1,4 @@
+using BajkoweCuda.Infrastructure.Emails;
 using BajkoweCuda.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -9,6 +10,8 @@ namespace BajkoweCuda.Infrastructure.Persistence;
 public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
     : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options)
 {
+    public DbSet<EmailOutboxMessage> EmailOutbox => Set<EmailOutboxMessage>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

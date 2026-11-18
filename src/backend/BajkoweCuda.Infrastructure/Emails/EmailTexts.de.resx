@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Texts of the transactional emails. English is the source; the other languages need review (docs/DECISIONS.md). -->
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Common_Signature" xml:space="preserve"><value>Pracownia Bajkowe Cuda</value></data>
+  <data name="Common_IgnoreIfNotYou" xml:space="preserve"><value>Wenn Sie das nicht angefordert haben, können Sie diese E-Mail ignorieren.</value></data>
+  <data name="Common_LinkFallback" xml:space="preserve"><value>Falls die Schaltfläche nicht funktioniert, kopieren Sie diesen Link in Ihren Browser:</value></data>
+  <data name="ConfirmEmail_Subject" xml:space="preserve"><value>Bestätigen Sie Ihre E-Mail-Adresse</value></data>
+  <data name="ConfirmEmail_Heading" xml:space="preserve"><value>Willkommen bei Pracownia Bajkowe Cuda</value></data>
+  <data name="ConfirmEmail_Body" xml:space="preserve"><value>Bitte bestätigen Sie Ihre E-Mail-Adresse, damit Sie mit uns über Ihr Spielzeug chatten können.</value></data>
+  <data name="ConfirmEmail_Action" xml:space="preserve"><value>E-Mail-Adresse bestätigen</value></data>
+  <data name="AlreadyRegistered_Subject" xml:space="preserve"><value>Sie haben bereits ein Konto</value></data>
+  <data name="AlreadyRegistered_Heading" xml:space="preserve"><value>Sie haben bereits ein Konto</value></data>
+  <data name="AlreadyRegistered_Body" xml:space="preserve"><value>Jemand, wahrscheinlich Sie, hat versucht, sich mit dieser E-Mail-Adresse zu registrieren, aber es gibt bereits ein Konto. Melden Sie sich an oder wählen Sie ein neues Passwort, falls Sie es vergessen haben.</value></data>
+  <data name="AlreadyRegistered_Action" xml:space="preserve"><value>Neues Passwort wählen</value></data>
+  <data name="ResetPassword_Subject" xml:space="preserve"><value>Passwort zurücksetzen</value></data>
+  <data name="ResetPassword_Heading" xml:space="preserve"><value>Passwort zurücksetzen</value></data>
+  <data name="ResetPassword_Body" xml:space="preserve"><value>Wir haben eine Anfrage erhalten, das Passwort Ihres Kontos zurückzusetzen. Der Link ist 24 Stunden gültig.</value></data>
+  <data name="ResetPassword_Action" xml:space="preserve"><value>Neues Passwort wählen</value></data>
+  <data name="PasswordChanged_Subject" xml:space="preserve"><value>Ihr Passwort wurde geändert</value></data>
+  <data name="PasswordChanged_Heading" xml:space="preserve"><value>Ihr Passwort wurde geändert</value></data>
+  <data name="PasswordChanged_Body" xml:space="preserve"><value>Das Passwort Ihres Kontos wurde soeben geändert. Wenn Sie das nicht waren, setzen Sie Ihr Passwort sofort zurück und kontaktieren Sie uns.</value></data>
+</root>
