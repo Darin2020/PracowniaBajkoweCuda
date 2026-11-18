@@ -1,10 +1,13 @@
 using BajkoweCuda.Api.Problems;
+using BajkoweCuda.Api.Security;
+using BajkoweCuda.Application.Audit;
 using BajkoweCuda.Application.Emails;
 using BajkoweCuda.Infrastructure.Emails;
 using BajkoweCuda.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BajkoweCuda.Api.Auth;
 
@@ -19,6 +22,9 @@ public sealed partial class AuthController(
     UserManager<ApplicationUser> users,
     SignInManager<ApplicationUser> signIn,
     IEmailOutbox emails,
+    EmailThrottle emailThrottle,
+    IAuditLog audit,
+    AdminRoleSync adminRoles,
     AccountLinks links,
     IConfiguration configuration,
     TimeProvider time,
@@ -43,11 +49,12 @@ public sealed partial class AuthController(
         }
 
         var user = await users.GetUserAsync(User);
-        return user is null || user.IsDeleted ? MeResponse.Anonymous : await ToMeAsync(user);
+        return user is null || user.IsDeleted ? MeResponse.Anonymous : await MeResponse.ForAsync(users, user);
     }
 
     [HttpPost("register")]
     [AllowAnonymous]
+    [EnableRateLimiting(RateLimiting.Auth)]
     public async Task<IActionResult> Register(RegisterRequest request, CancellationToken cancellationToken)
     {
         // The password is checked first, against a blank user: for an address that already has an account the
@@ -92,21 +99,28 @@ public sealed partial class AuthController(
         }
 
         LogRegistered(logger, user.Id);
+        await audit.WriteAsync(AuditActions.Registered, user.Id, cancellationToken: cancellationToken);
         await SendConfirmationAsync(user, cancellationToken);
         return Accepted();
     }
 
     [HttpPost("login")]
     [AllowAnonymous]
-    public async Task<IActionResult> Login(LoginRequest request)
+    [EnableRateLimiting(RateLimiting.Auth)]
+    public async Task<IActionResult> Login(LoginRequest request, CancellationToken cancellationToken)
     {
-        var user = await users.FindByEmailAsync(request.Email.Trim());
+        var email = request.Email.Trim();
+        var user = await users.FindByEmailAsync(email);
         if (user is null || user.IsDeleted)
         {
             var (dummyUser, dummyHash) = DummyPassword.Value;
             users.PasswordHasher.VerifyHashedPassword(dummyUser, dummyHash, request.Password);
+            await audit.WriteAsync(AuditActions.LoginFailed, actorId: null, details: new { email = EmailAddresses.Mask(email) }, cancellationToken: cancellationToken);
             return AuthErrors.InvalidCredentials.ToResult();
         }
+
+        // The session about to be issued must carry the right roles (Admin:Emails, §3.3).
+        await adminRoles.SyncUserAsync(user, cancellationToken);
 
         // Persistent cookie: the session survives closing the browser and slides for 14 days (§8.1).
         var result = await signIn.PasswordSignInAsync(user, request.Password, isPersistent: true, lockoutOnFailure: true);
@@ -118,19 +132,22 @@ public sealed partial class AuthController(
         if (!result.Succeeded)
         {
             LogSignInFailed(logger, user.Id, result.IsLockedOut);
+            await audit.WriteAsync(AuditActions.LoginFailed, user.Id, details: new { lockedOut = result.IsLockedOut }, cancellationToken: cancellationToken);
             return AuthErrors.InvalidCredentials.ToResult();
         }
 
-        // The new antiforgery token must be bound to the signed-in user.
-        HttpContext.User = await signIn.CreateUserPrincipalAsync(user);
-        HttpContext.IssueRequestToken();
-        LogSignedIn(logger, user.Id);
-        return Ok(await ToMeAsync(user));
+        await audit.WriteAsync(AuditActions.LoginSucceeded, user.Id, details: new { method = "password" }, cancellationToken: cancellationToken);
+        return Ok(await this.CompleteSignInAsync(signIn, users, user, logger));
     }
 
     [HttpPost("logout")]
-    public async Task<IActionResult> Logout()
+    public async Task<IActionResult> Logout(CancellationToken cancellationToken)
     {
+        if (Guid.TryParse(users.GetUserId(User), out var userId))
+        {
+            await audit.WriteAsync(AuditActions.Logout, userId, cancellationToken: cancellationToken);
+        }
+
         await signIn.SignOutAsync();
         HttpContext.User = new System.Security.Claims.ClaimsPrincipal(new System.Security.Claims.ClaimsIdentity());
         HttpContext.IssueRequestToken();
@@ -139,7 +156,8 @@ public sealed partial class AuthController(
 
     [HttpPost("confirm-email")]
     [AllowAnonymous]
-    public async Task<IActionResult> ConfirmEmail(ConfirmEmailRequest request)
+    [EnableRateLimiting(RateLimiting.Auth)]
+    public async Task<IActionResult> ConfirmEmail(ConfirmEmailRequest request, CancellationToken cancellationToken)
     {
         var user = await users.FindByIdAsync(request.UserId.ToString());
         var token = AccountLinks.DecodeToken(request.Code);
@@ -154,11 +172,19 @@ public sealed partial class AuthController(
         }
 
         var result = await users.ConfirmEmailAsync(user, token);
-        return result.Succeeded ? NoContent() : AuthErrors.InvalidToken.ToResult();
+        if (!result.Succeeded)
+        {
+            return AuthErrors.InvalidToken.ToResult();
+        }
+
+        await audit.WriteAsync(AuditActions.EmailConfirmed, user.Id, cancellationToken: cancellationToken);
+        await adminRoles.SyncUserAsync(user, cancellationToken);
+        return NoContent();
     }
 
     [HttpPost("resend-confirmation")]
     [AllowAnonymous]
+    [EnableRateLimiting(RateLimiting.Email)]
     public async Task<IActionResult> ResendConfirmation(EmailRequest request, CancellationToken cancellationToken)
     {
         var user = await users.FindByEmailAsync(request.Email.Trim());
@@ -172,6 +198,7 @@ public sealed partial class AuthController(
 
     [HttpPost("forgot-password")]
     [AllowAnonymous]
+    [EnableRateLimiting(RateLimiting.Email)]
     public async Task<IActionResult> ForgotPassword(EmailRequest request, CancellationToken cancellationToken)
     {
         var user = await users.FindByEmailAsync(request.Email.Trim());
@@ -194,6 +221,7 @@ public sealed partial class AuthController(
 
     [HttpPost("reset-password")]
     [AllowAnonymous]
+    [EnableRateLimiting(RateLimiting.Auth)]
     public async Task<IActionResult> ResetPassword(ResetPasswordRequest request, CancellationToken cancellationToken)
     {
         var user = await users.FindByIdAsync(request.UserId.ToString());
@@ -215,17 +243,9 @@ public sealed partial class AuthController(
         await users.SetLockoutEndDateAsync(user, null);
         await EnqueueAsync(user, EmailTemplate.PasswordChanged, link: null, cancellationToken);
         LogPasswordReset(logger, user.Id);
+        await audit.WriteAsync(AuditActions.PasswordReset, user.Id, cancellationToken: cancellationToken);
         return NoContent();
     }
-
-    private async Task<MeResponse> ToMeAsync(ApplicationUser user) => new(
-        Authenticated: true,
-        Id: user.Id,
-        Email: user.Email,
-        DisplayName: user.DisplayName,
-        EmailConfirmed: user.EmailConfirmed,
-        PreferredLanguage: user.PreferredLanguage,
-        Roles: [.. await users.GetRolesAsync(user)]);
 
     private async Task<List<IdentityError>> ValidatePasswordAsync(string password)
     {
@@ -264,6 +284,12 @@ public sealed partial class AuthController(
 
     private Task EnqueueAsync(ApplicationUser user, EmailTemplate template, string? link, CancellationToken cancellationToken)
     {
+        if (!emailThrottle.TryAcquire(user.Email!))
+        {
+            LogEmailThrottled(logger, template, user.Id);
+            return Task.CompletedTask;
+        }
+
         var payload = link is null
             ? new Dictionary<string, string>()
             : new Dictionary<string, string> { [EmailRenderer.LinkKey] = link };
@@ -274,11 +300,11 @@ public sealed partial class AuthController(
     [LoggerMessage(Level = LogLevel.Information, Message = "User {UserId} registered")]
     private static partial void LogRegistered(ILogger logger, Guid userId);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "User {UserId} signed in")]
-    private static partial void LogSignedIn(ILogger logger, Guid userId);
-
     [LoggerMessage(Level = LogLevel.Warning, Message = "Sign-in failed for user {UserId} (locked out: {LockedOut})")]
     private static partial void LogSignInFailed(ILogger logger, Guid userId, bool lockedOut);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Not sending {Template} email to user {UserId}: hourly limit for the address reached")]
+    private static partial void LogEmailThrottled(ILogger logger, EmailTemplate template, Guid userId);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "User {UserId} reset the password")]
     private static partial void LogPasswordReset(ILogger logger, Guid userId);

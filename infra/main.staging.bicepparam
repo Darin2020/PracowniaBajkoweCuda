@@ -8,6 +8,8 @@ param containerImage = readEnvironmentVariable('CONTAINER_IMAGE')
 param appVersion = readEnvironmentVariable('APP_VERSION')
 param registryName = readEnvironmentVariable('REGISTRY_NAME')
 param sqlAdminObjectId = readEnvironmentVariable('SQL_ADMIN_OBJECT_ID')
+// Personal data, so not in the repository: the GitHub secret ADMIN_EMAILS of the environment.
+param adminEmails = readEnvironmentVariable('ADMIN_EMAILS', '')
 // The pipeline migrates with the new image while the app still runs the current one (two-pass deployment).
 param migrationImage = readEnvironmentVariable('MIGRATION_IMAGE', readEnvironmentVariable('CONTAINER_IMAGE'))
 param migrationVersion = readEnvironmentVariable('MIGRATION_VERSION', readEnvironmentVariable('APP_VERSION'))

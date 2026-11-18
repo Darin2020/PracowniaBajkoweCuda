@@ -244,3 +244,45 @@ After that date the build fails again; an entry that is no longer reported is fl
 - **MailKit 4.18**: 5.0 changed the send API, and nothing in 5.0 is needed.
 - **Fixed in the tests:** the SQL Server container is created on first use, so test runs without Docker (the optional
   run inside the Docker build) work again.
+
+## 2026-11-18 — Phase 3: admins, 2FA, audit log, rate limits, export and deletion
+
+**Owner's decisions**
+- **`Admin:Emails` comes from the GitHub secret `ADMIN_EMAILS`** of each environment (personal data, so not in the
+  public repository). CD passes it to Bicep as a secure parameter; the app and the migration job read it from a
+  Container Apps secret (`Admin__Emails__0`, a comma-separated list).
+- **The Admin role is synced when a user signs in or confirms their email, and for everybody in the migration job**
+  (deviation from PLAN §3.3 "at startup"): a sync at startup would wake the serverless staging database on every cold
+  start. The list is the source of truth: a confirmed account with a listed address gets the role, every other account
+  loses it (with a new security stamp, so open sessions re-read their roles within 30 minutes).
+- **`POST /api/account/password` was added** (current + new password): PLAN §8.1 requires re-authentication for
+  password changes, but §6 listed no endpoint. Changing the email stays out of scope (no endpoint, no page).
+
+**Implementation**
+- **Admin endpoints use the `Admin` policy**: the role plus the `amr=mfa` claim, which Identity adds after a second
+  factor. Without it the answer is `403 auth.mfa_required`, so the frontend can send an admin to the 2FA setup.
+  `Features:RequireAdminMfa=false` is accepted in Development only; the app refuses to start with it elsewhere.
+- **2FA is TOTP for everybody who wants it, mandatory for admins.** Enabling it with a first valid code turns the
+  current session into an `amr=mfa` session (keeping its sign-in time) and returns 10 recovery codes. A recovery code
+  signs in through its own endpoint, `POST 2fa/recovery-login` (not a flag on `2fa/login`: CodeQL rightly dislikes a
+  request value choosing the verification method). Between the
+  password and the code, Identity's two-factor cookie is `__Host-bc.2fa` (SameSite=Strict, 5 minutes).
+- **Audit log** (`AuditLog` table, bigint identity as order and paging cursor): registration, email confirmation,
+  sign-ins and failed sign-ins (unknown addresses are stored masked), 2FA changes, password reset/change, failed
+  re-authentication, export, deletion, role changes. Entries are written through their own `DbContext`, so writing one
+  never saves the caller's pending changes. The client IP is recorded. No retention limit yet (Phase 7, with the lawyer).
+- **Rate limits are in memory** (ASP.NET Core `RateLimiter`, configurable under `RateLimiting`): auth endpoints 10/min
+  per IP (sliding window), resend/forgot 3/hour per IP, admin 300/min per admin, `429 rate_limited` with `Retry-After`.
+  The per-address limit (3 emails/hour to one address) is applied where emails are queued and fails silently, so the
+  answer reveals nothing. Enough for one replica per environment; several replicas would each allow the full limit.
+- **Re-authentication** (delete, change password) checks the password with lockout counting, and answers
+  `403 auth.reauthentication_failed`, not 401, because the session itself is still valid. Accounts without a password
+  (external sign-in only) will re-authenticate with their provider in the next part.
+- **Deletion anonymizes the user row instead of deleting it** (`IsDeleted`, email/name/password/2FA/logins/roles
+  removed, new security stamp, locked out), because orders (Phase 5) must keep pointing to it. Queued and sent emails
+  of the user and the IP addresses of their audit entries are removed. The "account deleted" email is queued without a
+  user id.
+- **Finished outbox rows are deleted after 30 days** by the dispatcher, so email addresses (also of deleted accounts)
+  do not stay forever.
+- **Authorization matrix test:** every controller endpoint must carry authorization metadata, anonymous endpoints must
+  match a reviewed list, and every `/api/admin` endpoint must use the `Admin` policy.

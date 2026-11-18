@@ -23,4 +23,7 @@
   <data name="PasswordChanged_Subject" xml:space="preserve"><value>Your password was changed</value></data>
   <data name="PasswordChanged_Heading" xml:space="preserve"><value>Your password was changed</value></data>
   <data name="PasswordChanged_Body" xml:space="preserve"><value>The password of your account was just changed. If this was not you, reset your password right away and contact us.</value></data>
+  <data name="AccountDeleted_Subject" xml:space="preserve"><value>Your account was deleted</value></data>
+  <data name="AccountDeleted_Heading" xml:space="preserve"><value>Your account was deleted</value></data>
+  <data name="AccountDeleted_Body" xml:space="preserve"><value>Your account and its personal data were deleted, as you asked. You are signed out everywhere. If this was not you, contact us right away.</value></data>
 </root>

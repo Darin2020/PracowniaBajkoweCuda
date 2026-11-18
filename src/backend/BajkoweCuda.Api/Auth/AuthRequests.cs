@@ -69,6 +69,29 @@ public sealed class UpdateAccountRequest
     public string? PreferredLanguage { get; init; }
 }
 
+public sealed class TwoFactorCodeRequest
+{
+    /// <summary>The 6-digit code of the authenticator app (spaces and dashes are ignored), or a recovery code.</summary>
+    [Required, MaxLength(32)]
+    public string Code { get; init; } = string.Empty;
+}
+
+/// <summary>Re-authentication before deleting the account (§8.6).</summary>
+public sealed class DeleteAccountRequest
+{
+    [Required, MaxLength(128)]
+    public string Password { get; init; } = string.Empty;
+}
+
+public sealed class ChangePasswordRequest
+{
+    [Required, MaxLength(128)]
+    public string CurrentPassword { get; init; } = string.Empty;
+
+    [Required, MaxLength(128)]
+    public string NewPassword { get; init; } = string.Empty;
+}
+
 /// <summary>One of the supported languages (en, de, fr, es, pl); <c>null</c> is left to [Required].</summary>
 [AttributeUsage(AttributeTargets.Property)]
 public sealed class SupportedLanguageAttribute : ValidationAttribute

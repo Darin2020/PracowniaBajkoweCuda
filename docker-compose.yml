@@ -68,6 +68,7 @@ services:
     command: ["migrate"]
     environment:
       ConnectionStrings__Sql: Server=sqlserver,1433;Database=BajkoweCuda;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True
+      Admin__Emails__0: ${ADMIN_EMAILS:-}
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -97,6 +98,8 @@ services:
       Email__Provider: Smtp
       Email__Smtp__Host: mailpit
       Email__Smtp__Port: "1025"
+      # Accounts with these confirmed addresses become admins (they must set up 2FA to use the admin endpoints).
+      Admin__Emails__0: ${ADMIN_EMAILS:-}
     ports:
       - "127.0.0.1:${APP_PORT:-8080}:8080"
     depends_on:

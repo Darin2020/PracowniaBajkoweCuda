@@ -142,6 +142,7 @@ jobs:
           version: ${{ needs.build.outputs.version }}
           registry-name: ${{ needs.build.outputs.registry-name }}
           sql-admin-object-id: ${{ secrets.SQL_ADMIN_OBJECT_ID }}
+          admin-emails: ${{ secrets.ADMIN_EMAILS }}
 
   production:
     name: Deploy to production
@@ -176,3 +177,4 @@ jobs:
           version: ${{ needs.build.outputs.version }}
           registry-name: ${{ needs.build.outputs.registry-name }}
           sql-admin-object-id: ${{ secrets.SQL_ADMIN_OBJECT_ID }}
+          admin-emails: ${{ secrets.ADMIN_EMAILS }}

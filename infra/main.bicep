@@ -38,6 +38,10 @@ param containerAppsEnvironmentName string = 'cae-bajkowecuda-shared'
 @description('Object id of the Entra group that administers the SQL server (sg-bajkowecuda-sql-admins-<env>).')
 param sqlAdminObjectId string
 
+@description('Admin:Emails, comma-separated: whose accounts are admins (docs/PLAN.md §3.3). From the GitHub secret ADMIN_EMAILS.')
+@secure()
+param adminEmails string = ''
+
 @description('Type of the SQL administrator principal.')
 @allowed(['User', 'Group', 'Application'])
 param sqlAdminPrincipalType string = 'Group'
@@ -172,6 +176,7 @@ module app 'modules/container-app.bicep' = {
     dataProtectionKeyUri: keyVault.outputs.dataProtectionKeyUri
     emailEndpoint: communication.outputs.endpoint
     emailSenderAddress: communication.outputs.senderAddress
+    adminEmails: adminEmails
   }
 }
 
@@ -193,6 +198,7 @@ module migrationJob 'modules/migration-job.bicep' = {
     applicationInsightsConnectionString: monitoring.outputs.applicationInsightsConnectionString
     sqlServerFqdn: sql.outputs.serverFqdn
     sqlDatabaseName: sql.outputs.databaseName
+    adminEmails: adminEmails
   }
 }
 

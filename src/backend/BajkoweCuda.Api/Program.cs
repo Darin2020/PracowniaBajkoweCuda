@@ -5,6 +5,7 @@ using BajkoweCuda.Api.Hosting;
 using BajkoweCuda.Api.Observability;
 using BajkoweCuda.Api.Problems;
 using BajkoweCuda.Api.Security;
+using BajkoweCuda.Infrastructure.Accounts;
 using BajkoweCuda.Infrastructure.Emails;
 using BajkoweCuda.Infrastructure.Persistence;
 
@@ -24,7 +25,9 @@ builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddEmail(builder.Configuration);
 builder.Services.AddHealth();
 builder.Services.AddPublicSite(builder.Configuration);
-builder.Services.AddAuth(builder.Configuration);
+builder.Services.AddAuth(builder.Configuration, builder.Environment);
+builder.Services.AddAccounts(builder.Configuration);
+builder.Services.AddRateLimits(builder.Configuration);
 builder.Services
     .AddControllers(options =>
     {
@@ -52,6 +55,8 @@ app.UsePublicSite();
 
 app.UseAuthentication();
 app.UseAuthorization();
+// After authentication, so the admin limit can count per user (docs/PLAN.md §8.3).
+app.UseRateLimiter();
 
 app.MapHealthEndpoints();
 app.MapVersionEndpoint();

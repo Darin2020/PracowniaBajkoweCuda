@@ -24,6 +24,10 @@ inputs:
   sql-admin-object-id:
     description: Object id of the Entra group that administers the SQL server.
     required: true
+  admin-emails:
+    description: Admin:Emails of the environment, comma-separated (the ADMIN_EMAILS secret). Empty means no admins.
+    required: false
+    default: ""
 
 outputs:
   app-url:
@@ -80,6 +84,7 @@ runs:
         MIGRATION_VERSION: ${{ inputs.version }}
         REGISTRY_NAME: ${{ inputs.registry-name }}
         SQL_ADMIN_OBJECT_ID: ${{ inputs.sql-admin-object-id }}
+        ADMIN_EMAILS: ${{ inputs.admin-emails }}
       run: |
         set -euo pipefail
         job="$(az deployment group create \
@@ -125,6 +130,7 @@ runs:
         APP_VERSION: ${{ inputs.version }}
         REGISTRY_NAME: ${{ inputs.registry-name }}
         SQL_ADMIN_OBJECT_ID: ${{ inputs.sql-admin-object-id }}
+        ADMIN_EMAILS: ${{ inputs.admin-emails }}
       run: |
         set -euo pipefail
         app_url="$(az deployment group create \
