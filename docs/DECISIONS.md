@@ -411,3 +411,21 @@ After that date the build fails again; an entry that is no longer reported is fl
 - **`POST /api/chat/messages` is limited to 20 per minute per user** (PLAN §8.3).
 - **Order events** (`OrderUpdated`) and system messages arrive with Phase 5; email digests in the next part of Phase 4.
 
+## 2026-11-18 — Phase 4: chat email notifications
+
+- **One pending notification per recipient and conversation**, in the existing email outbox (`Kind = ChatDigest`,
+  `SendAfter = now + Email:ChatDigestDelayMinutes`, default 5). Further messages do not add rows; a filtered unique
+  index (`ToUserId, ConversationId` where pending) keeps two simultaneous messages from queuing two emails.
+- **The content is decided when the email is due, not when it is queued**: it lists the messages the recipient has
+  still not read (oldest first, at most 10 excerpts of 200 characters, "Photos: N", "Update about your order" for
+  system messages, then the count of the rest). With nothing unread, or a customer who turned notifications off
+  meanwhile, the row becomes `Skipped`. The studio reads as one side, so once any admin has read the messages no admin
+  is emailed about them.
+- **Recipients**: every confirmed admin (role synced from Admin:Emails) for customer messages, always; the customer for
+  studio and system messages, only with "Send replies to my email" on. Each gets the email in their own preferred
+  language, with a link to the chat (`/{lang}/chat`) or to the conversation in the admin area
+  (`/{lang}/admin/conversations/{id}`). Customer emails say how to turn them off.
+- **Photo counts avoid plurals** ("Photos: 3", "Zdjęcia: 3") so the five languages need no plural rules in `.resx`.
+- **The email contains message excerpts**: that is the feature (PLAN §3.6). They are HTML-encoded, and still never
+  written to the logs.
+
