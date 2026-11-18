@@ -1,0 +1,331 @@
+<section class="page page--wide container">
+  <div class="actions heading">
+    <h1>{{ title }}</h1>
+    <button class="button" type="button" (click)="logout()" i18n="@@account.signOut">
+      Sign out
+    </button>
+  </div>
+
+  @if (redirectError(); as message) {
+    <p class="alert alert--error" role="alert">{{ message }}</p>
+  }
+  @if (linked(); as provider) {
+    <p class="alert alert--success" role="status" i18n="@@account.linkedNotice">
+      {{ providerName(provider) }} is now linked. You can use it to sign in.
+    </p>
+  }
+
+  @if (auth.user(); as user) {
+    <!-- Name and language -->
+    <section class="card" aria-labelledby="account-profile">
+      <h2 id="account-profile" i18n="@@account.profile">Your details</h2>
+
+      <div class="field">
+        <span class="field__label" i18n="@@auth.email">Email address</span>
+        <p>
+          {{ user.email }}
+          @if (user.emailConfirmed) {
+            <span class="hint" i18n="@@account.emailConfirmed">(confirmed)</span>
+          } @else {
+            <span class="hint" i18n="@@account.emailNotConfirmed">(not confirmed yet)</span>
+          }
+        </p>
+      </div>
+      @if (!user.emailConfirmed) {
+        <p class="alert" i18n="@@account.confirmNotice">
+          Please open the link we sent to your email address. The chat opens once the address is
+          confirmed.
+        </p>
+        <app-resend-confirmation [email]="user.email" />
+      }
+
+      <form class="form" [formGroup]="profileForm" (ngSubmit)="saveProfile()" novalidate>
+        <div class="field">
+          <label for="account-name" i18n="@@auth.displayName">Your name</label>
+          <input
+            id="account-name"
+            class="input"
+            type="text"
+            autocomplete="name"
+            maxlength="100"
+            formControlName="displayName"
+            [attr.aria-invalid]="!!fieldError(profileForm.controls.displayName)"
+            aria-describedby="account-name-error"
+          />
+          <p id="account-name-error" class="field-error">
+            {{ fieldError(profileForm.controls.displayName) }}
+          </p>
+        </div>
+
+        <div class="field">
+          <label for="account-language" i18n="@@account.language">Language of emails</label>
+          <select id="account-language" class="input" formControlName="preferredLanguage">
+            @for (locale of locales; track locale) {
+              <option [value]="locale" [attr.lang]="locale">{{ localeNames[locale] }}</option>
+            }
+          </select>
+        </div>
+
+        @if (profileState.error(); as message) {
+          <p class="alert alert--error" role="alert">{{ message }}</p>
+        }
+        @if (profileSaved()) {
+          <p class="alert alert--success" role="status" i18n="@@account.saved">Saved.</p>
+        }
+
+        <div class="actions">
+          <button
+            class="button button--primary"
+            type="submit"
+            [disabled]="profileState.busy()"
+            i18n="@@account.save"
+          >
+            Save
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Ways to sign in -->
+    <section class="card" aria-labelledby="account-logins">
+      <h2 id="account-logins" i18n="@@account.logins">Ways to sign in</h2>
+
+      @if (loginsError(); as message) {
+        <p class="alert alert--error" role="alert">{{ message }}</p>
+      }
+
+      @if (logins(); as logins) {
+        @if (logins.logins.length > 0 || logins.available.length > 0) {
+          <ul class="login-list">
+            @for (login of logins.logins; track login.provider) {
+              <li>
+                <span i18n="@@account.linkedProvider"
+                  >{{ providerName(login.provider) }} (linked)</span
+                >
+                <button
+                  class="link-button"
+                  type="button"
+                  [disabled]="loginState.busy()"
+                  (click)="removeLogin(login.provider)"
+                  i18n="@@account.unlink"
+                >
+                  Remove
+                </button>
+              </li>
+            }
+            @for (provider of logins.available; track provider) {
+              <li>
+                <span>{{ providerName(provider) }}</span>
+                <a [href]="externalUrl(provider, 'link')" i18n="@@account.link">Link</a>
+              </li>
+            }
+          </ul>
+        }
+        @if (loginState.error(); as message) {
+          <p class="alert alert--error" role="alert">{{ message }}</p>
+        }
+
+        @if (logins.hasPassword) {
+          <h3 i18n="@@account.changePassword">Change password</h3>
+          <form class="form" [formGroup]="passwordForm" (ngSubmit)="changePassword()" novalidate>
+            <div class="field">
+              <label for="account-current-password" i18n="@@account.currentPassword"
+                >Current password</label
+              >
+              <input
+                id="account-current-password"
+                class="input"
+                type="password"
+                autocomplete="current-password"
+                formControlName="currentPassword"
+                [attr.aria-invalid]="!!fieldError(passwordForm.controls.currentPassword)"
+                aria-describedby="account-current-password-error"
+              />
+              <p id="account-current-password-error" class="field-error">
+                {{ fieldError(passwordForm.controls.currentPassword) }}
+              </p>
+            </div>
+            <div class="field">
+              <label for="account-new-password" i18n="@@auth.newPassword">New password</label>
+              <input
+                id="account-new-password"
+                class="input"
+                type="password"
+                autocomplete="new-password"
+                formControlName="newPassword"
+                [attr.aria-invalid]="!!fieldError(passwordForm.controls.newPassword)"
+                aria-describedby="account-new-password-hint account-new-password-error"
+              />
+              <p id="account-new-password-hint" class="hint" i18n="@@auth.passwordHint">
+                At least 12 characters. A short sentence is easy to remember and hard to guess.
+              </p>
+              <p id="account-new-password-error" class="field-error">
+                {{ fieldError(passwordForm.controls.newPassword) }}
+              </p>
+            </div>
+
+            @if (passwordState.error(); as message) {
+              <p class="alert alert--error" role="alert">{{ message }}</p>
+            }
+            @if (passwordChanged()) {
+              <p class="alert alert--success" role="status" i18n="@@account.passwordChanged">
+                Your password has been changed. You stay signed in here; other devices are signed
+                out.
+              </p>
+            }
+
+            <div class="actions">
+              <button
+                class="button"
+                type="submit"
+                [disabled]="passwordState.busy()"
+                i18n="@@account.changePasswordSubmit"
+              >
+                Change password
+              </button>
+            </div>
+          </form>
+        }
+      } @else if (!loginsError()) {
+        <p role="status" i18n="@@common.loading">Loading…</p>
+      }
+    </section>
+
+    <!-- Two-factor authentication (admins) -->
+    @if (auth.isAdmin()) {
+      <section class="card" aria-labelledby="account-2fa">
+        <h2 id="account-2fa" i18n="@@account.twoFactor">Two-factor authentication</h2>
+        @if (user.twoFactorEnabled) {
+          <p i18n="@@account.twoFactorOn">Two-factor authentication is on.</p>
+        } @else {
+          <p i18n="@@account.twoFactorOff">
+            Two-factor authentication is required for the admin area and is not set up yet.
+          </p>
+        }
+        <p>
+          <a class="button" routerLink="/admin/2fa-setup" i18n="@@account.twoFactorManage"
+            >Manage</a
+          >
+        </p>
+      </section>
+    }
+
+    <!-- Personal data -->
+    <section class="card" aria-labelledby="account-data">
+      <h2 id="account-data" i18n="@@account.data">Your data</h2>
+      <p i18n="@@account.exportText">Download everything we store about you as a JSON file.</p>
+      <p>
+        <a class="button" [href]="account.exportUrl" download i18n="@@account.export"
+          >Export my data</a
+        >
+      </p>
+
+      <h3 i18n="@@account.delete">Delete account</h3>
+      <p i18n="@@account.deleteText">
+        Your account and your personal data are deleted for good. This cannot be undone.
+      </p>
+
+      @if (!deleting()) {
+        <p>
+          <button
+            class="button button--danger"
+            type="button"
+            (click)="startDeletion()"
+            i18n="@@account.deleteStart"
+          >
+            Delete my account
+          </button>
+        </p>
+      } @else if (logins()?.hasPassword ?? true) {
+        <form class="form" [formGroup]="deleteForm" (ngSubmit)="deleteAccount()" novalidate>
+          <div class="field">
+            <label for="account-delete-password" i18n="@@account.deletePassword"
+              >Enter your password to confirm</label
+            >
+            <input
+              id="account-delete-password"
+              class="input"
+              type="password"
+              autocomplete="current-password"
+              formControlName="password"
+              [attr.aria-invalid]="!!fieldError(deleteForm.controls.password)"
+              aria-describedby="account-delete-password-error"
+            />
+            <p id="account-delete-password-error" class="field-error">
+              {{ fieldError(deleteForm.controls.password) }}
+            </p>
+          </div>
+          @if (deleteState.error(); as message) {
+            <p class="alert alert--error" role="alert">{{ message }}</p>
+          }
+          <div class="actions">
+            <button
+              class="button button--danger"
+              type="submit"
+              [disabled]="deleteState.busy()"
+              i18n="@@account.deleteConfirm"
+            >
+              Delete for good
+            </button>
+            <button
+              class="link-button"
+              type="button"
+              (click)="cancelDeletion()"
+              i18n="@@account.cancel"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      } @else if (reauthenticated()) {
+        <p class="alert" i18n="@@account.deleteReady">
+          You have confirmed that it is you. Delete the account now?
+        </p>
+        @if (deleteState.error(); as message) {
+          <p class="alert alert--error" role="alert">{{ message }}</p>
+        }
+        <div class="actions">
+          <button
+            class="button button--danger"
+            type="button"
+            [disabled]="deleteState.busy()"
+            (click)="deleteAccount()"
+            i18n="@@account.deleteConfirm"
+          >
+            Delete for good
+          </button>
+          <button
+            class="link-button"
+            type="button"
+            (click)="cancelDeletion()"
+            i18n="@@account.cancel"
+          >
+            Cancel
+          </button>
+        </div>
+      } @else {
+        <p i18n="@@account.deleteReauth">
+          To confirm that it is you, sign in again with the provider you use.
+        </p>
+        <div class="actions">
+          @for (login of logins()?.logins ?? []; track login.provider) {
+            <a
+              class="button button--danger"
+              [href]="externalUrl(login.provider, 'reauth')"
+              i18n="@@account.deleteWith"
+              >Confirm with {{ providerName(login.provider) }}</a
+            >
+          }
+          <button
+            class="link-button"
+            type="button"
+            (click)="cancelDeletion()"
+            i18n="@@account.cancel"
+          >
+            Cancel
+          </button>
+        </div>
+      }
+    </section>
+  }
+</section>
