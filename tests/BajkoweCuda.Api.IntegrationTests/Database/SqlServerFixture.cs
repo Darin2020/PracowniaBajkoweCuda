@@ -15,9 +15,10 @@ public sealed class SqlServerFixture : IAsyncDisposable
 {
     public const string Category = "Database";
 
-    private readonly MsSqlContainer _container = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2025-latest").Build();
     private readonly SemaphoreSlim _startLock = new(1, 1);
-    private bool _started;
+
+    // Created on first use: building it already needs Docker, and runs without database tests have none.
+    private MsSqlContainer? _container;
 
     /// <summary>
     /// Returns a connection string to a new, empty database. The container starts on first use, so test runs that
@@ -27,7 +28,7 @@ public sealed class SqlServerFixture : IAsyncDisposable
     {
         await StartAsync();
 
-        var builder = new SqlConnectionStringBuilder(_container.GetConnectionString())
+        var builder = new SqlConnectionStringBuilder(_container!.GetConnectionString())
         {
             InitialCatalog = $"test_{Guid.NewGuid():N}",
         };
@@ -37,7 +38,11 @@ public sealed class SqlServerFixture : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        await _container.DisposeAsync();
+        if (_container is not null)
+        {
+            await _container.DisposeAsync();
+        }
+
         _startLock.Dispose();
     }
 
@@ -46,10 +51,11 @@ public sealed class SqlServerFixture : IAsyncDisposable
         await _startLock.WaitAsync();
         try
         {
-            if (!_started)
+            if (_container is null)
             {
-                await _container.StartAsync();
-                _started = true;
+                var container = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2025-latest").Build();
+                await container.StartAsync();
+                _container = container;
             }
         }
         finally
