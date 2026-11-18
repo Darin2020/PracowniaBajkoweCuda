@@ -320,3 +320,29 @@ After that date the build fails again; an entry that is no longer reported is fl
 - **The last way to sign in cannot be removed** (`DELETE /api/account/logins/{provider}` → `409 auth.last_login`).
 - **Tests** use a fake remote handler registered as "Google" that does what an OAuth handler does on our side
   (correlation cookie, protected state, external cookie), so the whole round trip runs without Google.
+
+## 2026-11-18 — Phase 3: Angular sign-in pages and the session in the browser
+
+- **The session state is one service with signals** (`AuthService`: `user`, `loaded`, `signedIn`, `isAdmin`).
+  `GET /api/auth/me` is asked once, in the browser only, after the first render (`afterNextRender` in `App`), so the
+  prerendered pages never call the API (PLAN §4.4). The top bar of a prerendered page first shows "Sign in" and
+  switches to the user menu when the answer comes. Guards wait for the same request.
+- **Guards**: `authGuard` (signed in, otherwise `/login?returnUrl=`), `adminGuard` (role Admin; the second factor is
+  enforced by the API, which answers `403 auth.mfa_required`), `anonymousGuard` (the sign-in pages send a signed-in
+  user home), `sessionGuard` (pages opened from emails need the XSRF cookie before they POST).
+- **One interceptor turns errors into `ApiError { status, code, errors }`**; pages show `errorMessage(code)`, a
+  translated text per code (the server's title is never shown). 401 `auth.not_authenticated` outside `/api/auth/*`
+  forgets the user and goes to the sign-in page with a return URL; 403 `auth.mfa_required` goes to the 2FA setup.
+- **Return URLs are app paths** ("/chat") checked by the same rule as the API's; for an external sign-in the locale
+  prefix is added ("/pl/chat"), because the API redirects the browser to it directly.
+- **Where people land**: customers go to `/chat`, admins without 2FA to `/admin/2fa-setup`, other admins to
+  `/account`. Until Phase 4, `/chat` is a placeholder that already needs a signed-in user and asks to confirm the
+  email address first.
+- **The confirmation page confirms with a POST from the page**, so a mail scanner that only fetches the link does not
+  confirm anything.
+- **The 2FA setup shows the key as text and as an `otpauth://` link**, which opens the authenticator app on a phone.
+  No QR code for now: it would need a QR library, and the admins are one or two people. The recovery codes are shown
+  once and can be saved as a text file made in the browser.
+- **The user's language for emails is the locale of the page they register on**; the account page can change it.
+- **Form styles are global** (`styles.scss`: `.page`, `.card`, `.field`, `.input`, `.alert`, ...), so each page stays
+  under the component style budget.

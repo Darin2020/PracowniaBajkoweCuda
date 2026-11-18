@@ -43,13 +43,61 @@
 
       <app-language-switcher />
 
-      <a
-        class="button button--primary sign-in"
-        routerLink="/login"
-        (click)="closeMenu()"
-        i18n="@@nav.signIn"
-        >Sign in</a
-      >
+      @if (auth.user(); as user) {
+        <div class="user-menu">
+          <button
+            type="button"
+            class="button user-menu__toggle"
+            aria-controls="user-menu"
+            [attr.aria-expanded]="userMenuOpen()"
+            (click)="toggleUserMenu()"
+          >
+            <span class="visually-hidden" i18n="@@nav.userMenu">Account menu:</span>
+            {{ user.displayName }}
+          </button>
+          <ul id="user-menu" class="user-menu__list" [class.user-menu__list--open]="userMenuOpen()">
+            <li>
+              <a class="nav-link" routerLink="/chat" (click)="closeMenu()" i18n="@@nav.chat"
+                >Chat</a
+              >
+            </li>
+            <li>
+              <a class="nav-link" routerLink="/account" (click)="closeMenu()" i18n="@@nav.account"
+                >Your account</a
+              >
+            </li>
+            @if (auth.isAdmin() && !user.twoFactorEnabled) {
+              <li>
+                <a
+                  class="nav-link"
+                  routerLink="/admin/2fa-setup"
+                  (click)="closeMenu()"
+                  i18n="@@nav.twoFactor"
+                  >Set up two-factor authentication</a
+                >
+              </li>
+            }
+            <li>
+              <button
+                class="nav-link nav-link--button"
+                type="button"
+                (click)="logout()"
+                i18n="@@nav.signOut"
+              >
+                Sign out
+              </button>
+            </li>
+          </ul>
+        </div>
+      } @else {
+        <a
+          class="button button--primary sign-in"
+          routerLink="/login"
+          (click)="closeMenu()"
+          i18n="@@nav.signIn"
+          >Sign in</a
+        >
+      }
     </div>
   </div>
 </header>

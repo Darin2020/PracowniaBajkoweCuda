@@ -1,3 +1,9 @@
+import {
+  provideHttpClient,
+  withFetch,
+  withInterceptors,
+  withXsrfConfiguration,
+} from '@angular/common/http';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import {
   provideClientHydration,
@@ -11,10 +17,18 @@ import {
   withRouterConfig,
 } from '@angular/router';
 import { routes } from './app.routes';
+import { apiErrorInterceptor } from './core/api/api-error.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    // Same origin, relative URLs only (§4.3). The API's antiforgery token travels from the XSRF-TOKEN cookie into the
+    // X-XSRF-TOKEN header of every POST, PUT, PATCH and DELETE.
+    provideHttpClient(
+      withFetch(),
+      withXsrfConfiguration({ cookieName: 'XSRF-TOKEN', headerName: 'X-XSRF-TOKEN' }),
+      withInterceptors([apiErrorInterceptor]),
+    ),
     provideRouter(
       routes,
       // Route data (for example the legal document id) is bound to component inputs.

@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { SITE } from '../../content/site';
 import { ActiveSection } from '../../core/active-section';
+import { AuthService } from '../../core/auth/auth.service';
 import { LanguageSwitcher } from './language-switcher';
 
 interface NavItem {
@@ -20,10 +21,14 @@ interface NavItem {
 })
 export class TopBar {
   private readonly activeSection = inject(ActiveSection);
+  private readonly router = inject(Router);
+  /** On prerendered pages the bar first shows "Sign in"; the user appears once the browser knows the session. */
+  protected readonly auth = inject(AuthService);
 
   protected readonly siteName = SITE.name;
   protected readonly activeId = this.activeSection.id;
   protected readonly menuOpen = signal(false);
+  protected readonly userMenuOpen = signal(false);
 
   protected readonly navItems: readonly NavItem[] = [
     { id: 'about', label: $localize`:@@nav.about:About` },
@@ -36,7 +41,18 @@ export class TopBar {
     this.menuOpen.update((open) => !open);
   }
 
+  protected toggleUserMenu(): void {
+    this.userMenuOpen.update((open) => !open);
+  }
+
   protected closeMenu(): void {
     this.menuOpen.set(false);
+    this.userMenuOpen.set(false);
+  }
+
+  protected async logout(): Promise<void> {
+    this.closeMenu();
+    await this.auth.logout();
+    await this.router.navigateByUrl('/');
   }
 }

@@ -11,9 +11,10 @@ and customers follow those orders.
 The project is also a portfolio piece for **Docker, Azure and CI/CD**: one container, infrastructure as code,
 and a build-once / promote pipeline.
 
-> **Status:** Phase 1 (public site, i18n, SEO, container) is done: the prerendered one-page site in five languages
-> runs from the Docker image. Phase 2 (Azure infrastructure and continuous deployment) is in progress.
-> Accounts, chat and orders come next. Texts, prices, contact details and pictures are
+> **Status:** Phases 1 and 2 are done: the prerendered one-page site in five languages runs from the Docker image and
+> deploys to Azure (staging, then production after approval). Phase 3 (accounts) is nearly done: registration with
+> email confirmation, sign-in with a password or Google, 2FA for admins, the account page with data export and
+> deletion. The chat and orders come next. Texts, prices, contact details and pictures are
 > **placeholders**. The roadmap and the full specification are in [docs/PLAN.md](docs/PLAN.md); decisions are logged
 > in [docs/DECISIONS.md](docs/DECISIONS.md).
 
