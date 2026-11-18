@@ -130,6 +130,14 @@ jobs:
           done
           echo "SQL Server did not start."; docker logs sqlserver; exit 1
 
+      # Blob Storage emulator for chat images (/health/ready checks storage). The account key is Azurite's
+      # well-known public development key, not a secret.
+      - name: Start Azurite
+        run: |
+          docker run --detach --name azurite --network ci mcr.microsoft.com/azure-storage/azurite:3.37.0 \
+            azurite-blob --blobHost 0.0.0.0 --loose --skipApiVersionCheck
+          echo "STORAGE_CONNECTION=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;" >> "$GITHUB_ENV"
+
       # The image's own migrate command, exactly as the migration job runs it in Azure.
       - name: Migrate the database
         run: >
@@ -140,7 +148,8 @@ jobs:
       - name: Start container
         run: |
           docker run --detach --name app --network ci --read-only --tmpfs /tmp --cap-drop ALL --security-opt no-new-privileges \
-            --env PublicBaseUrl=http://localhost:8080 --env "ConnectionStrings__Sql=$SQL_CONNECTION" --publish 8080:8080 bajkowecuda:ci
+            --env PublicBaseUrl=http://localhost:8080 --env "ConnectionStrings__Sql=$SQL_CONNECTION" \
+            --env "Storage__ConnectionString=$STORAGE_CONNECTION" --publish 8080:8080 bajkowecuda:ci
           for attempt in $(seq 1 30); do
             if curl --silent --fail --output /dev/null http://localhost:8080/health/live; then exit 0; fi
             sleep 1

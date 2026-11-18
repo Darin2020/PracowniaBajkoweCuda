@@ -1,12 +1,20 @@
+using BajkoweCuda.Application.Files;
+using BajkoweCuda.Domain.Chat;
 using BajkoweCuda.Infrastructure.Identity;
 using BajkoweCuda.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace BajkoweCuda.Infrastructure.Accounts;
 
 /// <summary>Data export and erasure of one account (docs/PLAN.md §3.7, §8.6).</summary>
-public sealed class AccountData(AppDbContext db, UserManager<ApplicationUser> users, TimeProvider time)
+public sealed partial class AccountData(
+    AppDbContext db,
+    UserManager<ApplicationUser> users,
+    IFileStore files,
+    TimeProvider time,
+    ILogger<AccountData> logger)
 {
     public async Task<AccountExport> ExportAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
@@ -44,21 +52,70 @@ public sealed class AccountData(AppDbContext db, UserManager<ApplicationUser> us
             [.. await users.GetRolesAsync(user)],
             logins,
             [.. emails.Select(message => new ExportedEmail(message.Template, message.ToEmail, message.CreatedAt, message.Status.ToString(), message.SentAt))],
-            events);
+            events,
+            await ExportConversationAsync(id, cancellationToken));
+    }
+
+    private async Task<ExportedConversation?> ExportConversationAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        var conversation = await db.Conversations.AsNoTracking().SingleOrDefaultAsync(row => row.CustomerId == userId, cancellationToken);
+        if (conversation is null)
+        {
+            return null;
+        }
+
+        var messages = await db.Messages.AsNoTracking()
+            .Where(message => message.ConversationId == conversation.Id)
+            .OrderBy(message => message.CreatedAt).ThenBy(message => message.Id)
+            .ToListAsync(cancellationToken);
+        var images = (await db.Attachments.AsNoTracking()
+                .Where(attachment => db.Messages.Any(message => message.Id == attachment.MessageId && message.ConversationId == conversation.Id))
+                .Select(attachment => new { attachment.Id, attachment.MessageId })
+                .ToListAsync(cancellationToken))
+            .ToLookup(attachment => attachment.MessageId!.Value, attachment => $"/api/files/{attachment.Id}");
+
+        return new ExportedConversation(
+            conversation.CreatedAt,
+            conversation.CustomerEmailNotificationsEnabled,
+            [.. messages.Select(message => new ExportedMessage(
+                message.CreatedAt,
+                message.From == ChatSide.Customer ? "you" : "studio",
+                message.Kind.ToString(),
+                message.Body,
+                message.SystemEventType,
+                [.. images[message.Id]]))]);
     }
 
     /// <summary>
     /// Erases the personal data of the account (§8.6): name, email, password, external logins, 2FA, roles, queued and
-    /// sent emails, and the IP addresses in its audit entries. The row stays, anonymized and marked deleted, because
+    /// sent emails, the IP addresses in its audit entries, and the conversation with all its messages and images
+    /// (the blobs too, once the rows are gone). The row stays, anonymized and marked deleted, because
     /// other records (orders, from Phase 5) keep pointing to it. Its new security stamp ends every session.
     /// </summary>
     public async Task EraseAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
         var id = user.Id;
+        var blobs = new List<(string Container, string Name)>();
         var strategy = db.Database.CreateExecutionStrategy();
         await strategy.ExecuteAsync(async () =>
         {
+            blobs.Clear();
             await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
+
+            // The conversation's images (whoever sent them) and the user's own uploads that were never sent.
+            var conversationIds = db.Conversations.Where(row => row.CustomerId == id).Select(row => row.Id);
+            var attachments = db.Attachments.Where(row =>
+                row.OwnerUserId == id && row.MessageId == null
+                || db.Messages.Any(message => message.Id == row.MessageId && conversationIds.Contains(message.ConversationId)));
+            foreach (var row in await attachments.Select(row => new { row.Container, row.BlobName, row.ThumbnailBlobName }).ToListAsync(cancellationToken))
+            {
+                blobs.Add((row.Container, row.BlobName));
+                blobs.Add((row.Container, row.ThumbnailBlobName));
+            }
+
+            await attachments.ExecuteDeleteAsync(cancellationToken);
+            await db.Messages.Where(row => conversationIds.Contains(row.ConversationId)).ExecuteDeleteAsync(cancellationToken);
+            await db.Conversations.Where(row => row.CustomerId == id).ExecuteDeleteAsync(cancellationToken);
 
             await db.UserLogins.Where(row => row.UserId == id).ExecuteDeleteAsync(cancellationToken);
             await db.UserTokens.Where(row => row.UserId == id).ExecuteDeleteAsync(cancellationToken);
@@ -92,5 +149,29 @@ public sealed class AccountData(AppDbContext db, UserManager<ApplicationUser> us
             await db.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
         });
+
+        await DeleteBlobsAsync(blobs);
     }
+
+    /// <summary>
+    /// After the commit, so a failure cannot bring rows back. A blob that cannot be deleted now is logged (by name
+    /// only) for the operator; nothing points to it any more.
+    /// </summary>
+    private async Task DeleteBlobsAsync(List<(string Container, string Name)> blobs)
+    {
+        foreach (var (container, name) in blobs)
+        {
+            try
+            {
+                await files.DeleteAsync(container, name, CancellationToken.None);
+            }
+            catch (Exception error) when (error is not OperationCanceledException)
+            {
+                LogBlobNotDeleted(logger, error, container, name);
+            }
+        }
+    }
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Blob {Container}/{BlobName} of a deleted account could not be deleted")]
+    private static partial void LogBlobNotDeleted(ILogger logger, Exception error, string container, string blobName);
 }
