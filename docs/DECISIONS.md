@@ -429,3 +429,26 @@ After that date the build fails again; an entry that is no longer reported is fl
 - **The email contains message excerpts**: that is the feature (PLAN §3.6). They are HTML-encoded, and still never
   written to the logs.
 
+## 2026-11-18 — Phase 4: the customer's chat in Angular
+
+- **One SignalR connection per signed-in user** (`ChatRealtime`), opened when a user who may chat signs in (a confirmed
+  customer, or an admin) and closed on sign-out. Its state is a signal; events are streams. The client
+  (`@microsoft/signalr` 10.0.x, the line of the .NET 10 server) is loaded with a dynamic import, so the public pages
+  never download it. Automatic reconnect tries at 0, 2, 5, 10 and 30 s, then starts again every 30 s; after a
+  reconnect the chat reloads its newest page, so nothing missed meanwhile is lost.
+- **Messages are merged by id** (`mergeMessages`): the same message arrives through the API, through SignalR and from
+  the user's other tabs. Read times are never cleared by an older copy.
+- **History** loads newest first; older pages load when the top of the list scrolls into view (IntersectionObserver),
+  keeping the visible messages in place. New messages scroll into view when the reader is at the bottom (or wrote
+  them).
+- **Read receipts**: while the page is visible, the studio's messages are marked read up to the newest one; the
+  customer sees "Sent" / "Read" under their own messages. The top-bar badge comes from `/api/auth/me` and is updated
+  by `UnreadCountChanged`.
+- **Photos** are uploaded as soon as they are chosen (preview from a local object URL, at most 5, 10 MB checked in the
+  browser too), and sent with the message by id. A thumbnail opens the existing fullscreen viewer.
+- **Email question**: after the first message a native `<dialog>` asks "Send replies to your email?"; afterwards the
+  composer shows the checkbox (PLAN §3.6).
+- **Enter sends** on devices with a fine pointer (keyboard and mouse); on touch keyboards Enter is a new line and the
+  button sends.
+- System messages show "Update about your order" until Phase 5 renders each order event.
+
