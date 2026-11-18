@@ -197,6 +197,15 @@ are in the `AuditLog` table; admins read them through `GET /api/admin/audit`. To
 `429 rate_limited` with `Retry-After`: sign-in and similar 10/min per IP, emails 3/hour per IP and per address. Limits
 are per replica, in memory, and reset on restart.
 
+### Chat and real-time events (SignalR)
+- The hub is `/hubs/chat` on the same origin, with the session cookie; browsers use WebSockets through the Container
+  Apps ingress (long polling as a fallback). It only pushes events; messages are sent through the REST API.
+- Connections live in the memory of the replica. **Keep one replica per environment** (as now): with several, a
+  message posted on one replica would not reach clients connected to another. Scaling out needs a backplane (Azure
+  SignalR Service or Redis) first.
+- Admins receive events only in a session that passed 2FA (they join the `admins` group when they connect).
+- Limits: 20 messages per minute and 30 image uploads per hour per user.
+
 ### Chat images (Blob Storage)
 - Uploads are re-encoded to WebP by the app (SkiaSharp) and stored in the private container `attachments` under random
   names: a display copy (max 1600 px) and a thumbnail (max 480 px). The uploaded original is never stored.

@@ -75,6 +75,9 @@ expect_status /health/ready 200
 expect_contains /api/auth/me '"authenticated":false'
 expect_header /api/auth/me '^set-cookie: XSRF-TOKEN='
 expect_status /api/admin/audit 401
+expect_status /api/chat 401
+expect_status /api/admin/conversations 401
+expect_status /hubs/chat 401
 expect_status /api/version 200
 if [ -n "${EXPECTED_VERSION:-}" ]; then
   expect_contains /api/version "\"version\":\"$EXPECTED_VERSION\""
