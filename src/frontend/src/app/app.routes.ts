@@ -1,6 +1,12 @@
 import { Routes } from '@angular/router';
 import { LegalDocumentId } from './content/legal';
-import { adminGuard, anonymousGuard, authGuard, sessionGuard } from './core/auth/auth.guards';
+import {
+  adminGuard,
+  anonymousGuard,
+  authGuard,
+  homeGuard,
+  sessionGuard,
+} from './core/auth/auth.guards';
 import { LandingPage } from './public/landing/landing-page';
 
 const legalRoute = (document: LegalDocumentId) => ({
@@ -55,7 +61,8 @@ export const routes: Routes = [
     loadComponent: () => import('./auth/confirm-email-page').then((m) => m.ConfirmEmailPage),
   },
 
-  // Signed-in area.
+  // Signed-in area. `/signed-in` only redirects (see homeGuard).
+  { path: 'signed-in', canActivate: [homeGuard], children: [] },
   {
     path: 'account',
     canActivate: [authGuard],

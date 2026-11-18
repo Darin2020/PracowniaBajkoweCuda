@@ -540,6 +540,7 @@ Each phase ends with: green CI, updated README/DECISIONS, acceptance criteria de
 - [x] Angular: auth state service (signals), guards, login/register/confirm/forgot/reset/2FA/account pages, top-bar user menu
 - [x] Integration tests: auth flows + authorization matrix skeleton
 - **AC:** a user can register, confirm by email (Mailpit locally / ACS on staging), sign in with password and Google, export and delete the account. An admin cannot reach admin endpoints without 2FA.
+  ✅ Verified on staging on 2026-11-18 (and locally with docker compose).
 
 ### Phase 4 — Chat
 - [ ] Domain: Conversation, Message, Attachment. Migrations

@@ -27,7 +27,7 @@ import { AuthService } from '../core/auth/auth.service';
         @for (provider of providers(); track provider) {
           <a
             class="button"
-            [href]="auth.externalUrl(provider, 'signin', returnUrl())"
+            [href]="auth.externalUrl(provider, 'signin', returnUrl() || '/signed-in')"
             i18n="@@auth.providers.continueWith"
             >Continue with {{ name(provider) }}</a
           >
@@ -39,7 +39,7 @@ import { AuthService } from '../core/auth/auth.service';
 export class ProviderButtons {
   protected readonly auth = inject(AuthService);
 
-  /** Where to go after signing in (an app path like "/chat"). */
+  /** Where to go after signing in (an app path like "/chat"); by default the user's home page. */
   readonly returnUrl = input<string | null | undefined>(null);
 
   protected readonly providers = signal<string[]>([]);

@@ -105,6 +105,16 @@ describe('LoginPage', () => {
     ).toBe('/api/auth/external/google?mode=signin&lang=pl&returnUrl=%2Fpl%2Fchat');
   });
 
+  it('returns to the home page after a provider sign-in without a return URL', async () => {
+    const harness = await open('/login');
+
+    expect(
+      harness
+        .routeNativeElement!.querySelector('a[href^="/api/auth/external/"]')
+        ?.getAttribute('href'),
+    ).toBe('/api/auth/external/google?mode=signin&lang=pl&returnUrl=%2Fpl%2Fsigned-in');
+  });
+
   it('explains an error code from a redirect of the API', async () => {
     const harness = await open('/login?error=account_exists');
 
