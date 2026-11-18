@@ -349,3 +349,42 @@ After that date the build fails again; an entry that is no longer reported is fl
 - **An external sign-in without a return URL comes back to `/signed-in`**, a route that only redirects to the user's
   home page (`homeGuard`), because the API does not know the frontend's rules for where people land. Return URLs that
   come back from the API carry the locale prefix and are normalized (`Location.normalize`) before the router uses them.
+
+## 2026-11-18 — Phase 4: chat model, uploads and file access
+
+**Owner's decision**
+- **Images are processed with SkiaSharp** (MIT), not ImageSharp (Six Labors split license, like the commercially
+  licensed MediatR/AutoMapper) or Magick.NET (large native package, many formats we do not need). Version 3.119.x:
+  the 4.x line was only days old. `SkiaSharp.NativeAssets.Linux.NoDependencies`, because the chiseled runtime image
+  has no fontconfig.
+
+**Implementation**
+- **Domain**: `Conversation` (one per customer, started by the first message), `Message` (text up to 2,000 characters
+  and/or up to 5 images; system messages carry an event type and a JSON payload that the client renders in the
+  reader's language), `Attachment` (uploaded first, attached to a message when it is sent, only by its uploader and
+  only once). Read state is kept per side (customer / studio), as PLAN §5 says. Broken rules throw
+  `DomainException` with an error code (`chat.empty_message`, `chat.too_many_attachments`, ...).
+- **Upload pipeline** (`POST /api/chat/attachments`, one image per request):
+  - the type comes from the magic bytes only (JPEG, PNG, WebP);
+  - limits: 10 MB and 40 megapixels (checked from the header, before decoding);
+  - the EXIF orientation is applied, then the image is re-encoded to WebP: display copy at most 1600 px (quality 82)
+    and thumbnail at most 480 px (quality 75). The re-encoding drops EXIF/GPS and anything hidden in the file; the
+    original is not kept;
+  - JPEGs are decoded already scaled down (in eighths, never below the target), so a 40-megapixel photo does not need
+    160 MB of memory;
+  - blob names are new random GUIDs, unrelated to the attachment id and never taken from the file name.
+  The uploader needs a confirmed email address (chatting does, PLAN §3.2). Limit: 30 uploads per hour per user.
+- **File access** (`GET /api/files/{id}` and `/thumbnail`): the uploader, the customer of the conversation the image
+  was sent in, or an admin whose session meets the admin policy (2FA). Everyone else gets `404 files.not_found`, the
+  same as for an id that does not exist. `Cache-Control: private, max-age=3600`.
+- **Cleanup**: an hourly background job deletes uploads that were not sent within 24 hours (rows first, then blobs).
+- **Account deletion** now deletes the conversation, its messages and all its images (also those the studio sent)
+  plus the user's unsent uploads; blobs are deleted after the transaction commits. The data export lists the
+  conversation with the image addresses.
+- **Storage client**: `Storage:BlobServiceUri` with the managed identity in Azure, `Storage:ConnectionString` for
+  Azurite locally and in tests (containers created on first use there; in Azure the infrastructure creates them).
+  `/health/ready` checks the storage account too.
+- **Tests** run against Azurite in Testcontainers. The Blob client takes the account name from the path only for IP
+  addresses, "localhost" and the emulator's default ports, so the test fixture uses the container's IP address when
+  tests run inside a container (host.docker.internal).
+

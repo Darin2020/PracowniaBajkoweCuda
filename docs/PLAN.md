@@ -543,8 +543,8 @@ Each phase ends with: green CI, updated README/DECISIONS, acceptance criteria de
   ✅ Verified on staging on 2026-11-18 (and locally with docker compose).
 
 ### Phase 4 — Chat
-- [ ] Domain: Conversation, Message, Attachment. Migrations
-- [ ] Upload pipeline (magic-byte validation, re-encode, thumbnails, Blob), `/api/files` with access checks, orphan cleanup
+- [x] Domain: Conversation, Message, Attachment. Migrations
+- [x] Upload pipeline (magic-byte validation, re-encode, thumbnails, Blob), `/api/files` with access checks, orphan cleanup
 - [ ] Customer chat API + SignalR hub, read receipts, unread counts
 - [ ] Email digest notifications (debounced), first-message dialog, "send replies to my email" checkbox
 - [ ] Angular customer chat (infinite scroll, attachments with preview, fullscreen viewer, reconnect handling)

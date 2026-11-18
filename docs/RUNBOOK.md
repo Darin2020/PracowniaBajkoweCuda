@@ -197,6 +197,17 @@ are in the `AuditLog` table; admins read them through `GET /api/admin/audit`. To
 `429 rate_limited` with `Retry-After`: sign-in and similar 10/min per IP, emails 3/hour per IP and per address. Limits
 are per replica, in memory, and reset on restart.
 
+### Chat images (Blob Storage)
+- Uploads are re-encoded to WebP by the app (SkiaSharp) and stored in the private container `attachments` under random
+  names: a display copy (max 1600 px) and a thumbnail (max 480 px). The uploaded original is never stored.
+- Nobody reads the container directly: the app streams files through `/api/files/{id}` after an access check. Do not
+  enable public access or SAS links on the storage account.
+- Uploads that are never sent with a message are deleted after 24 hours (hourly job in the app, logged as
+  "Deleted N abandoned chat uploads"). Deleting an account deletes its conversation and images; a blob that cannot be
+  deleted at that moment is logged as an error with its name, and can be removed by hand.
+- `/health/ready` also checks the storage account (the smoke test after each deployment calls it).
+- Locally the app uses Azurite (`docker compose up -d`); the containers are created on first use.
+
 ### Sessions and Data Protection keys
 
 Session cookies, antiforgery tokens and the links in emails are protected by ASP.NET Core Data Protection keys. In
