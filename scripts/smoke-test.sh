@@ -71,6 +71,9 @@ expect_contains /health/live Healthy
 # Readiness opens a database connection with the app's own credentials: in Azure this proves that the migration
 # job created the managed identity's database user.
 expect_status /health/ready 200
+# The session endpoint issues the antiforgery cookie, which needs the Data Protection keys (Blob + Key Vault in Azure).
+expect_contains /api/auth/me '"authenticated":false'
+expect_header /api/auth/me '^set-cookie: XSRF-TOKEN='
 expect_status /api/version 200
 if [ -n "${EXPECTED_VERSION:-}" ]; then
   expect_contains /api/version "\"version\":\"$EXPECTED_VERSION\""

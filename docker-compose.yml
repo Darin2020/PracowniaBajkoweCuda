@@ -93,7 +93,7 @@ services:
       # Public origin used in canonical URLs, robots.txt and sitemap.xml.
       PublicBaseUrl: ${PUBLIC_BASE_URL:-http://localhost:8080}
       ConnectionStrings__Sql: Server=sqlserver,1433;Database=BajkoweCuda;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True
-      # Not read by the API yet; wired now so later phases only add code (docs/PLAN.md §14).
+      # Account emails go to Mailpit (UI on http://localhost:8025).
       Email__Provider: Smtp
       Email__Smtp__Host: mailpit
       Email__Smtp__Port: "1025"

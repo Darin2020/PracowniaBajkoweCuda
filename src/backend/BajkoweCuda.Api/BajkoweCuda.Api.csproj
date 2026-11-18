@@ -5,6 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Extensions.AspNetCore.DataProtection.Blobs" />
+    <PackageReference Include="Azure.Extensions.AspNetCore.DataProtection.Keys" />
     <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" />
     <PackageReference Include="Serilog.AspNetCore" />
     <PackageReference Include="Serilog.Formatting.Compact" />

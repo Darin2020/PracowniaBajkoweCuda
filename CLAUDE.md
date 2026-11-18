@@ -23,7 +23,7 @@ Record the decisions you make along the way in `docs/DECISIONS.md` (short ADR-st
 
 ## Commands (keep this section current once the projects exist)
 ```bash
-docker compose up -d                       # SQL Server, Azurite, Mailpit
+docker compose up -d                       # SQL Server, Azurite, Mailpit (emails: http://localhost:8025)
 docker compose --profile app up -d --build # + `migrate` (one-shot) and the application image on http://localhost:8080
 scripts/smoke-test.sh http://localhost:8080 # checks a running instance (health/ready, redirect, pages per locale, headers)
 dotnet build BajkoweCuda.sln

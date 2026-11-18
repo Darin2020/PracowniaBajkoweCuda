@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Texts of the transactional emails. English is the source; the other languages need review (docs/DECISIONS.md). -->
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Common_Signature" xml:space="preserve"><value>Pracownia Bajkowe Cuda</value></data>
+  <data name="Common_IgnoreIfNotYou" xml:space="preserve"><value>Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet e-mail.</value></data>
+  <data name="Common_LinkFallback" xml:space="preserve"><value>Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :</value></data>
+  <data name="ConfirmEmail_Subject" xml:space="preserve"><value>Confirmez votre adresse e-mail</value></data>
+  <data name="ConfirmEmail_Heading" xml:space="preserve"><value>Bienvenue chez Pracownia Bajkowe Cuda</value></data>
+  <data name="ConfirmEmail_Body" xml:space="preserve"><value>Veuillez confirmer votre adresse e-mail pour pouvoir discuter avec nous de votre jouet.</value></data>
+  <data name="ConfirmEmail_Action" xml:space="preserve"><value>Confirmer l'adresse e-mail</value></data>
+  <data name="AlreadyRegistered_Subject" xml:space="preserve"><value>Vous avez déjà un compte</value></data>
+  <data name="AlreadyRegistered_Heading" xml:space="preserve"><value>Vous avez déjà un compte</value></data>
+  <data name="AlreadyRegistered_Body" xml:space="preserve"><value>Quelqu'un, probablement vous, a essayé de s'inscrire avec cette adresse e-mail, mais un compte existe déjà. Connectez-vous, ou choisissez un nouveau mot de passe si vous l'avez oublié.</value></data>
+  <data name="AlreadyRegistered_Action" xml:space="preserve"><value>Choisir un nouveau mot de passe</value></data>
+  <data name="ResetPassword_Subject" xml:space="preserve"><value>Réinitialisez votre mot de passe</value></data>
+  <data name="ResetPassword_Heading" xml:space="preserve"><value>Réinitialisez votre mot de passe</value></data>
+  <data name="ResetPassword_Body" xml:space="preserve"><value>Nous avons reçu une demande de réinitialisation du mot de passe de votre compte. Le lien est valable 24 heures.</value></data>
+  <data name="ResetPassword_Action" xml:space="preserve"><value>Choisir un nouveau mot de passe</value></data>
+  <data name="PasswordChanged_Subject" xml:space="preserve"><value>Votre mot de passe a été modifié</value></data>
+  <data name="PasswordChanged_Heading" xml:space="preserve"><value>Votre mot de passe a été modifié</value></data>
+  <data name="PasswordChanged_Body" xml:space="preserve"><value>Le mot de passe de votre compte vient d'être modifié. Si ce n'était pas vous, réinitialisez immédiatement votre mot de passe et contactez-nous.</value></data>
+</root>

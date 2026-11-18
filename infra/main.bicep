@@ -143,6 +143,7 @@ module communication 'modules/communication.bicep' = {
     environmentName: environmentName
     suffix: suffix
     tags: tags
+    appPrincipalId: identity.outputs.principalId
   }
 }
 
@@ -167,6 +168,8 @@ module app 'modules/container-app.bicep' = {
     sqlDatabaseName: sql.outputs.databaseName
     blobServiceUri: storage.outputs.blobServiceUri
     keyVaultUri: keyVault.outputs.uri
+    dataProtectionBlobUri: storage.outputs.dataProtectionBlobUri
+    dataProtectionKeyUri: keyVault.outputs.dataProtectionKeyUri
     emailEndpoint: communication.outputs.endpoint
     emailSenderAddress: communication.outputs.senderAddress
   }

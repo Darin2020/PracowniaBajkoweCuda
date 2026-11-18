@@ -5,6 +5,9 @@ param environmentName string
 param suffix string
 param tags object
 
+@description('Principal id of the application managed identity, which sends the emails.')
+param appPrincipalId string
+
 @description('Where the service stores data at rest.')
 param dataLocation string = 'Europe'
 
@@ -37,6 +40,20 @@ resource communicationService 'Microsoft.Communication/communicationServices@202
     linkedDomains: [
       managedDomain.id
     ]
+  }
+}
+
+// Built-in role: Communication and Email Service Owner. Azure Communication Services does not support custom roles;
+// this is the role Microsoft documents for sending email with a managed identity.
+var emailServiceOwnerRoleId = '09976791-48a7-449e-bb21-39d1a415f350'
+
+resource sendAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(communicationService.id, appPrincipalId, emailServiceOwnerRoleId)
+  scope: communicationService
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', emailServiceOwnerRoleId)
+    principalId: appPrincipalId
+    principalType: 'ServicePrincipal'
   }
 }
 
