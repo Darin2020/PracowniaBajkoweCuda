@@ -76,11 +76,31 @@ public sealed class TwoFactorCodeRequest
     public string Code { get; init; } = string.Empty;
 }
 
-/// <summary>Re-authentication before deleting the account (§8.6).</summary>
+/// <summary>
+/// Re-authentication before deleting the account (§8.6): the password, or nothing for an account without a password
+/// that has just re-authenticated through its provider (<c>GET /api/auth/external/{provider}?mode=reauth</c>).
+/// </summary>
 public sealed class DeleteAccountRequest
 {
-    [Required, MaxLength(128)]
-    public string Password { get; init; } = string.Empty;
+    [MaxLength(128)]
+    public string? Password { get; init; }
+}
+
+/// <summary>The last step of a first external sign-in (§3.2).</summary>
+public sealed class CompleteProfileRequest
+{
+    /// <summary>Needed only when the provider sent no address; ignored otherwise.</summary>
+    [EmailAddress, MaxLength(256)]
+    public string? Email { get; init; }
+
+    [Required, MaxLength(ApplicationUser.DisplayNameMaxLength)]
+    public string DisplayName { get; init; } = string.Empty;
+
+    [Required, SupportedLanguage]
+    public string PreferredLanguage { get; init; } = Languages.Default;
+
+    [Range(typeof(bool), "true", "true", ErrorMessage = "The terms must be accepted.")]
+    public bool AcceptTerms { get; init; }
 }
 
 public sealed class ChangePasswordRequest

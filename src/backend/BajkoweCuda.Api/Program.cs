@@ -16,6 +16,13 @@ if (MigrateCommand.IsRequested(args))
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Application secrets (external sign-in) come from the environment's Key Vault, read with the managed identity
+// (docs/PLAN.md §8.5). Secret "Auth--Google--ClientSecret" becomes the setting Auth:Google:ClientSecret.
+if (builder.Configuration["KeyVault:Uri"] is { Length: > 0 } keyVaultUri)
+{
+    builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), new Azure.Identity.DefaultAzureCredential());
+}
+
 builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
 builder.AddObservability();

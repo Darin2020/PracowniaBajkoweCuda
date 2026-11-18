@@ -85,6 +85,60 @@ public sealed partial class AccountController(
         return File(JsonSerializer.SerializeToUtf8Bytes(export, ExportJson), "application/json", fileName);
     }
 
+    /// <summary>The password and the linked providers (§6, <c>GET /api/account/logins</c>).</summary>
+    [HttpGet("logins")]
+    public async Task<IActionResult> Logins()
+    {
+        var user = await users.GetUserAsync(User);
+        if (user is null || user.IsDeleted)
+        {
+            return AuthErrors.NotAuthenticated.ToResult();
+        }
+
+        var logins = await users.GetLoginsAsync(user);
+        var providers = (await signIn.GetExternalAuthenticationSchemesAsync()).Select(scheme => scheme.Name).ToList();
+        return Ok(new AccountLoginsResponse(
+            await users.HasPasswordAsync(user),
+            [.. logins.Select(login => new LinkedLoginResponse(login.LoginProvider.ToLowerInvariant(), login.ProviderDisplayName))],
+            [.. providers
+                .Where(provider => !logins.Any(login => string.Equals(login.LoginProvider, provider, StringComparison.OrdinalIgnoreCase)))
+                .Select(provider => provider.ToLowerInvariant())]));
+    }
+
+    /// <summary>Unlinks a provider, unless it is the only way left to sign in.</summary>
+    [HttpDelete("logins/{provider}")]
+    public async Task<IActionResult> RemoveLogin(string provider, CancellationToken cancellationToken)
+    {
+        var user = await users.GetUserAsync(User);
+        if (user is null || user.IsDeleted)
+        {
+            return AuthErrors.NotAuthenticated.ToResult();
+        }
+
+        var logins = await users.GetLoginsAsync(user);
+        var login = logins.FirstOrDefault(item => string.Equals(item.LoginProvider, provider, StringComparison.OrdinalIgnoreCase));
+        if (login is null)
+        {
+            return AuthErrors.LoginNotFound.ToResult();
+        }
+
+        if (logins.Count == 1 && !await users.HasPasswordAsync(user))
+        {
+            return AuthErrors.LastLogin.ToResult();
+        }
+
+        var result = await users.RemoveLoginAsync(user, login.LoginProvider, login.ProviderKey);
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException($"Removing the login failed: {string.Join(", ", result.Errors.Select(error => error.Code))}");
+        }
+
+        // Removing a login changes the security stamp: keep this session valid.
+        await signIn.RefreshSignInAsync(user);
+        await audit.WriteAsync(AuditActions.ExternalLoginRemoved, user.Id, details: new { method = login.LoginProvider.ToLowerInvariant() }, cancellationToken: cancellationToken);
+        return NoContent();
+    }
+
     /// <summary>Changes the password; the current one is asked again (§8.1). Other sessions end, this one stays.</summary>
     [HttpPost("password")]
     [EnableRateLimiting(RateLimiting.Auth)]
@@ -116,9 +170,8 @@ public sealed partial class AccountController(
     }
 
     /// <summary>
-    /// Deletes the account after asking for the password again (§8.6): erases the personal data, ends every session,
-    /// confirms by email and writes an audit entry. Accounts without a password (external sign-in only) will
-    /// re-authenticate with their provider; that comes with external sign-in.
+    /// Deletes the account after re-authentication (§8.6): erases the personal data, ends every session, confirms by
+    /// email and writes an audit entry. Accounts without a password re-authenticate through their provider first.
     /// </summary>
     [HttpPost("delete")]
     [EnableRateLimiting(RateLimiting.Auth)]
@@ -130,7 +183,7 @@ public sealed partial class AccountController(
             return AuthErrors.NotAuthenticated.ToResult();
         }
 
-        if (!await ReauthenticateAsync(user, request.Password, cancellationToken))
+        if (!await ReauthenticateForDeletionAsync(user, request.Password, cancellationToken))
         {
             return AuthErrors.ReauthenticationFailed.ToResult();
         }
@@ -153,6 +206,26 @@ public sealed partial class AccountController(
         HttpContext.IssueRequestToken();
         LogDeleted(logger, user.Id);
         return NoContent();
+    }
+
+    /// <summary>
+    /// The password when the account has one; otherwise an external re-authentication of this session within the
+    /// last minutes.
+    /// </summary>
+    private async Task<bool> ReauthenticateForDeletionAsync(ApplicationUser user, string? password, CancellationToken cancellationToken)
+    {
+        if (await users.HasPasswordAsync(user))
+        {
+            return await ReauthenticateAsync(user, password ?? string.Empty, cancellationToken);
+        }
+
+        if (await HttpContext.IsFreshlyReauthenticatedAsync(time.GetUtcNow()))
+        {
+            return true;
+        }
+
+        await audit.WriteAsync(AuditActions.ReauthenticationFailed, user.Id, cancellationToken: cancellationToken);
+        return false;
     }
 
     /// <summary>Checks the password again. Wrong guesses count towards the lockout, like failed sign-ins.</summary>

@@ -64,3 +64,11 @@ public sealed record AuditEntryResponse(
     string? EntityId,
     string? IpAddress,
     System.Text.Json.JsonElement? Details);
+
+/// <summary><c>GET /api/auth/complete-profile</c>: what the provider told about the person signing up.</summary>
+public sealed record PendingProfileResponse(string Provider, string? Email, bool EmailVerified, string? DisplayName);
+
+/// <summary><c>GET /api/account/logins</c>: how the user can sign in, and which providers can still be linked.</summary>
+public sealed record AccountLoginsResponse(bool HasPassword, IReadOnlyList<LinkedLoginResponse> Logins, IReadOnlyList<string> Available);
+
+public sealed record LinkedLoginResponse(string Provider, string? DisplayName);

@@ -42,7 +42,7 @@ public sealed partial class AuthApp(SqlServerFixture sqlServer) : IAsyncLifetime
             builder.UseSetting("RateLimiting:EmailsPerHour", "100000");
             // One entry with a list, as the environment variable Admin__Emails__0 is set in Azure.
             builder.UseSetting("Admin:Emails:0", string.Join(", ", _adminEmails));
-            builder.ConfigureTestServices(services => services.AddSingleton<IEmailSender>(Emails));
+            builder.ConfigureTestServices(services => services.AddSingleton<IEmailSender>(Emails).AddFakeProvider());
         });
 
         await using var scope = Factory.Services.CreateAsyncScope();
