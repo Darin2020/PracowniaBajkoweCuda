@@ -22,6 +22,10 @@ public sealed partial class AuthApp(SqlServerFixture sqlServer) : IAsyncLifetime
 
     private readonly SiteFactory _site = new();
 
+    /// <summary>Addresses listed in Admin:Emails; each admin test takes its own (<see cref="NewAdminEmail"/>).</summary>
+    private readonly string[] _adminEmails = [.. Enumerable.Range(0, 16).Select(_ => $"admin-{Guid.NewGuid():N}@example.test")];
+    private int _nextAdmin = -1;
+
     public CapturingEmailSender Emails { get; } = new();
 
     public WebApplicationFactory<Program> Factory { get; private set; } = null!;
@@ -33,6 +37,11 @@ public sealed partial class AuthApp(SqlServerFixture sqlServer) : IAsyncLifetime
         {
             builder.UseSetting("ConnectionStrings:Sql", connectionString);
             builder.UseSetting("Legal:TermsVersion", "test-terms");
+            // The tests sign in far more often than a person would; RateLimitTests checks the real limits.
+            builder.UseSetting("RateLimiting:AuthPerMinute", "100000");
+            builder.UseSetting("RateLimiting:EmailsPerHour", "100000");
+            // One entry with a list, as the environment variable Admin__Emails__0 is set in Azure.
+            builder.UseSetting("Admin:Emails:0", string.Join(", ", _adminEmails));
             builder.ConfigureTestServices(services => services.AddSingleton<IEmailSender>(Emails));
         });
 
@@ -46,6 +55,23 @@ public sealed partial class AuthApp(SqlServerFixture sqlServer) : IAsyncLifetime
     }
 
     public static string NewEmail() => $"user-{Guid.NewGuid():N}@example.test";
+
+    /// <summary>An address from Admin:Emails that no other test uses.</summary>
+    public string NewAdminEmail() => _adminEmails[Interlocked.Increment(ref _nextAdmin)];
+
+    /// <summary>Signs in a confirmed admin (or any user) and turns 2FA on; returns the authenticator key and the recovery codes.</summary>
+    public static async Task<(string SharedKey, IReadOnlyList<string> RecoveryCodes)> EnableTwoFactorAsync(HttpClient client)
+    {
+        using var setup = await client.GetAsync(new Uri("/api/auth/2fa/setup", UriKind.Relative));
+        setup.EnsureSuccessStatusCode();
+        var sharedKey = (await setup.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("sharedKey").GetString()!;
+
+        using var enabled = await PostAsync(client, "/api/auth/2fa/enable", new { code = Totp.Code(sharedKey) });
+        enabled.EnsureSuccessStatusCode();
+        var codes = (await enabled.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("recoveryCodes")
+            .EnumerateArray().Select(code => code.GetString()!).ToList();
+        return (sharedKey, codes);
+    }
 
     /// <summary>A browser-like client that already has its XSRF cookie (from <c>GET /api/auth/me</c>).</summary>
     public async Task<(HttpClient Client, BrowserHandler Browser)> CreateBrowserAsync()

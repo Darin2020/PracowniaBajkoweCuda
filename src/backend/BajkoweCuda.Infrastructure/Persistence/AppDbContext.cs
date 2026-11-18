@@ -1,3 +1,4 @@
+using BajkoweCuda.Infrastructure.Audit;
 using BajkoweCuda.Infrastructure.Emails;
 using BajkoweCuda.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -11,6 +12,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
     : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options)
 {
     public DbSet<EmailOutboxMessage> EmailOutbox => Set<EmailOutboxMessage>();
+
+    public DbSet<AuditLogEntry> AuditLog => Set<AuditLogEntry>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -23,4 +23,7 @@
   <data name="PasswordChanged_Subject" xml:space="preserve"><value>Votre mot de passe a été modifié</value></data>
   <data name="PasswordChanged_Heading" xml:space="preserve"><value>Votre mot de passe a été modifié</value></data>
   <data name="PasswordChanged_Body" xml:space="preserve"><value>Le mot de passe de votre compte vient d'être modifié. Si ce n'était pas vous, réinitialisez immédiatement votre mot de passe et contactez-nous.</value></data>
+  <data name="AccountDeleted_Subject" xml:space="preserve"><value>Votre compte a été supprimé</value></data>
+  <data name="AccountDeleted_Heading" xml:space="preserve"><value>Votre compte a été supprimé</value></data>
+  <data name="AccountDeleted_Body" xml:space="preserve"><value>Votre compte et ses données personnelles ont été supprimés, comme vous l'avez demandé. Toutes vos sessions ont été fermées. Si ce n'était pas vous, contactez-nous immédiatement.</value></data>
 </root>

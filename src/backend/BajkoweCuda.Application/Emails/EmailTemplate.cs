@@ -17,4 +17,7 @@ public enum EmailTemplate
 
     /// <summary>Notice that the password was changed or reset. No payload.</summary>
     PasswordChanged,
+
+    /// <summary>Confirms that the account and its personal data were deleted. No payload.</summary>
+    AccountDeleted,
 }

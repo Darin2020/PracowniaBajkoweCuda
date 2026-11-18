@@ -58,6 +58,34 @@ public sealed class EmailDispatcherTests(SqlServerFixture sqlServer)
         message.Attempts.ShouldBe(3);
     }
 
+    [Fact]
+    public async Task Finished_emails_are_deleted_after_the_retention_period_and_pending_ones_are_kept()
+    {
+        var sender = new CapturingEmailSender();
+        await using var services = await BuildAsync(sender);
+        await EnqueueAsync(services);
+        await Dispatcher(services).DispatchDueAsync(Ct);
+
+        _time.Advance(EmailDispatcher.Retention - TimeSpan.FromMinutes(1));
+        await Dispatcher(services).DispatchDueAsync(Ct);
+        (await SingleAsync(services)).Status.ShouldBe(EmailStatus.Sent, "still within the retention period");
+
+        _time.Advance(TimeSpan.FromMinutes(2));
+        await EnqueueAsync(services);
+        await using (var scope = services.CreateAsyncScope())
+        {
+            // A new email that is not due yet must survive the clean-up.
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var pending = await db.EmailOutbox.SingleAsync(message => message.Status == EmailStatus.Pending, Ct);
+            pending.SendAfter = _time.GetUtcNow() + TimeSpan.FromHours(1);
+            await db.SaveChangesAsync(Ct);
+        }
+
+        await Dispatcher(services).DispatchDueAsync(Ct);
+
+        (await SingleAsync(services)).Status.ShouldBe(EmailStatus.Pending);
+    }
+
     [Theory]
     [InlineData(1, 30)]
     [InlineData(2, 60)]

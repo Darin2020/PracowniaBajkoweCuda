@@ -1,12 +1,16 @@
 using BajkoweCuda.Api.Observability;
+using BajkoweCuda.Infrastructure.Accounts;
+using BajkoweCuda.Infrastructure.Identity;
 using BajkoweCuda.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Identity;
 
 namespace BajkoweCuda.Api.Database;
 
 /// <summary>
 /// <c>dotnet BajkoweCuda.Api.dll migrate</c>: applies the EF Core migrations and exits. The same image that runs the
 /// application runs this command, in Azure as a Container Apps job with its own identity (docs/RUNBOOK.md).
-/// It needs only the connection string, not the web settings of the application.
+/// It needs the connection string and <c>Admin:Emails</c>, not the web settings of the application: after the
+/// migrations it brings the Admin role in line with <c>Admin:Emails</c> (docs/PLAN.md §3.3).
 /// </summary>
 internal static partial class MigrateCommand
 {
@@ -19,6 +23,8 @@ internal static partial class MigrateCommand
         var builder = Host.CreateApplicationBuilder(args[1..]);
         builder.AddObservability();
         builder.Services.AddPersistence(builder.Configuration);
+        builder.Services.AddIdentityCore<ApplicationUser>().AddRoles<IdentityRole<Guid>>().AddEntityFrameworkStores<AppDbContext>();
+        builder.Services.AddAccounts(builder.Configuration);
 
         // Disposing the host flushes the buffered logs and telemetry before the job container stops.
         using var host = builder.Build();
@@ -28,6 +34,7 @@ internal static partial class MigrateCommand
         {
             await using var scope = host.Services.CreateAsyncScope();
             await scope.ServiceProvider.GetRequiredService<DatabaseMigrator>().RunAsync(CancellationToken.None);
+            await scope.ServiceProvider.GetRequiredService<AdminRoleSync>().SyncAllAsync(CancellationToken.None);
             LogFinished(logger);
             return 0;
         }

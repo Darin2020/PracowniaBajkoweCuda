@@ -27,6 +27,9 @@ public sealed partial class EmailDispatcher(
     private static readonly TimeSpan FirstRetry = TimeSpan.FromSeconds(30);
     private static readonly TimeSpan LongestRetry = TimeSpan.FromHours(2);
 
+    /// <summary>Finished emails (sent, skipped, dead) are kept this long for support questions, then deleted.</summary>
+    internal static readonly TimeSpan Retention = TimeSpan.FromDays(30);
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
@@ -76,6 +79,13 @@ public sealed partial class EmailDispatcher(
                 break;
             }
         }
+
+        // Old finished rows hold email addresses that are no longer needed (also those of deleted accounts).
+        var expired = time.GetUtcNow() - Retention;
+        await db.EmailOutbox
+            .Where(message => (message.Status == EmailStatus.Sent || message.Status == EmailStatus.Skipped || message.Status == EmailStatus.Dead)
+                && message.CreatedAt < expired)
+            .ExecuteDeleteAsync(cancellationToken);
 
         return await db.EmailOutbox
             .Where(message => message.Status == EmailStatus.Pending)

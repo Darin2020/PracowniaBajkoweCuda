@@ -23,4 +23,7 @@
   <data name="PasswordChanged_Subject" xml:space="preserve"><value>Tu contraseña ha cambiado</value></data>
   <data name="PasswordChanged_Heading" xml:space="preserve"><value>Tu contraseña ha cambiado</value></data>
   <data name="PasswordChanged_Body" xml:space="preserve"><value>Se acaba de cambiar la contraseña de tu cuenta. Si no has sido tú, restablece tu contraseña de inmediato y ponte en contacto con nosotros.</value></data>
+  <data name="AccountDeleted_Subject" xml:space="preserve"><value>Tu cuenta ha sido eliminada</value></data>
+  <data name="AccountDeleted_Heading" xml:space="preserve"><value>Tu cuenta ha sido eliminada</value></data>
+  <data name="AccountDeleted_Body" xml:space="preserve"><value>Tu cuenta y sus datos personales se han eliminado, como pediste. Se ha cerrado tu sesión en todos los dispositivos. Si no has sido tú, ponte en contacto con nosotros de inmediato.</value></data>
 </root>

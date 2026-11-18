@@ -1,4 +1,5 @@
 using Azure.Identity;
+using BajkoweCuda.Application.Audit;
 using BajkoweCuda.Api.Hosting;
 using BajkoweCuda.Api.Problems;
 using BajkoweCuda.Infrastructure.Identity;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace BajkoweCuda.Api.Auth;
 
@@ -27,6 +29,10 @@ internal static class AuthSetup
     public const string LocalSessionCookieName = "bc.session";
     public const string LocalAntiforgeryCookieName = "bc.af";
 
+    /// <summary>Between the password and the second factor: who is signing in (Identity's two-factor cookie, 5 minutes).</summary>
+    public const string TwoFactorCookieName = "__Host-bc.2fa";
+    public const string LocalTwoFactorCookieName = "bc.2fa";
+
     /// <summary>Readable by the Angular app, which sends its value back in <see cref="AntiforgeryHeaderName"/>.</summary>
     public const string RequestTokenCookieName = "XSRF-TOKEN";
     public const string AntiforgeryHeaderName = "X-XSRF-TOKEN";
@@ -35,12 +41,25 @@ internal static class AuthSetup
     public static readonly TimeSpan AbsoluteExpiration = TimeSpan.FromDays(30);
     public static readonly TimeSpan SecurityStampValidationInterval = TimeSpan.FromMinutes(30);
 
+    /// <summary>The policy of every /api/admin endpoint (§6): the Admin role and, outside Development, a second factor.</summary>
+    public const string AdminPolicy = "Admin";
+
+    /// <summary>Identity adds <c>amr=mfa</c> to the session when the user signed in with a second factor.</summary>
+    public const string AuthenticationMethodClaim = "amr";
+    public const string MultiFactorMethod = "mfa";
+
     private const string SignedInAtKey = "bc.signed_in_at";
 
-    public static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
         var cookies = AuthCookies.For(PublicSiteOptions.FromConfiguration(configuration));
         services.AddSingleton(cookies);
+
+        var requireAdminMfa = configuration.GetValue("Features:RequireAdminMfa", defaultValue: true);
+        if (!requireAdminMfa && !environment.IsDevelopment())
+        {
+            throw new InvalidOperationException("Features:RequireAdminMfa can be turned off in Development only (docs/PLAN.md §14).");
+        }
 
         services
             .AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
@@ -81,7 +100,7 @@ internal static class AuthSetup
             options.Events.OnRedirectToLogin = context =>
                 ApiProblems.WriteAsync(context.HttpContext, AuthErrors.NotAuthenticated);
             options.Events.OnRedirectToAccessDenied = context =>
-                ApiProblems.WriteAsync(context.HttpContext, AuthErrors.Forbidden);
+                ApiProblems.WriteAsync(context.HttpContext, IsAdminWithoutMfa(context.HttpContext.User) ? AuthErrors.MfaRequired : AuthErrors.Forbidden);
             options.Events.OnSigningIn = context =>
             {
                 context.Properties.Items.TryAdd(SignedInAtKey, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(System.Globalization.CultureInfo.InvariantCulture));
@@ -90,9 +109,25 @@ internal static class AuthSetup
             options.Events.OnValidatePrincipal = ValidatePrincipalAsync;
         });
 
+        services.Configure<CookieAuthenticationOptions>(IdentityConstants.TwoFactorUserIdScheme, options =>
+        {
+            options.Cookie.Name = cookies.TwoFactor;
+            options.Cookie.HttpOnly = true;
+            options.Cookie.SecurePolicy = cookies.SecurePolicy;
+            options.Cookie.SameSite = SameSiteMode.Strict;
+        });
+
         // Controllers need a signed-in user unless they say [AllowAnonymous]: MapControllers().RequireAuthorization()
         // in Program.cs (CLAUDE.md, Rules). A fallback policy would also turn every 404 into a 401.
-        services.AddAuthorization();
+        services.AddAuthorizationBuilder()
+            .AddPolicy(AdminPolicy, policy =>
+            {
+                policy.RequireAuthenticatedUser().RequireRole(Roles.Admin);
+                if (requireAdminMfa)
+                {
+                    policy.RequireClaim(AuthenticationMethodClaim, MultiFactorMethod);
+                }
+            });
 
         services.AddAntiforgery(options =>
         {
@@ -104,6 +139,8 @@ internal static class AuthSetup
 
         services.AddDataProtectionKeys(configuration);
         services.AddScoped<AccountLinks>();
+        services.AddHttpContextAccessor();
+        services.Replace(ServiceDescriptor.Singleton<IClientInfo, HttpClientInfo>());
 
         return services;
     }
@@ -124,6 +161,12 @@ internal static class AuthSetup
             Path = "/",
         });
     }
+
+    public static bool HasMultiFactor(this System.Security.Claims.ClaimsPrincipal user) =>
+        user.HasClaim(AuthenticationMethodClaim, MultiFactorMethod);
+
+    private static bool IsAdminWithoutMfa(System.Security.Claims.ClaimsPrincipal user) =>
+        user.IsInRole(Roles.Admin) && !user.HasMultiFactor();
 
     /// <summary>
     /// The session slides for 14 days but ends 30 days after sign-in at the latest; the security stamp is checked
@@ -172,10 +215,16 @@ internal static class AuthSetup
 /// __Host- cookies that are always Secure; a plain-http origin (local development only) gets unprefixed cookies
 /// that follow the request scheme.
 /// </summary>
-internal sealed record AuthCookies(string Session, string Antiforgery, CookieSecurePolicy SecurePolicy)
+internal sealed record AuthCookies(string Session, string Antiforgery, string TwoFactor, CookieSecurePolicy SecurePolicy)
 {
     public static AuthCookies For(PublicSiteOptions site) =>
         site.Origin.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
-            ? new(AuthSetup.SessionCookieName, AuthSetup.AntiforgeryCookieName, CookieSecurePolicy.Always)
-            : new(AuthSetup.LocalSessionCookieName, AuthSetup.LocalAntiforgeryCookieName, CookieSecurePolicy.SameAsRequest);
+            ? new(AuthSetup.SessionCookieName, AuthSetup.AntiforgeryCookieName, AuthSetup.TwoFactorCookieName, CookieSecurePolicy.Always)
+            : new(AuthSetup.LocalSessionCookieName, AuthSetup.LocalAntiforgeryCookieName, AuthSetup.LocalTwoFactorCookieName, CookieSecurePolicy.SameAsRequest);
+}
+
+/// <summary>The client address for audit entries (behind the ingress it comes from X-Forwarded-For).</summary>
+internal sealed class HttpClientInfo(IHttpContextAccessor accessor) : IClientInfo
+{
+    public string? IpAddress => accessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
 }

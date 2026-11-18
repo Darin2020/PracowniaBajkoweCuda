@@ -1,4 +1,6 @@
 using System.Text.Json.Serialization;
+using BajkoweCuda.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
 
 namespace BajkoweCuda.Api.Auth;
 
@@ -12,12 +14,27 @@ public sealed record MeResponse(
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? DisplayName = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] bool? EmailConfirmed = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? PreferredLanguage = null,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<string>? Roles = null)
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<string>? Roles = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] bool? TwoFactorEnabled = null)
 {
     public static MeResponse Anonymous { get; } = new(Authenticated: false);
+
+    /// <summary>
+    /// The summary of a signed-in user. An admin with <c>twoFactorEnabled: false</c> must set up 2FA before the admin
+    /// endpoints answer (they return <c>auth.mfa_required</c>).
+    /// </summary>
+    public static async Task<MeResponse> ForAsync(UserManager<ApplicationUser> users, ApplicationUser user) => new(
+        Authenticated: true,
+        Id: user.Id,
+        Email: user.Email,
+        DisplayName: user.DisplayName,
+        EmailConfirmed: user.EmailConfirmed,
+        PreferredLanguage: user.PreferredLanguage,
+        Roles: [.. await users.GetRolesAsync(user)],
+        TwoFactorEnabled: user.TwoFactorEnabled);
 }
 
-/// <summary><c>POST /api/auth/login</c> when a second factor is needed (admins, Phase 3 part 3).</summary>
+/// <summary><c>POST /api/auth/login</c> when the account has 2FA: continue with <c>POST /api/auth/2fa/login</c>.</summary>
 public sealed record TwoFactorRequiredResponse(bool RequiresTwoFactor = true);
 
 /// <summary><c>GET /api/account</c>.</summary>
@@ -28,3 +45,22 @@ public sealed record AccountResponse(
     bool EmailConfirmed,
     string PreferredLanguage,
     DateTimeOffset CreatedAt);
+
+/// <summary><c>GET /api/auth/2fa/setup</c>: the key to enter in an authenticator app, also as an otpauth:// URI for a QR code.</summary>
+public sealed record TwoFactorSetupResponse(string SharedKey, string AuthenticatorUri);
+
+/// <summary>One-time recovery codes, shown once (<c>POST 2fa/enable</c>, <c>POST 2fa/recovery-codes</c>).</summary>
+public sealed record RecoveryCodesResponse(IReadOnlyList<string> RecoveryCodes);
+
+/// <summary><c>GET /api/admin/audit</c>: newest first; pass <c>nextCursor</c> as <c>cursor</c> for older entries.</summary>
+public sealed record AuditPageResponse(IReadOnlyList<AuditEntryResponse> Items, long? NextCursor);
+
+public sealed record AuditEntryResponse(
+    long Id,
+    DateTimeOffset CreatedAt,
+    string Action,
+    Guid? ActorId,
+    string? EntityType,
+    string? EntityId,
+    string? IpAddress,
+    System.Text.Json.JsonElement? Details);

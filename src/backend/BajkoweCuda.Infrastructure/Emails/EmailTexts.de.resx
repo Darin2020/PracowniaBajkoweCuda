@@ -23,4 +23,7 @@
   <data name="PasswordChanged_Subject" xml:space="preserve"><value>Ihr Passwort wurde geändert</value></data>
   <data name="PasswordChanged_Heading" xml:space="preserve"><value>Ihr Passwort wurde geändert</value></data>
   <data name="PasswordChanged_Body" xml:space="preserve"><value>Das Passwort Ihres Kontos wurde soeben geändert. Wenn Sie das nicht waren, setzen Sie Ihr Passwort sofort zurück und kontaktieren Sie uns.</value></data>
+  <data name="AccountDeleted_Subject" xml:space="preserve"><value>Ihr Konto wurde gelöscht</value></data>
+  <data name="AccountDeleted_Heading" xml:space="preserve"><value>Ihr Konto wurde gelöscht</value></data>
+  <data name="AccountDeleted_Body" xml:space="preserve"><value>Ihr Konto und seine personenbezogenen Daten wurden wie gewünscht gelöscht. Sie sind überall abgemeldet. Wenn Sie das nicht waren, kontaktieren Sie uns bitte sofort.</value></data>
 </root>
