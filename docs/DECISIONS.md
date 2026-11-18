@@ -346,3 +346,6 @@ After that date the build fails again; an entry that is no longer reported is fl
 - **The user's language for emails is the locale of the page they register on**; the account page can change it.
 - **Form styles are global** (`styles.scss`: `.page`, `.card`, `.field`, `.input`, `.alert`, ...), so each page stays
   under the component style budget.
+- **An external sign-in without a return URL comes back to `/signed-in`**, a route that only redirects to the user's
+  home page (`homeGuard`), because the API does not know the frontend's rules for where people land. Return URLs that
+  come back from the API carry the locale prefix and are normalized (`Location.normalize`) before the router uses them.

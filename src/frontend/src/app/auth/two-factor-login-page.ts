@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -78,11 +79,16 @@ import { FormState, fieldError } from '../shared/forms/form-state';
 export class TwoFactorLoginPage {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
 
   readonly returnUrl = input<string>();
 
   protected readonly title = $localize`:@@auth.2fa.title:Two-factor authentication`;
-  protected readonly target = computed(() => safeReturnUrl(this.returnUrl()));
+  // After an external sign-in the API passes the return URL with the locale prefix ("/pl/chat"): strip it.
+  protected readonly target = computed(() => {
+    const returnUrl = this.returnUrl();
+    return safeReturnUrl(returnUrl ? this.location.normalize(returnUrl) : returnUrl);
+  });
   protected readonly recovery = signal(false);
 
   protected readonly state = new FormState();

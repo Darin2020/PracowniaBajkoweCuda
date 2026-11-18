@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -127,13 +128,18 @@ import { FormState, fieldError } from '../shared/forms/form-state';
 export class CompleteProfilePage {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
   private readonly locale = toAppLocale(inject(LOCALE_ID));
 
   readonly returnUrl = input<string>();
 
   protected readonly title = $localize`:@@auth.complete.title:Almost there`;
   protected readonly providerName = providerName;
-  protected readonly target = computed(() => safeReturnUrl(this.returnUrl()));
+  // After an external sign-in the API passes the return URL with the locale prefix ("/pl/chat"): strip it.
+  protected readonly target = computed(() => {
+    const returnUrl = this.returnUrl();
+    return safeReturnUrl(returnUrl ? this.location.normalize(returnUrl) : returnUrl);
+  });
   protected readonly profile = signal<PendingProfile | null>(null);
   protected readonly loadError = signal<string | null>(null);
 

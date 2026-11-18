@@ -37,6 +37,17 @@ export const anonymousGuard: CanActivateFn = async () => {
   return user ? router.parseUrl(auth.homeFor(user)) : true;
 };
 
+/**
+ * `/signed-in`: where an external sign-in returns when no return URL was given. The API only redirects the browser;
+ * this sends the user on to their home page (the chat, or the 2FA setup for an admin without it).
+ */
+export const homeGuard: CanActivateFn = async () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  const user = await auth.ensureLoaded();
+  return router.parseUrl(user ? auth.homeFor(user) : '/login');
+};
+
 /** Pages open to everyone that send a form: they need the XSRF cookie, which `GET /api/auth/me` issues. */
 export const sessionGuard: CanActivateFn = async () => {
   await inject(AuthService).ensureLoaded();

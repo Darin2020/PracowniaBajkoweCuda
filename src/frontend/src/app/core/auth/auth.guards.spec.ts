@@ -5,7 +5,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { ANNA, provideApiTesting } from '../../testing/auth-testing';
-import { adminGuard, anonymousGuard, authGuard } from './auth.guards';
+import { adminGuard, anonymousGuard, authGuard, homeGuard } from './auth.guards';
 
 @Component({ template: '' })
 class Blank {}
@@ -24,6 +24,7 @@ describe('auth guards and the API error interceptor', () => {
           { path: 'chat', component: Blank, canActivate: [authGuard] },
           { path: 'account', component: Blank, canActivate: [authGuard] },
           { path: 'orders', component: Blank },
+          { path: 'signed-in', canActivate: [homeGuard], children: [] },
           { path: 'admin/2fa-setup', component: Blank, canActivate: [adminGuard] },
         ]),
       ],
@@ -62,6 +63,16 @@ describe('auth guards and the API error interceptor', () => {
     const admin = { authenticated: true, ...ANNA, roles: ['Admin'] };
 
     expect(await navigate('/admin/2fa-setup', admin)).toBe('/admin/2fa-setup');
+  });
+
+  it('sends the user home after an external sign-in without a return URL', async () => {
+    expect(await navigate('/signed-in', { authenticated: true, ...ANNA })).toBe('/chat');
+  });
+
+  it('sends an admin without 2FA to the setup after an external sign-in', async () => {
+    const admin = { authenticated: true, ...ANNA, roles: ['Admin'] };
+
+    expect(await navigate('/signed-in', admin)).toBe('/admin/2fa-setup');
   });
 
   it('goes to the sign-in page when the session has ended', async () => {
