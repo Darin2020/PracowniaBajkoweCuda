@@ -535,8 +535,8 @@ Each phase ends with: green CI, updated README/DECISIONS, acceptance criteria de
 - [x] BFF cookie auth, antiforgery, `/api/auth/*`, `/api/account/*`, ProblemDetails error codes
 - [x] Email outbox + dispatcher + SMTP/ACS senders + localized transactional templates
 - [ ] Google + Facebook login (config-gated), account linking rules, complete-profile step
-- [ ] Admin seeding, mandatory TOTP 2FA for admins, audit log
-- [ ] Rate limiting, lockout, password policy, re-authentication, data export, account deletion
+- [x] Admin seeding, mandatory TOTP 2FA for admins, audit log
+- [x] Rate limiting, lockout, password policy, re-authentication, data export, account deletion
 - [ ] Angular: auth state service (signals), guards, login/register/confirm/forgot/reset/2FA/account pages, top-bar user menu
 - [ ] Integration tests: auth flows + authorization matrix skeleton
 - **AC:** a user can register, confirm by email (Mailpit locally / ACS on staging), sign in with password and Google, export and delete the account. An admin cannot reach admin endpoints without 2FA.

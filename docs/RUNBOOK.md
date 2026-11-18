@@ -144,6 +144,36 @@ site lets the serverless database pause.
 The sender is `DoNotReply@<azure-managed-domain>` until a custom domain exists (Phase 8). The app identity sends with
 the "Communication and Email Service Owner" role on the Communication Services resource.
 
+### Admins and 2FA
+
+Admins are the accounts whose **confirmed** email is listed in the GitHub secret `ADMIN_EMAILS` of the environment
+(comma-separated). Nobody becomes an admin through registration.
+
+```bash
+gh secret set ADMIN_EMAILS --env staging --body "owner@example.com"
+gh secret set ADMIN_EMAILS --env production --body "owner@example.com"
+```
+
+The next deployment applies it: the migration job grants the role to listed confirmed accounts and removes it from
+everybody else. A listed person who registers later gets the role when they confirm their email or sign in.
+An admin must set up 2FA (authenticator app) before the admin pages work, and keeps the recovery codes safe.
+
+Lost authenticator and recovery codes: reset 2FA in the database (see *Database access*), then the admin signs in with
+the password and sets up 2FA anew. The new security stamp ends the admin's open sessions.
+
+```sql
+DECLARE @id uniqueidentifier = (SELECT Id FROM AspNetUsers WHERE NormalizedEmail = UPPER('<email>'));
+DELETE FROM AspNetUserTokens WHERE UserId = @id;
+UPDATE AspNetUsers SET TwoFactorEnabled = 0, SecurityStamp = REPLACE(CONVERT(varchar(36), NEWID()), '-', '') WHERE Id = @id;
+```
+
+### Audit log and rate limits
+
+Admin actions and security events (sign-ins, failed sign-ins, 2FA, password changes, export, deletion, role changes)
+are in the `AuditLog` table; admins read them through `GET /api/admin/audit`. Too many requests answer
+`429 rate_limited` with `Retry-After`: sign-in and similar 10/min per IP, emails 3/hour per IP and per address. Limits
+are per replica, in memory, and reset on restart.
+
 ### Sessions and Data Protection keys
 
 Session cookies, antiforgery tokens and the links in emails are protected by ASP.NET Core Data Protection keys. In
