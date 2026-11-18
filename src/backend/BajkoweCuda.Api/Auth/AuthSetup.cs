@@ -146,6 +146,7 @@ internal static class AuthSetup
         services.AddExternalProviders(configuration, cookies);
         services.AddDataProtectionKeys(configuration);
         services.AddScoped<AccountLinks>();
+        services.AddScoped<BajkoweCuda.Application.Chat.IChatLinks>(provider => provider.GetRequiredService<AccountLinks>());
         services.AddHttpContextAccessor();
         services.Replace(ServiceDescriptor.Singleton<IClientInfo, HttpClientInfo>());
 

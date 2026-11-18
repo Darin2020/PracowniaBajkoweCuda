@@ -12,7 +12,7 @@ namespace BajkoweCuda.Infrastructure.Chat;
 /// The chat's reads and writes (docs/PLAN.md §3.4). Customers only ever reach their own conversation (found by their
 /// user id, never by an id they send); admins reach any conversation by id. Message bodies are never logged.
 /// </summary>
-public sealed partial class ChatService(AppDbContext db, TimeProvider time, ILogger<ChatService> logger)
+public sealed partial class ChatService(AppDbContext db, ChatDigests digests, TimeProvider time, ILogger<ChatService> logger)
 {
     public const int DefaultPageSize = 30;
     public const int MaxPageSize = 100;
@@ -96,6 +96,7 @@ public sealed partial class ChatService(AppDbContext db, TimeProvider time, ILog
         }
 
         LogPosted(logger, message.Id, conversation.Id, "customer", images.Count);
+        await digests.QueueAsync(conversation.Id, ChatSide.Customer, cancellationToken);
         return (ChatMessage.Create(message, images), started);
     }
 
@@ -114,6 +115,7 @@ public sealed partial class ChatService(AppDbContext db, TimeProvider time, ILog
         db.Messages.Add(message);
         await db.SaveChangesAsync(cancellationToken);
         LogPosted(logger, message.Id, conversation.Id, "studio", images.Count);
+        await digests.QueueAsync(conversation.Id, ChatSide.Studio, cancellationToken);
         return ChatMessage.Create(message, images);
     }
 
@@ -263,6 +265,7 @@ public sealed partial class ChatService(AppDbContext db, TimeProvider time, ILog
         db.Messages.Add(message);
         await db.SaveChangesAsync(cancellationToken);
         LogPosted(logger, message.Id, conversation.Id, "customer", images.Count);
+        await digests.QueueAsync(conversation.Id, ChatSide.Customer, cancellationToken);
         return ChatMessage.Create(message, images);
     }
 

@@ -21,5 +21,10 @@ internal sealed class EmailOutboxMessageConfiguration : IEntityTypeConfiguration
 
         // The dispatcher's query: pending messages that are due, oldest first.
         builder.HasIndex(message => new { message.Status, message.SendAfter });
+
+        // At most one pending chat notification per recipient and conversation: later messages join it (§3.6).
+        builder.HasIndex(message => new { message.ToUserId, message.ConversationId })
+            .IsUnique()
+            .HasFilter("[Kind] = 'ChatDigest' AND [Status] = 'Pending'");
     }
 }

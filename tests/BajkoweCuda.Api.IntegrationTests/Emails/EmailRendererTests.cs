@@ -94,4 +94,48 @@ public sealed class EmailRendererTests
         EmailAddresses.MaskAll("550 5.1.1 <anna.nowak@example.com>: Recipient address rejected")
             .ShouldBe("550 5.1.1 <a***@example.com>: Recipient address rejected");
     }
+
+    [Theory]
+    [MemberData(nameof(Languages_))]
+    public void The_chat_notification_renders_in_every_language_for_both_sides(string language)
+    {
+        foreach (var forCustomer in new[] { true, false })
+        {
+            var email = EmailRenderer.RenderChatDigest(
+                "anna@example.test", language, forCustomer, "Anna", [new DigestItem(false, "Hello", 2), new DigestItem(true, string.Empty, 0)], 3, "https://toys.test/en/chat");
+
+            email.Subject.ShouldNotBeNullOrWhiteSpace();
+            email.HtmlBody.ShouldContain($"lang=\"{language}\"");
+            email.TextBody.ShouldContain("Hello");
+            email.TextBody.ShouldContain("https://toys.test/en/chat");
+        }
+    }
+
+    public static TheoryData<string> Languages_() => [.. Languages.All];
+
+    [Fact]
+    public void The_chat_notification_encodes_message_text_and_counts_the_rest()
+    {
+        var email = EmailRenderer.RenderChatDigest(
+            "owner@example.test", "en", forCustomer: false, "Anna <b>", [new DigestItem(false, "<script>alert(1)</script>", 1)], 4, "https://toys.test/en/admin/conversations/1");
+
+        email.Subject.ShouldBe("New message from Anna <b>");
+        email.HtmlBody.ShouldNotContain("<script>");
+        email.HtmlBody.ShouldContain("&lt;script&gt;");
+        email.HtmlBody.ShouldNotContain("Anna <b>");
+        email.TextBody.ShouldContain("Photos: 1");
+        email.TextBody.ShouldContain("Further unread messages: 4");
+        // Admins have no notification setting to point to.
+        email.TextBody.ShouldNotContain("Send replies to my email");
+    }
+
+    [Fact]
+    public void The_customer_notification_explains_how_to_turn_it_off()
+    {
+        var email = EmailRenderer.RenderChatDigest("anna@example.test", "en", forCustomer: true, null, [new DigestItem(true, string.Empty, 0)], 0, "https://toys.test/en/chat");
+
+        email.Subject.ShouldBe("New message from Pracownia Bajkowe Cuda");
+        email.TextBody.ShouldContain("Update about your order");
+        email.TextBody.ShouldContain("Send replies to my email");
+    }
 }

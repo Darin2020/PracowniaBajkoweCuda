@@ -141,6 +141,13 @@ site lets the serverless database pause.
 | Emails that gave up | `SELECT Id, Template, Attempts, LastError, CreatedAt FROM EmailOutbox WHERE Status = 'Dead'` (see *Database access*) |
 | Send a dead email again | `UPDATE EmailOutbox SET Status = 'Pending', Attempts = 0, SendAfter = SYSUTCDATETIME() WHERE Id = '<id>'`, then restart the app revision (or queue any email) to wake the dispatcher |
 
+**Chat notifications** (`Kind = 'ChatDigest'`) are rows of the same table. A new message queues one per recipient and
+conversation, due after `Email:ChatDigestDelayMinutes` (5); later messages join it. When due, it lists the messages
+the recipient has still not read, or becomes `Skipped` (log: `Skipped ChatDigest email ... nothing left to tell`) if
+everything was read or the customer turned notifications off. Admins are always notified about customer messages;
+customers only with "Send replies to my email" on. Locally, `CHAT_DIGEST_DELAY_MINUTES=0 docker compose --profile app up -d`
+sends them at once.
+
 The sender is `DoNotReply@<azure-managed-domain>` until a custom domain exists (Phase 8). The app identity sends with
 the "Communication and Email Service Owner" role on the Communication Services resource.
 

@@ -16,6 +16,7 @@ public static class ChatExtensions
         services.AddSingleton<IFileStore>(provider => provider.GetRequiredService<BlobFileStore>());
         services.AddScoped<Attachments>();
         services.AddScoped<ChatService>();
+        services.AddScoped<ChatDigests>();
         services.AddHostedService<AttachmentCleanup>();
         return services;
     }

@@ -26,4 +26,16 @@
   <data name="AccountDeleted_Subject" xml:space="preserve"><value>Tu cuenta ha sido eliminada</value></data>
   <data name="AccountDeleted_Heading" xml:space="preserve"><value>Tu cuenta ha sido eliminada</value></data>
   <data name="AccountDeleted_Body" xml:space="preserve"><value>Tu cuenta y sus datos personales se han eliminado, como pediste. Se ha cerrado tu sesión en todos los dispositivos. Si no has sido tú, ponte en contacto con nosotros de inmediato.</value></data>
+  <data name="ChatDigest_Subject_Customer" xml:space="preserve"><value>Nuevo mensaje de Pracownia Bajkowe Cuda</value></data>
+  <data name="ChatDigest_Heading_Customer" xml:space="preserve"><value>Tienes mensajes nuevos</value></data>
+  <data name="ChatDigest_Intro_Customer" xml:space="preserve"><value>El taller te ha escrito en el chat:</value></data>
+  <data name="ChatDigest_Footer_Customer" xml:space="preserve"><value>Recibes estos correos porque activaste «Enviar las respuestas a mi correo». Puedes desactivarlo en el chat cuando quieras.</value></data>
+  <data name="ChatDigest_Subject_Studio" xml:space="preserve"><value>Nuevo mensaje de {0}</value></data>
+  <data name="ChatDigest_Heading_Studio" xml:space="preserve"><value>Mensajes nuevos en el chat</value></data>
+  <data name="ChatDigest_Intro_Studio" xml:space="preserve"><value>{0} ha escrito:</value></data>
+  <data name="ChatDigest_UnknownCustomer" xml:space="preserve"><value>Un cliente</value></data>
+  <data name="ChatDigest_OrderUpdate" xml:space="preserve"><value>Novedades sobre tu pedido</value></data>
+  <data name="ChatDigest_Photos" xml:space="preserve"><value>Fotos: {0}</value></data>
+  <data name="ChatDigest_More" xml:space="preserve"><value>Otros mensajes sin leer: {0}</value></data>
+  <data name="ChatDigest_Action" xml:space="preserve"><value>Abrir el chat</value></data>
 </root>

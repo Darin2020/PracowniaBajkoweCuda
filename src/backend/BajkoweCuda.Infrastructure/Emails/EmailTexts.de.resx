@@ -26,4 +26,16 @@
   <data name="AccountDeleted_Subject" xml:space="preserve"><value>Ihr Konto wurde gelöscht</value></data>
   <data name="AccountDeleted_Heading" xml:space="preserve"><value>Ihr Konto wurde gelöscht</value></data>
   <data name="AccountDeleted_Body" xml:space="preserve"><value>Ihr Konto und seine personenbezogenen Daten wurden wie gewünscht gelöscht. Sie sind überall abgemeldet. Wenn Sie das nicht waren, kontaktieren Sie uns bitte sofort.</value></data>
+  <data name="ChatDigest_Subject_Customer" xml:space="preserve"><value>Neue Nachricht von Pracownia Bajkowe Cuda</value></data>
+  <data name="ChatDigest_Heading_Customer" xml:space="preserve"><value>Sie haben neue Nachrichten</value></data>
+  <data name="ChatDigest_Intro_Customer" xml:space="preserve"><value>Die Werkstatt hat Ihnen im Chat geschrieben:</value></data>
+  <data name="ChatDigest_Footer_Customer" xml:space="preserve"><value>Sie erhalten diese E-Mails, weil Sie „Antworten per E-Mail senden“ eingeschaltet haben. Sie können es im Chat jederzeit ausschalten.</value></data>
+  <data name="ChatDigest_Subject_Studio" xml:space="preserve"><value>Neue Nachricht von {0}</value></data>
+  <data name="ChatDigest_Heading_Studio" xml:space="preserve"><value>Neue Nachrichten im Chat</value></data>
+  <data name="ChatDigest_Intro_Studio" xml:space="preserve"><value>{0} hat geschrieben:</value></data>
+  <data name="ChatDigest_UnknownCustomer" xml:space="preserve"><value>Ein Kunde</value></data>
+  <data name="ChatDigest_OrderUpdate" xml:space="preserve"><value>Neuigkeit zu Ihrer Bestellung</value></data>
+  <data name="ChatDigest_Photos" xml:space="preserve"><value>Fotos: {0}</value></data>
+  <data name="ChatDigest_More" xml:space="preserve"><value>Weitere ungelesene Nachrichten: {0}</value></data>
+  <data name="ChatDigest_Action" xml:space="preserve"><value>Chat öffnen</value></data>
 </root>
