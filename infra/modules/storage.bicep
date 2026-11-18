@@ -1,5 +1,5 @@
-// Blob Storage for chat attachments and order photos. Containers are private and files are served only
-// through the API after an authorization check (docs/PLAN.md §8.4).
+// Blob Storage for chat attachments and order photos, plus the Data Protection key ring. Containers are private and
+// files are served only through the API after an authorization check (docs/PLAN.md §8.4).
 
 @minLength(3)
 @maxLength(24)
@@ -53,7 +53,7 @@ resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01'
 }
 
 resource containers 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = [
-  for containerName in ['attachments', 'order-photos']: {
+  for containerName in ['attachments', 'order-photos', 'dataprotection']: {
     parent: blobService
     name: containerName
     properties: {
@@ -73,3 +73,4 @@ resource blobAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 }
 
 output blobServiceUri string = account.properties.primaryEndpoints.blob
+output dataProtectionBlobUri string = '${account.properties.primaryEndpoints.blob}dataprotection/keys.xml'

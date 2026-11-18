@@ -37,6 +37,10 @@ param sqlServerFqdn string
 param sqlDatabaseName string
 param blobServiceUri string
 param keyVaultUri string
+
+@description('Blob that holds the Data Protection key ring, and the Key Vault key that wraps it.')
+param dataProtectionBlobUri string
+param dataProtectionKeyUri string
 param emailEndpoint string
 param emailSenderAddress string
 
@@ -115,6 +119,8 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
             }
             { name: 'Storage__BlobServiceUri', value: blobServiceUri }
             { name: 'KeyVault__Uri', value: keyVaultUri }
+            { name: 'DataProtection__BlobUri', value: dataProtectionBlobUri }
+            { name: 'DataProtection__KeyUri', value: dataProtectionKeyUri }
             { name: 'Email__Provider', value: 'Acs' }
             { name: 'Email__Acs__Endpoint', value: emailEndpoint }
             { name: 'Email__From', value: emailSenderAddress }
