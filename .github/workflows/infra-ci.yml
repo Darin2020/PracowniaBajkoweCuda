@@ -77,6 +77,7 @@ jobs:
       - name: Staging environment
         env:
           SQL_ADMIN_OBJECT_ID: ${{ secrets.SQL_ADMIN_OBJECT_ID }}
+          ADMIN_EMAILS: ${{ secrets.ADMIN_EMAILS }}
         run: |
           set -euo pipefail
           REGISTRY_NAME="$(az acr list --resource-group "$SHARED_RESOURCE_GROUP" --query '[0].name' --output tsv)"

@@ -44,6 +44,14 @@ param dataProtectionKeyUri string
 param emailEndpoint string
 param emailSenderAddress string
 
+@description('Admin:Emails, comma-separated (docs/PLAN.md §3.3). Kept in a Container Apps secret: not for the repository.')
+@secure()
+param adminEmails string = ''
+
+// A Container Apps secret cannot be empty, so the secret and its variable exist only when there are admins.
+var adminEmailsSecret = empty(adminEmails) ? [] : [{ name: 'admin-emails', value: adminEmails }]
+var adminEmailsEnv = empty(adminEmails) ? [] : [{ name: 'Admin__Emails__0', secretRef: 'admin-emails' }]
+
 var appName = 'ca-bajkowecuda-${environmentName}'
 var containerPort = 8080
 
@@ -87,12 +95,12 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
           identity: identityId
         }
       ]
-      secrets: [
+      secrets: concat([
         {
           name: 'applicationinsights-connection-string'
           value: applicationInsightsConnectionString
         }
-      ]
+      ], adminEmailsSecret)
     }
     template: {
       containers: [
@@ -103,7 +111,7 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
             cpu: json('0.25')
             memory: '0.5Gi'
           }
-          env: [
+          env: concat([
             { name: 'ASPNETCORE_ENVIRONMENT', value: 'Production' }
             // Trust X-Forwarded-Proto / X-Forwarded-For from the ingress (scheme for HSTS, client address).
             { name: 'ASPNETCORE_FORWARDEDHEADERS_ENABLED', value: 'true' }
@@ -124,7 +132,7 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
             { name: 'Email__Provider', value: 'Acs' }
             { name: 'Email__Acs__Endpoint', value: emailEndpoint }
             { name: 'Email__From', value: emailSenderAddress }
-          ]
+          ], adminEmailsEnv)
           probes: [
             // /health/live runs no dependency checks, so probes never wake the serverless database.
             {

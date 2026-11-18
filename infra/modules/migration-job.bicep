@@ -29,6 +29,14 @@ param applicationInsightsConnectionString string
 param sqlServerFqdn string
 param sqlDatabaseName string
 
+@description('Admin:Emails, comma-separated: the job brings the Admin role in line with it (docs/PLAN.md §3.3). Kept in a Container Apps secret: not for the repository.')
+@secure()
+param adminEmails string = ''
+
+// A Container Apps secret cannot be empty, so the secret and its variable exist only when there are admins.
+var adminEmailsSecret = empty(adminEmails) ? [] : [{ name: 'admin-emails', value: adminEmails }]
+var adminEmailsEnv = empty(adminEmails) ? [] : [{ name: 'Admin__Emails__0', secretRef: 'admin-emails' }]
+
 resource environment 'Microsoft.App/managedEnvironments@2024-03-01' existing = {
   name: containerAppsEnvironmentName
   scope: resourceGroup(sharedResourceGroup)
@@ -69,12 +77,12 @@ resource job 'Microsoft.App/jobs@2024-03-01' = {
           identity: appIdentityId
         }
       ]
-      secrets: [
+      secrets: concat([
         {
           name: 'applicationinsights-connection-string'
           value: applicationInsightsConnectionString
         }
-      ]
+      ], adminEmailsSecret)
     }
     template: {
       containers: [
@@ -86,7 +94,7 @@ resource job 'Microsoft.App/jobs@2024-03-01' = {
             cpu: json('0.25')
             memory: '0.5Gi'
           }
-          env: [
+          env: concat([
             { name: 'DOTNET_ENVIRONMENT', value: 'Production' }
             { name: 'APP_VERSION', value: appVersion }
             { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', secretRef: 'applicationinsights-connection-string' }
@@ -97,7 +105,7 @@ resource job 'Microsoft.App/jobs@2024-03-01' = {
             }
             { name: 'Database__AppUserName', value: appIdentityName }
             { name: 'Database__AppUserClientId', value: appIdentityClientId }
-          ]
+          ], adminEmailsEnv)
         }
       ]
     }
