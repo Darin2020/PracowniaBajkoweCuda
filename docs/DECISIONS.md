@@ -203,3 +203,44 @@ After that date the build fails again; an entry that is no longer reported is fl
   serverless database can pause.
 - **Integration tests use Testcontainers** (SQL Server 2025), one container per test run, a fresh database per test.
   Tests that need it carry the trait `Category=Database`; the optional test run inside the Docker build skips them.
+
+## 2026-11-18 — Phase 3: accounts API, cookies and email
+
+**Owner's decision**
+- **The email dispatcher runs on a signal, not on a 30-second poll** (deviation from PLAN §3.6, approved by the owner).
+  Production keeps one replica running, and a timer would stop the free serverless database from ever pausing
+  (it pauses after 60 idle minutes): the free monthly allowance would be gone in two to three days. The dispatcher
+  reads the outbox once at startup, when an email is queued (in-process signal) and when the next delayed email or
+  retry is due (time kept in memory). Delivery stays reliable: queued emails are rows in the database and are sent
+  after a restart.
+
+**Implementation**
+- **Auth endpoints are thin controllers over ASP.NET Core Identity** (`Api/Auth`), not Application handlers: they are
+  adapters around `UserManager`/`SignInManager`, which belong to the framework. Application holds what other layers
+  share: `AppError` (stable error codes) and the `IEmailOutbox` port.
+- **Request shape is validated with data annotations** in the API (PLAN §4.2 suggests FluentValidation in Application;
+  there are no Application handlers for auth). The password policy is Identity's, reported as
+  `auth.password_rejected` with Identity's error codes.
+- **No account enumeration:** register, resend-confirmation and forgot-password always answer 202. Registering an
+  address that has an account emails its owner instead ("you already have an account"); the password is validated
+  before the address is looked up, so both cases answer the same. Every failed sign-in, including lockout and unknown
+  addresses (with a dummy hash check), is `401 auth.invalid_credentials`.
+- **Signing in does not require a confirmed email**; `me` reports `emailConfirmed`, and the chat will require it (§3.2).
+- **Cookies:** `__Host-bc.session` (HttpOnly, Secure, SameSite=Lax, sliding 14 days, at most 30 days after sign-in,
+  security stamp checked every 30 minutes) and `__Host-bc.af` + readable `XSRF-TOKEN` for antiforgery. When the public
+  origin is plain `http://` (local development only) the cookies are named `bc.session` / `bc.af` and follow the
+  request scheme, because `__Host-` cookies must be Secure.
+- **Antiforgery is checked by a small filter** on every unsafe controller request (`400 antiforgery.invalid`): MVC's
+  `AutoValidateAntiforgeryToken` needs the view services, which the API does not register.
+- **Controllers require a signed-in user by default** (`MapControllers().RequireAuthorization()`); a fallback
+  authorization policy would also have turned every unknown path into 401 instead of 404.
+- **Data Protection keys** (session cookies, antiforgery tokens, email links) live in Blob Storage
+  (`dataprotection/keys.xml`), wrapped by the Key Vault key `dataprotection`, so sessions survive restarts and new
+  revisions. The app identity has "Key Vault Crypto Service Encryption User" on that key only.
+- **ACS sends with the managed identity**, which has the built-in "Communication and Email Service Owner" role on the
+  Communication Services resource (ACS does not support custom roles).
+- **Email texts** are `.resx` resources in Infrastructure (en source; de, fr, es, pl need review, like the site's
+  translations). Links point to Angular pages in the recipient's language; those pages come with the frontend part.
+- **MailKit 4.18**: 5.0 changed the send API, and nothing in 5.0 is needed.
+- **Fixed in the tests:** the SQL Server container is created on first use, so test runs without Docker (the optional
+  run inside the Docker build) work again.

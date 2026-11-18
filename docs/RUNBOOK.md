@@ -127,6 +127,30 @@ delete the database, deploy, then import. Do it before real data exists, or plan
 | Clean the registry | Weekly *Cleanup* workflow; it never deletes an image that staging or production is running |
 | Add a secret | `az keyvault secret set --vault-name <vault> ...`; the app identity can read secrets, nobody else is granted access by the templates |
 
+### Email
+
+Account emails (confirmation, password reset, notices) go through the `EmailOutbox` table: the request only queues a
+row, and a background dispatcher in the app sends it through Azure Communication Services (Mailpit locally,
+UI on http://localhost:8025). A failed send is retried after 30 s, 1 min, 2 min ... up to 2 hours; after 8 attempts
+the row becomes `Dead`. The dispatcher reads the table only when an email is queued or a retry is due, so an idle
+site lets the serverless database pause.
+
+| Question | How |
+|---|---|
+| Was an email sent? | App logs: `Sent ConfirmEmail email to a***@example.com` (addresses are masked) |
+| Emails that gave up | `SELECT Id, Template, Attempts, LastError, CreatedAt FROM EmailOutbox WHERE Status = 'Dead'` (see *Database access*) |
+| Send a dead email again | `UPDATE EmailOutbox SET Status = 'Pending', Attempts = 0, SendAfter = SYSUTCDATETIME() WHERE Id = '<id>'`, then restart the app revision (or queue any email) to wake the dispatcher |
+
+The sender is `DoNotReply@<azure-managed-domain>` until a custom domain exists (Phase 8). The app identity sends with
+the "Communication and Email Service Owner" role on the Communication Services resource.
+
+### Sessions and Data Protection keys
+
+Session cookies, antiforgery tokens and the links in emails are protected by ASP.NET Core Data Protection keys. In
+Azure the key ring is the blob `dataprotection/keys.xml` in the environment's storage account, wrapped by the Key Vault
+key `dataprotection`. Deleting the blob or the key signs everybody out and invalidates links already sent; do not
+delete them. ASP.NET Core rotates the keys in the ring every 90 days by itself.
+
 ## 6. Not automated yet
 
 - **Alerts, availability test, restore drill**: later phases (docs/PLAN.md §15).
