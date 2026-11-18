@@ -28,6 +28,7 @@ public sealed partial class AuthController(
     AccountLinks links,
     IConfiguration configuration,
     TimeProvider time,
+    BajkoweCuda.Infrastructure.Chat.ChatService chat,
     ILogger<AuthController> logger) : ControllerBase
 {
     /// <summary>Used when the email is unknown, so a failed sign-in costs the same time either way.</summary>
@@ -49,7 +50,15 @@ public sealed partial class AuthController(
         }
 
         var user = await users.GetUserAsync(User);
-        return user is null || user.IsDeleted ? MeResponse.Anonymous : await MeResponse.ForAsync(users, user);
+        if (user is null || user.IsDeleted)
+        {
+            return MeResponse.Anonymous;
+        }
+
+        var unread = User.IsInRole(Roles.Admin)
+            ? User.HasMultiFactor() ? await chat.StudioUnreadAsync(HttpContext.RequestAborted) : 0
+            : await chat.CustomerUnreadAsync(user.Id, HttpContext.RequestAborted);
+        return await MeResponse.ForAsync(users, user, unread);
     }
 
     [HttpPost("register")]

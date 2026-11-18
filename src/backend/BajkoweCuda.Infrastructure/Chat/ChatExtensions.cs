@@ -8,13 +8,14 @@ namespace BajkoweCuda.Infrastructure.Chat;
 
 public static class ChatExtensions
 {
-    /// <summary>File storage, the image pipeline, chat attachments and their cleanup.</summary>
+    /// <summary>The chat: messages, file storage, the image pipeline, attachments and their cleanup.</summary>
     public static IServiceCollection AddChat(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<StorageOptions>(configuration.GetSection(StorageOptions.SectionName));
         services.AddSingleton<BlobFileStore>();
         services.AddSingleton<IFileStore>(provider => provider.GetRequiredService<BlobFileStore>());
         services.AddScoped<Attachments>();
+        services.AddScoped<ChatService>();
         services.AddHostedService<AttachmentCleanup>();
         return services;
     }

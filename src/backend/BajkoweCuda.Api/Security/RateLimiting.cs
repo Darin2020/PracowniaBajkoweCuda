@@ -21,6 +21,9 @@ public sealed class RateLimitOptions
     /// <summary>Admin endpoints: requests per minute per admin. Generous; it only stops runaway clients.</summary>
     public int AdminPerMinute { get; set; } = 300;
 
+    /// <summary>Chat messages: per minute per user.</summary>
+    public int ChatMessagesPerMinute { get; set; } = 20;
+
     /// <summary>Chat image uploads: per hour per user.</summary>
     public int UploadsPerHour { get; set; } = 30;
 }
@@ -35,6 +38,7 @@ internal static class RateLimiting
     public const string Email = "email";
     public const string Admin = "admin";
     public const string Uploads = "uploads";
+    public const string Chat = "chat";
 
     public static IServiceCollection AddRateLimits(this IServiceCollection services, IConfiguration configuration)
     {
@@ -67,6 +71,15 @@ internal static class RateLimiting
                 _ => new FixedWindowRateLimiterOptions
                 {
                     PermitLimit = Limits(context).AdminPerMinute,
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0,
+                }));
+
+            options.AddPolicy(Chat, context => RateLimitPartition.GetFixedWindowLimiter(
+                context.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? ClientAddress(context),
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = Limits(context).ChatMessagesPerMinute,
                     Window = TimeSpan.FromMinutes(1),
                     QueueLimit = 0,
                 }));

@@ -1,4 +1,5 @@
 using BajkoweCuda.Api.Auth;
+using BajkoweCuda.Api.Chat;
 using BajkoweCuda.Api.Database;
 using BajkoweCuda.Api.Health;
 using BajkoweCuda.Api.Hosting;
@@ -36,6 +37,8 @@ builder.Services.AddPublicSite(builder.Configuration);
 builder.Services.AddAuth(builder.Configuration, builder.Environment);
 builder.Services.AddAccounts(builder.Configuration);
 builder.Services.AddChat(builder.Configuration);
+builder.Services.AddSignalR();
+builder.Services.AddScoped<ChatEvents>();
 builder.Services.AddRateLimits(builder.Configuration);
 builder.Services
     .AddControllers(options =>
@@ -70,6 +73,7 @@ app.UseRateLimiter();
 app.MapHealthEndpoints();
 app.MapVersionEndpoint();
 app.MapControllers().RequireAuthorization();
+app.MapHub<ChatHub>(ChatHub.Path).RequireAuthorization();
 
 await app.RunAsync();
 

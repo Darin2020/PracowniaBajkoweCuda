@@ -89,4 +89,12 @@ internal static class ChatApiErrors
     public static readonly AppError FileMissing = new("files.missing", ErrorKind.Validation);
 
     public static readonly AppError FileNotFound = new("files.not_found", ErrorKind.NotFound);
+
+    /// <summary>The message is not in this conversation (or does not exist).</summary>
+    public static readonly AppError MessageNotFound = new("chat.message_not_found", ErrorKind.NotFound);
+
+    public static readonly AppError ConversationNotFound = new("chat.conversation_not_found", ErrorKind.NotFound);
+
+    /// <summary>The setting belongs to the conversation, which the first message starts.</summary>
+    public static readonly AppError NotStarted = new("chat.not_started", ErrorKind.Conflict);
 }
