@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { AuthService } from './core/auth/auth.service';
+import { ChatRealtime } from './core/chat/chat-realtime.service';
 import { CookieNotice } from './public/layout/cookie-notice';
 import { Footer } from './public/layout/footer';
 import { TopBar } from './public/layout/top-bar';
@@ -31,6 +32,8 @@ export class App {
 
     // Who is signed in is asked only in the browser, after the (possibly prerendered) page has hydrated.
     const auth = inject(AuthService);
+    // Connects to the chat hub whenever a user who may chat is signed in (and only in the browser).
+    inject(ChatRealtime);
     afterNextRender(() => void auth.ensureLoaded());
   }
 }

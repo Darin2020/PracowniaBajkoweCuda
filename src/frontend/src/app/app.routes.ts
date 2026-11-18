@@ -76,7 +76,7 @@ export const routes: Routes = [
   {
     path: 'chat',
     canActivate: [authGuard],
-    loadComponent: () => import('./chat/chat-placeholder-page').then((m) => m.ChatPlaceholderPage),
+    loadComponent: () => import('./chat/chat-page').then((m) => m.ChatPage),
   },
   {
     path: 'admin/2fa-setup',
