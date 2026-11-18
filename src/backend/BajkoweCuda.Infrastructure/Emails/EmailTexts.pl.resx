@@ -26,4 +26,16 @@
   <data name="AccountDeleted_Subject" xml:space="preserve"><value>Twoje konto zostało usunięte</value></data>
   <data name="AccountDeleted_Heading" xml:space="preserve"><value>Twoje konto zostało usunięte</value></data>
   <data name="AccountDeleted_Body" xml:space="preserve"><value>Twoje konto i jego dane osobowe zostały usunięte zgodnie z Twoją prośbą. Wszystkie sesje zostały zakończone. Jeśli to nie Ty, natychmiast skontaktuj się z nami.</value></data>
+  <data name="ChatDigest_Subject_Customer" xml:space="preserve"><value>Nowa wiadomość od Pracowni Bajkowe Cuda</value></data>
+  <data name="ChatDigest_Heading_Customer" xml:space="preserve"><value>Masz nowe wiadomości</value></data>
+  <data name="ChatDigest_Intro_Customer" xml:space="preserve"><value>Pracownia napisała do Ciebie na czacie:</value></data>
+  <data name="ChatDigest_Footer_Customer" xml:space="preserve"><value>Dostajesz te e-maile, ponieważ włączyłeś opcję „Wysyłaj odpowiedzi na mój e-mail”. Możesz ją wyłączyć na czacie w każdej chwili.</value></data>
+  <data name="ChatDigest_Subject_Studio" xml:space="preserve"><value>Nowa wiadomość od: {0}</value></data>
+  <data name="ChatDigest_Heading_Studio" xml:space="preserve"><value>Nowe wiadomości na czacie</value></data>
+  <data name="ChatDigest_Intro_Studio" xml:space="preserve"><value>{0} pisze:</value></data>
+  <data name="ChatDigest_UnknownCustomer" xml:space="preserve"><value>Klient</value></data>
+  <data name="ChatDigest_OrderUpdate" xml:space="preserve"><value>Informacja o Twoim zamówieniu</value></data>
+  <data name="ChatDigest_Photos" xml:space="preserve"><value>Zdjęcia: {0}</value></data>
+  <data name="ChatDigest_More" xml:space="preserve"><value>Pozostałe nieprzeczytane wiadomości: {0}</value></data>
+  <data name="ChatDigest_Action" xml:space="preserve"><value>Otwórz czat</value></data>
 </root>

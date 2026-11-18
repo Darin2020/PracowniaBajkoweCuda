@@ -1,5 +1,6 @@
 using System.Text.Json;
 using BajkoweCuda.Application.Emails;
+using BajkoweCuda.Infrastructure.Chat;
 using BajkoweCuda.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -70,7 +71,7 @@ public sealed partial class EmailDispatcher(
 
             foreach (var message in due)
             {
-                await SendAsync(message, sender, cancellationToken);
+                await SendAsync(message, sender, scope.ServiceProvider, cancellationToken);
                 await db.SaveChangesAsync(cancellationToken);
             }
 
@@ -94,13 +95,21 @@ public sealed partial class EmailDispatcher(
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    private async Task SendAsync(EmailOutboxMessage message, IEmailSender sender, CancellationToken cancellationToken)
+    private async Task SendAsync(EmailOutboxMessage message, IEmailSender sender, IServiceProvider services, CancellationToken cancellationToken)
     {
         try
         {
-            var template = Enum.Parse<EmailTemplate>(message.Template);
-            var payload = JsonSerializer.Deserialize<Dictionary<string, string>>(message.PayloadJson) ?? [];
-            await sender.SendAsync(EmailRenderer.Render(message.ToEmail, template, message.Language, payload), cancellationToken);
+            var email = await RenderAsync(message, services, cancellationToken);
+            if (email is null)
+            {
+                // A chat notification with nothing left to tell (everything read meanwhile, §3.6).
+                message.Status = EmailStatus.Skipped;
+                message.LastError = null;
+                LogSkipped(logger, message.Template, message.Id);
+                return;
+            }
+
+            await sender.SendAsync(email, cancellationToken);
 
             message.Status = EmailStatus.Sent;
             message.SentAt = time.GetUtcNow();
@@ -128,6 +137,22 @@ public sealed partial class EmailDispatcher(
         }
     }
 
+    /// <summary>
+    /// Transactional emails are rendered from their stored payload; chat notifications from the conversation as it is
+    /// now, when they are due (<see cref="ChatDigests"/>).
+    /// </summary>
+    private static async Task<RenderedEmail?> RenderAsync(EmailOutboxMessage message, IServiceProvider services, CancellationToken cancellationToken)
+    {
+        if (message.Kind == EmailKind.ChatDigest)
+        {
+            return await services.GetRequiredService<ChatDigests>().ComposeAsync(message, cancellationToken);
+        }
+
+        var template = Enum.Parse<EmailTemplate>(message.Template);
+        var payload = JsonSerializer.Deserialize<Dictionary<string, string>>(message.PayloadJson) ?? [];
+        return EmailRenderer.Render(message.ToEmail, template, message.Language, payload);
+    }
+
     /// <summary>30 s, 1 min, 2 min, 4 min ... at most 2 hours.</summary>
     internal static TimeSpan RetryDelay(int attempts) =>
         Clamp(FirstRetry * Math.Pow(2, attempts - 1), FirstRetry, LongestRetry);
@@ -142,6 +167,9 @@ public sealed partial class EmailDispatcher(
     // Only its masked text (LastError) is.
     [LoggerMessage(Level = LogLevel.Information, Message = "Sent {Template} email to {Recipient}")]
     private static partial void LogSent(ILogger logger, string template, string recipient);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Skipped {Template} email {MessageId}: nothing left to tell")]
+    private static partial void LogSkipped(ILogger logger, string template, Guid messageId);
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Sending {Template} email {MessageId} failed (attempt {Attempts}), next try at {SendAfter}: {Error}")]
     private static partial void LogRetry(ILogger logger, string template, Guid messageId, int attempts, DateTimeOffset sendAfter, string error);

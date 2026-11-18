@@ -26,4 +26,16 @@
   <data name="AccountDeleted_Subject" xml:space="preserve"><value>Your account was deleted</value></data>
   <data name="AccountDeleted_Heading" xml:space="preserve"><value>Your account was deleted</value></data>
   <data name="AccountDeleted_Body" xml:space="preserve"><value>Your account and its personal data were deleted, as you asked. You are signed out everywhere. If this was not you, contact us right away.</value></data>
+  <data name="ChatDigest_Subject_Customer" xml:space="preserve"><value>New message from Pracownia Bajkowe Cuda</value></data>
+  <data name="ChatDigest_Heading_Customer" xml:space="preserve"><value>You have new messages</value></data>
+  <data name="ChatDigest_Intro_Customer" xml:space="preserve"><value>The studio has written to you in the chat:</value></data>
+  <data name="ChatDigest_Footer_Customer" xml:space="preserve"><value>You get these emails because you turned on “Send replies to my email”. You can turn it off in the chat at any time.</value></data>
+  <data name="ChatDigest_Subject_Studio" xml:space="preserve"><value>New message from {0}</value></data>
+  <data name="ChatDigest_Heading_Studio" xml:space="preserve"><value>New messages in the chat</value></data>
+  <data name="ChatDigest_Intro_Studio" xml:space="preserve"><value>{0} wrote:</value></data>
+  <data name="ChatDigest_UnknownCustomer" xml:space="preserve"><value>A customer</value></data>
+  <data name="ChatDigest_OrderUpdate" xml:space="preserve"><value>Update about your order</value></data>
+  <data name="ChatDigest_Photos" xml:space="preserve"><value>Photos: {0}</value></data>
+  <data name="ChatDigest_More" xml:space="preserve"><value>Further unread messages: {0}</value></data>
+  <data name="ChatDigest_Action" xml:space="preserve"><value>Open the chat</value></data>
 </root>

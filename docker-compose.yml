@@ -98,6 +98,8 @@ services:
       Email__Provider: Smtp
       Email__Smtp__Host: mailpit
       Email__Smtp__Port: "1025"
+      # Chat notifications wait this long for more messages (0 sends them at once, handy for trying it out).
+      Email__ChatDigestDelayMinutes: ${CHAT_DIGEST_DELAY_MINUTES:-5}
       # Chat images go to Azurite. The account key is the emulator's well-known public development key, not a secret.
       Storage__ConnectionString: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
       # Accounts with these confirmed addresses become admins (they must set up 2FA to use the admin endpoints).

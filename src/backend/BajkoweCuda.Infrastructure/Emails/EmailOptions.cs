@@ -26,6 +26,9 @@ public sealed class EmailOptions
     /// <summary>A message that fails this many times is given up (status Dead).</summary>
     public int MaxAttempts { get; set; } = 8;
 
+    /// <summary>How long a chat notification waits for more messages (and for the recipient to read them) before it is sent.</summary>
+    public int ChatDigestDelayMinutes { get; set; } = 5;
+
     public sealed class SmtpOptions
     {
         public string Host { get; set; } = "localhost";

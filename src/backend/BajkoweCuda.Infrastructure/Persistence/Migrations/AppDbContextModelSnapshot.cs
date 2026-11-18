@@ -273,6 +273,10 @@ namespace BajkoweCuda.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Status", "SendAfter");
 
+                    b.HasIndex("ToUserId", "ConversationId")
+                        .IsUnique()
+                        .HasFilter("[Kind] = 'ChatDigest' AND [Status] = 'Pending'");
+
                     b.ToTable("EmailOutbox", (string)null);
                 });
 
