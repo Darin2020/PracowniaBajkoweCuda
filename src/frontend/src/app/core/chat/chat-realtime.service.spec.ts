@@ -5,7 +5,7 @@ import { ANNA, provideApiTesting } from '../../testing/auth-testing';
 import { AuthService } from '../auth/auth.service';
 import { CHAT_CONNECTION_FACTORY, ChatConnection, ChatRealtime } from './chat-realtime.service';
 import { ChatMessage } from './chat.models';
-import { message } from './chat.models.spec';
+import { message } from '../../testing/chat-testing';
 
 /** Plays the server's side of a SignalR connection. */
 class FakeConnection implements ChatConnection {

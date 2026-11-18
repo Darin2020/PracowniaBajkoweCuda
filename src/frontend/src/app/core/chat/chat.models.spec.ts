@@ -1,26 +1,5 @@
-import { ChatMessage, mergeMessages } from './chat.models';
-
-export function message(
-  id: string,
-  createdAt: string,
-  change: Partial<ChatMessage> = {},
-): ChatMessage {
-  return {
-    id,
-    conversationId: 'c1',
-    from: 'customer',
-    kind: 'text',
-    body: `Message ${id}`,
-    systemEventType: null,
-    systemEventPayload: null,
-    orderId: null,
-    createdAt,
-    readByCustomerAt: createdAt,
-    readByAdminAt: null,
-    images: [],
-    ...change,
-  };
-}
+import { message } from '../../testing/chat-testing';
+import { mergeMessages } from './chat.models';
 
 describe('mergeMessages', () => {
   it('keeps the list sorted oldest first', () => {

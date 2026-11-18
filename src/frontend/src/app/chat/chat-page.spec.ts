@@ -6,7 +6,7 @@ import { Subject } from 'rxjs';
 import { AuthService } from '../core/auth/auth.service';
 import { ChatRealtime } from '../core/chat/chat-realtime.service';
 import { ChatMessage, ReadReceipt } from '../core/chat/chat.models';
-import { message } from '../core/chat/chat.models.spec';
+import { message } from '../testing/chat-testing';
 import { ANNA, provideApiTesting } from '../testing/auth-testing';
 import { ChatPage } from './chat-page';
 
