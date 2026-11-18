@@ -50,6 +50,12 @@ internal static class AuthSetup
 
     private const string SignedInAtKey = "bc.signed_in_at";
 
+    /// <summary>When the session last proved the user again through an external provider (re-authentication, §8.6).</summary>
+    private const string ReauthenticatedAtKey = "bc.reauthenticated_at";
+
+    /// <summary>How long an external re-authentication allows a sensitive action such as deleting the account.</summary>
+    public static readonly TimeSpan ReauthenticationLifetime = TimeSpan.FromMinutes(10);
+
     public static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
     {
         var cookies = AuthCookies.For(PublicSiteOptions.FromConfiguration(configuration));
@@ -137,6 +143,7 @@ internal static class AuthSetup
             options.Cookie.SameSite = SameSiteMode.Strict;
         });
 
+        services.AddExternalProviders(configuration, cookies);
         services.AddDataProtectionKeys(configuration);
         services.AddScoped<AccountLinks>();
         services.AddHttpContextAccessor();
@@ -160,6 +167,25 @@ internal static class AuthSetup
             SameSite = SameSiteMode.Strict,
             Path = "/",
         });
+    }
+
+    /// <summary>Re-issues the session cookie, keeping its sign-in time and second factor, and records a re-authentication.</summary>
+    public static async Task MarkReauthenticatedAsync(this HttpContext context, SignInManager<ApplicationUser> signIn, ApplicationUser user, DateTimeOffset now)
+    {
+        var current = await context.AuthenticateAsync(IdentityConstants.ApplicationScheme);
+        var properties = current.Properties ?? new AuthenticationProperties { IsPersistent = true };
+        properties.Items[ReauthenticatedAtKey] = now.ToUnixTimeSeconds().ToString(System.Globalization.CultureInfo.InvariantCulture);
+        var methods = current.Principal?.FindAll(AuthenticationMethodClaim).ToList() ?? [];
+        await signIn.SignInWithClaimsAsync(user, properties, methods);
+    }
+
+    /// <summary>Whether this session re-authenticated through an external provider within <see cref="ReauthenticationLifetime"/>.</summary>
+    public static async Task<bool> IsFreshlyReauthenticatedAsync(this HttpContext context, DateTimeOffset now)
+    {
+        var current = await context.AuthenticateAsync(IdentityConstants.ApplicationScheme);
+        return current.Properties?.Items.TryGetValue(ReauthenticatedAtKey, out var value) == true
+            && long.TryParse(value, System.Globalization.CultureInfo.InvariantCulture, out var seconds)
+            && now - DateTimeOffset.FromUnixTimeSeconds(seconds) <= ReauthenticationLifetime;
     }
 
     public static bool HasMultiFactor(this System.Security.Claims.ClaimsPrincipal user) =>
@@ -215,12 +241,12 @@ internal static class AuthSetup
 /// __Host- cookies that are always Secure; a plain-http origin (local development only) gets unprefixed cookies
 /// that follow the request scheme.
 /// </summary>
-internal sealed record AuthCookies(string Session, string Antiforgery, string TwoFactor, CookieSecurePolicy SecurePolicy)
+internal sealed record AuthCookies(string Session, string Antiforgery, string TwoFactor, string External, CookieSecurePolicy SecurePolicy)
 {
     public static AuthCookies For(PublicSiteOptions site) =>
         site.Origin.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
-            ? new(AuthSetup.SessionCookieName, AuthSetup.AntiforgeryCookieName, AuthSetup.TwoFactorCookieName, CookieSecurePolicy.Always)
-            : new(AuthSetup.LocalSessionCookieName, AuthSetup.LocalAntiforgeryCookieName, AuthSetup.LocalTwoFactorCookieName, CookieSecurePolicy.SameAsRequest);
+            ? new(AuthSetup.SessionCookieName, AuthSetup.AntiforgeryCookieName, AuthSetup.TwoFactorCookieName, ExternalProviders.ExternalCookieName, CookieSecurePolicy.Always)
+            : new(AuthSetup.LocalSessionCookieName, AuthSetup.LocalAntiforgeryCookieName, AuthSetup.LocalTwoFactorCookieName, ExternalProviders.LocalExternalCookieName, CookieSecurePolicy.SameAsRequest);
 }
 
 /// <summary>The client address for audit entries (behind the ingress it comes from X-Forwarded-For).</summary>

@@ -286,3 +286,37 @@ After that date the build fails again; an entry that is no longer reported is fl
   do not stay forever.
 - **Authorization matrix test:** every controller endpoint must carry authorization metadata, anonymous endpoints must
   match a reviewed list, and every `/api/admin` endpoint must use the `Admin` policy.
+
+## 2026-11-18 — Phase 3: sign-in with Google and Facebook
+
+**Owner's decisions**
+- **The OAuth client secrets live in Key Vault** (PLAN §8.5), as secrets `Auth--Google--ClientId` and
+  `Auth--Google--ClientSecret` (later `Auth--Facebook--AppId` / `AppSecret`) in each environment's vault. The owner
+  writes them with the "Key Vault Secrets Officer" role; the app reads the whole vault into its configuration at
+  startup with its managed identity ("Key Vault Secrets User"). A secret added later takes effect at the next
+  restart or deployment. If Key Vault cannot be reached, the app does not start (like a missing setting).
+- **Two Google OAuth clients**: `bajkowecuda-prod` (production redirect URI only) and `bajkowecuda-staging-local`
+  (staging, `localhost:8080`, `localhost:4200`), so the production secret never sits on a developer machine. The
+  consent screen stays in "Testing" (listed test users only) until the custom domain exists (Phase 8).
+
+**Implementation**
+- **Providers are registered only when configured**; `GET /api/auth/providers` lists them for the buttons.
+  Callback paths are the ASP.NET Core defaults `/signin-google` and `/signin-facebook` (outside `/api`, so the dev
+  proxy forwards them too).
+- **One callback, three modes** (`GET /api/auth/external/{provider}?mode=signin|link|reauth&returnUrl=`): sign in;
+  link to the signed-in account (the provider's answer is bound to the user id, so it cannot be replayed in another
+  session); re-authenticate before deleting an account without a password (valid 10 minutes, stored in the session
+  cookie's properties). The callback answers with redirects to Angular pages (`?error=account_exists`,
+  `login_in_use`, `external_failed`, `reauthentication_failed`), since the browser follows them, not the app.
+- **Linking by email only when both sides vouch for it**: the provider says the address is verified (Google's
+  `email_verified`; Facebook says nothing, so never) and the local account confirmed it. Otherwise the person signs in
+  to the existing account and links from the account page (PLAN §3.2, against account takeover).
+- **Every new external account goes through complete-profile** (`GET`/`POST /api/auth/complete-profile`), not only
+  those without an email: the terms must be accepted and stored with their version, as for registration. The external
+  cookie (`__Host-bc.ext`, 15 minutes) keeps the provider's answer meanwhile. An address the provider did not verify
+  gets a confirmation email. Complete-profile answers `409 auth.account_exists` for a taken address: this reveals that
+  an account exists, but only to someone who has just signed in with a provider and typed that address.
+- **Return URLs** must be local paths (`/pl/chat`); anything else is dropped (open-redirect protection, PLAN §6).
+- **The last way to sign in cannot be removed** (`DELETE /api/account/logins/{provider}` → `409 auth.last_login`).
+- **Tests** use a fake remote handler registered as "Google" that does what an OAuth handler does on our side
+  (correlation cookie, protected state, external cookie), so the whole round trip runs without Google.

@@ -100,6 +100,9 @@ services:
       Email__Smtp__Port: "1025"
       # Accounts with these confirmed addresses become admins (they must set up 2FA to use the admin endpoints).
       Admin__Emails__0: ${ADMIN_EMAILS:-}
+      # Sign-in with Google appears only when both are set (the bajkowecuda-staging-local client).
+      Auth__Google__ClientId: ${GOOGLE_CLIENT_ID:-}
+      Auth__Google__ClientSecret: ${GOOGLE_CLIENT_SECRET:-}
     ports:
       - "127.0.0.1:${APP_PORT:-8080}:8080"
     depends_on:

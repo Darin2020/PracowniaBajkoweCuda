@@ -32,6 +32,23 @@ internal static class AuthErrors
     /// </summary>
     public static readonly AppError ReauthenticationFailed = new("auth.reauthentication_failed", ErrorKind.Forbidden);
 
+    /// <summary>The provider is not configured in this environment (see <c>GET /api/auth/providers</c>).</summary>
+    public static readonly AppError ProviderUnavailable = new("auth.provider_unavailable", ErrorKind.NotFound);
+
+    /// <summary>The provider's answer is gone (15 minutes passed, or another tab finished): start again.</summary>
+    public static readonly AppError ExternalSessionExpired = new("auth.external_session_expired", ErrorKind.Validation);
+
+    /// <summary>
+    /// The address already has an account: sign in to it and link the provider on the account page (§3.2, no automatic
+    /// linking without a verified email, against account takeover).
+    /// </summary>
+    public static readonly AppError AccountExists = new("auth.account_exists", ErrorKind.Conflict);
+
+    /// <summary>Removing this login would leave the account without any way to sign in.</summary>
+    public static readonly AppError LastLogin = new("auth.last_login", ErrorKind.Conflict);
+
+    public static readonly AppError LoginNotFound = new("auth.login_not_found", ErrorKind.NotFound);
+
     /// <summary>Too many requests (§8.3); the response carries <c>Retry-After</c>.</summary>
     public static readonly AppError RateLimited = new("rate_limited", ErrorKind.TooManyRequests);
 

@@ -12,6 +12,9 @@ public static class AuditActions
     public const string PasswordReset = "auth.password_reset";
     public const string PasswordChanged = "auth.password_changed";
     public const string ReauthenticationFailed = "auth.reauthentication_failed";
+    public const string ExternalLoginLinked = "auth.external_login_linked";
+    public const string ExternalLoginRemoved = "auth.external_login_removed";
+    public const string Reauthenticated = "auth.reauthenticated";
     public const string TwoFactorEnabled = "auth.2fa_enabled";
     public const string RecoveryCodesGenerated = "auth.2fa_recovery_codes_generated";
     public const string AccountExported = "account.exported";

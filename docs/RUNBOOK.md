@@ -167,6 +167,29 @@ DELETE FROM AspNetUserTokens WHERE UserId = @id;
 UPDATE AspNetUsers SET TwoFactorEnabled = 0, SecurityStamp = REPLACE(CONVERT(varchar(36), NEWID()), '-', '') WHERE Id = @id;
 ```
 
+### Sign-in with Google (and Facebook)
+
+The buttons appear only for providers whose settings exist. The OAuth clients are in the Google Cloud project
+"Pracownia Bajkowe Cuda" (Google Auth Platform → Clients): `bajkowecuda-prod` for production,
+`bajkowecuda-staging-local` for staging and local development. Their ids and secrets are Key Vault secrets of each
+environment; the app reads them at startup.
+
+```powershell
+# Once: allow yourself to write secrets (takes a few minutes to apply)
+$me = az ad signed-in-user show --query id -o tsv
+az role assignment create --assignee-object-id $me --assignee-principal-type User --role "Key Vault Secrets Officer" --scope (az keyvault show -n <vault> --query id -o tsv)
+
+az keyvault secret set --vault-name <vault> --name "Auth--Google--ClientId" --value "<client id>" --output none
+az keyvault secret set --vault-name <vault> --name "Auth--Google--ClientSecret" --value "<client secret>" --output none
+az containerapp revision restart -g rg-bajkowecuda-<env> -n ca-bajkowecuda-<env> --revision (az containerapp show -g rg-bajkowecuda-<env> -n ca-bajkowecuda-<env> --query properties.latestRevisionName -o tsv)
+```
+
+Vaults: `az keyvault list -g rg-bajkowecuda-<env> --query [].name -o tsv`. Rotating a secret: add a new one in
+Google (Clients → the client → Add secret), store it as above, restart, then delete the old one in Google.
+While the consent screen is in "Testing", only the test users listed under Audience can sign in with Google;
+publish it after the custom domain exists (Phase 8). Facebook works the same way with `Auth--Facebook--AppId` and
+`Auth--Facebook--AppSecret` once a Meta app exists.
+
 ### Audit log and rate limits
 
 Admin actions and security events (sign-ins, failed sign-ins, 2FA, password changes, export, deletion, role changes)

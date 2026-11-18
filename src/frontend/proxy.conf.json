@@ -11,5 +11,13 @@
   "/health": {
     "target": "http://localhost:5080",
     "secure": false
+  },
+  "/signin-google": {
+    "target": "http://localhost:5080",
+    "secure": false
+  },
+  "/signin-facebook": {
+    "target": "http://localhost:5080",
+    "secure": false
   }
 }
