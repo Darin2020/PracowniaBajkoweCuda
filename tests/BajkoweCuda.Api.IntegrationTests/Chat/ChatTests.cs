@@ -115,6 +115,20 @@ public sealed class ChatTests(AuthApp app) : IClassFixture<AuthApp>
     }
 
     [Fact]
+    public async Task Signing_in_returns_the_unread_badge()
+    {
+        var customer = await CustomerAsync();
+        var admin = await AdminAsync();
+        var conversationId = (await PostAsync(customer.Client, "/api/chat/messages", new { body = "Hi" })).GetProperty("conversationId").GetGuid();
+        await PostAsync(admin.Client, $"/api/admin/conversations/{conversationId}/messages", new { body = "Hello!" });
+
+        var (fresh, _) = await app.CreateBrowserAsync();
+        using var login = await AuthApp.LoginAsync(fresh, customer.Email);
+
+        (await login.Content.ReadFromJsonAsync<JsonElement>(Ct)).GetProperty("unreadCount").GetInt32().ShouldBe(1);
+    }
+
+    [Fact]
     public async Task A_customer_cannot_mark_messages_of_another_conversation()
     {
         var customer = await CustomerAsync();

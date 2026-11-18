@@ -59,6 +59,7 @@ export class ChatRealtime {
   private readonly browser = isPlatformBrowser(inject(PLATFORM_ID));
 
   private connection: ChatConnection | null = null;
+  /** Who the connection is for (user, roles, 2FA); a change means reconnecting. */
   private userId: string | null = null;
   private restartTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -80,10 +81,14 @@ export class ChatRealtime {
       const user = this.auth.user();
       // Customers chat once their address is confirmed; admins hear every conversation (the hub checks 2FA).
       const allowed = !!user && (user.emailConfirmed || user.roles.includes(ADMIN_ROLE));
-      const id = allowed ? user.id : null;
-      if (id !== this.userId) {
-        this.userId = id;
-        void this.reconnectFor(id);
+      // The server decides on connecting what the connection receives (an admin joins the admins' group only with
+      // 2FA), so turning 2FA on, or a new role, needs a new connection.
+      const key = allowed
+        ? `${user.id}:${user.roles.join(',')}:${user.twoFactorEnabled ? 'mfa' : ''}`
+        : null;
+      if (key !== this.userId) {
+        this.userId = key;
+        void this.reconnectFor(key);
       }
     });
 

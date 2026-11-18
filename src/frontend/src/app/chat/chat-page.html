@@ -13,167 +13,23 @@
     <header class="chat__header">
       <h1 id="chat-title">{{ title }}</h1>
       @if (realtime.state() === 'reconnecting' || realtime.state() === 'disconnected') {
-        @if (!loading()) {
+        @if (!session.loading()) {
           <p class="chat__status" role="status" i18n="@@chat.reconnecting">Reconnecting…</p>
         }
       }
     </header>
 
-    <div #list class="chat__list" role="log" aria-live="polite" aria-labelledby="chat-title">
-      <div #top class="chat__top" aria-hidden="true"></div>
-
-      @if (loadingOlder()) {
-        <p class="chat__hint" role="status" i18n="@@chat.loadingOlder">Loading earlier messages…</p>
-      }
-      @if (loadError(); as message) {
-        <p class="alert alert--error" role="alert">{{ message }}</p>
-      }
-
-      @if (loading()) {
-        <p class="chat__hint" role="status" i18n="@@common.loading">Loading…</p>
-      } @else if (messages().length === 0 && !loadError()) {
-        <div class="chat__empty">
-          <h2 i18n="@@chat.emptyTitle">Tell us about your toy</h2>
-          <p i18n="@@chat.emptyText">
-            Who is it for, what should it look like, how big should it be? Photos and drawings help
-            a lot. We usually answer within a day.
-          </p>
-        </div>
-      }
-
-      @for (message of messages(); track message.id; let index = $index) {
-        @if (showDateBefore(index)) {
-          <p class="chat__date">{{ message.createdAt | date: 'longDate' }}</p>
-        }
-
-        @if (message.kind === 'system') {
-          <p class="message message--system">
-            <span i18n="@@chat.orderUpdate">Update about your order</span>
-            <time [attr.datetime]="message.createdAt">{{
-              message.createdAt | date: 'shortTime'
-            }}</time>
-          </p>
-        } @else {
-          <article class="message" [class.message--mine]="isMine(message)">
-            @if (!isMine(message)) {
-              <p class="message__author" i18n="@@chat.studio">Pracownia Bajkowe Cuda</p>
-            }
-            @if (message.images.length > 0) {
-              <div
-                class="message__images"
-                [class.message__images--single]="message.images.length === 1"
-              >
-                @for (image of message.images; track image.id; let position = $index) {
-                  <button
-                    type="button"
-                    class="message__image"
-                    (click)="openImage(message, position)"
-                  >
-                    <img
-                      [src]="image.thumbnailUrl"
-                      [width]="image.width"
-                      [height]="image.height"
-                      loading="lazy"
-                      alt="Photo {{ position + 1 }} of {{ message.images.length }}"
-                      i18n-alt="@@chat.photoAlt"
-                    />
-                  </button>
-                }
-              </div>
-            }
-            @if (message.body) {
-              <p class="message__body">{{ message.body }}</p>
-            }
-            <p class="message__meta">
-              <time [attr.datetime]="message.createdAt">{{
-                message.createdAt | date: 'shortTime'
-              }}</time>
-              @if (isMine(message)) {
-                @if (message.readByAdminAt) {
-                  <span i18n="@@chat.read">Read</span>
-                } @else {
-                  <span i18n="@@chat.sent">Sent</span>
-                }
-              }
-            </p>
-          </article>
-        }
-      }
-    </div>
-
-    <form class="composer" (ngSubmit)="send()">
-      @if (images().length > 0) {
-        <ul class="composer__images">
-          @for (image of images(); track image.key) {
-            <li class="composer__image" [class.composer__image--error]="image.error">
-              <img [src]="image.preview" alt="" />
-              @if (!image.attachmentId && !image.error) {
-                <span class="composer__badge" role="status" i18n="@@chat.uploading"
-                  >Uploading…</span
-                >
-              }
-              @if (image.error; as message) {
-                <span class="composer__badge composer__badge--error" role="alert">{{
-                  message
-                }}</span>
-              }
-              <button
-                type="button"
-                class="composer__remove"
-                (click)="removeImage(image.key)"
-                aria-label="Remove photo {{ image.name }}"
-                i18n-aria-label="@@chat.removePhoto"
-              >
-                ×
-              </button>
-            </li>
-          }
-        </ul>
-      }
-
-      @if (sendError(); as message) {
-        <p class="alert alert--error" role="alert">{{ message }}</p>
-      }
-
-      <div class="composer__row">
-        <label
-          class="composer__attach button"
-          [class.composer__attach--disabled]="images().length >= maxImages"
-        >
-          <span class="visually-hidden" i18n="@@chat.addPhotos">Add photos</span>
-          <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">
-            <path d="M4 7h3l2-2h6l2 2h3v12H4z" />
-            <circle cx="12" cy="13" r="3.5" />
-          </svg>
-          <input
-            type="file"
-            class="visually-hidden"
-            [accept]="acceptedTypes"
-            multiple
-            [disabled]="images().length >= maxImages"
-            (change)="addFiles($any($event.target))"
-          />
-        </label>
-
-        <label class="visually-hidden" for="chat-text" i18n="@@chat.messageLabel">Message</label>
-        <textarea
-          id="chat-text"
-          class="input composer__text"
-          rows="1"
-          [maxlength]="maxLength"
-          placeholder="Write a message…"
-          i18n-placeholder="@@chat.placeholder"
-          [ngModel]="text()"
-          (ngModelChange)="onText($event)"
-          name="text"
-          (keydown)="onKeydown($event)"
-        ></textarea>
-
-        <button class="button button--primary composer__send" type="submit" [disabled]="!canSend()">
-          <span i18n="@@chat.send">Send</span>
-        </button>
+    <app-chat-thread [session]="session" side="customer" [otherName]="studioName" [label]="title">
+      <div class="chat__empty">
+        <h2 i18n="@@chat.emptyTitle">Tell us about your toy</h2>
+        <p i18n="@@chat.emptyText">
+          Who is it for, what should it look like, how big should it be? Photos and drawings help a
+          lot. We usually answer within a day.
+        </p>
       </div>
+    </app-chat-thread>
 
+    <app-chat-composer [send]="send">
       @let state = chat();
       @if (state?.emailPromptAnswered) {
         <label class="checkbox composer__email">
@@ -188,7 +44,7 @@
       @if (settingError(); as message) {
         <p class="alert alert--error" role="alert">{{ message }}</p>
       }
-    </form>
+    </app-chat-composer>
   </section>
 
   <dialog #emailDialog class="email-dialog" aria-labelledby="email-dialog-title">
@@ -216,6 +72,4 @@
       </button>
     </div>
   </dialog>
-
-  <app-image-viewer [items]="viewerImages()" />
 }

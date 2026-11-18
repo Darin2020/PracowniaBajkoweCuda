@@ -28,6 +28,24 @@ export const adminGuard: CanActivateFn = async (_route, state) => {
   return user.roles.includes(ADMIN_ROLE) ? true : router.createUrlTree(['/account']);
 };
 
+/**
+ * The admin area itself (conversations, later orders): an admin with 2FA. Without it the API would answer
+ * `auth.mfa_required` to every call, so the admin is sent to the setup first.
+ */
+export const adminAreaGuard: CanActivateFn = async (_route, state) => {
+  const router = inject(Router);
+  const user = await inject(AuthService).ensureLoaded();
+  if (!user) {
+    return router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
+  }
+
+  if (!user.roles.includes(ADMIN_ROLE)) {
+    return router.createUrlTree(['/account']);
+  }
+
+  return user.twoFactorEnabled ? true : router.createUrlTree(['/admin/2fa-setup']);
+};
+
 /** Sign-in and registration pages: a signed-in user goes to their home page instead. */
 export const anonymousGuard: CanActivateFn = async () => {
   // inject() works only before the first await.

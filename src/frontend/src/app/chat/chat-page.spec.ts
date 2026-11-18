@@ -55,6 +55,7 @@ describe('ChatPage', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     http.expectOne('/api/chat').flush(chat);
+    await settle();
     http.expectOne((request) => request.url === '/api/chat/messages').flush({ items, nextCursor });
     await settle();
     fixture.detectChanges();
