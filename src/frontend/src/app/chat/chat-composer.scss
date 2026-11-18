@@ -1,0 +1,106 @@
+:host {
+  display: block;
+}
+
+.composer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+}
+
+.composer__row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.composer__text {
+  flex: 1;
+  min-height: 2.75rem;
+  max-height: 10rem;
+  resize: vertical;
+}
+
+.composer__attach {
+  flex: none;
+  width: 2.75rem;
+  padding: 0;
+
+  svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-linejoin: round;
+    stroke-width: 1.75;
+  }
+
+  &:focus-within {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+}
+
+.composer__attach--disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.composer__send {
+  flex: none;
+}
+
+.composer__images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.composer__image {
+  position: relative;
+  width: 5rem;
+  height: 5rem;
+  overflow: hidden;
+  border-radius: var(--radius-small);
+  background: var(--color-border);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.composer__image--error img {
+  opacity: 0.35;
+}
+
+.composer__badge {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 0.125rem 0.25rem;
+  background: rgb(255 255 255 / 85%);
+  font-size: 0.6875rem;
+  line-height: 1.2;
+}
+
+.composer__badge--error {
+  color: var(--color-error);
+}
+
+.composer__remove {
+  position: absolute;
+  top: 0.125rem;
+  right: 0.125rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(43 35 48 / 70%);
+  color: #fff;
+  font-size: 1.125rem;
+  line-height: 1;
+  cursor: pointer;
+}

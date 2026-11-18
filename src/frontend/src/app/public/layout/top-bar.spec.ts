@@ -57,6 +57,19 @@ describe('TopBar', () => {
     expect(links).toEqual(['/pl/chat', '/pl/account']);
   });
 
+  it('gives admins the conversations instead of the chat', async () => {
+    const fixture = await render({
+      authenticated: true,
+      ...ANNA,
+      roles: ['Admin'],
+      unreadCount: 4,
+    });
+    const element = fixture.nativeElement as HTMLElement;
+
+    expect(element.querySelector('a[href="/pl/admin/conversations"]')?.textContent).toContain('4');
+    expect(element.querySelector('a[href="/pl/chat"]')).toBeNull();
+  });
+
   it('reminds an admin without 2FA to set it up', async () => {
     const fixture = await render({ authenticated: true, ...ANNA, roles: ['Admin'] });
 

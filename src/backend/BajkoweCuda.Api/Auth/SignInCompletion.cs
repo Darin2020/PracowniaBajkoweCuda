@@ -1,3 +1,4 @@
+using BajkoweCuda.Infrastructure.Chat;
 using BajkoweCuda.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,7 @@ internal static partial class SignInCompletion
 {
     /// <summary>
     /// After the session cookie is issued: binds a new antiforgery token to the signed-in user (a token belongs to the
-    /// user it was issued for) and returns the session summary.
+    /// user it was issued for) and returns the session summary, with the chat badge.
     /// </summary>
     public static async Task<MeResponse> CompleteSignInAsync(
         this ControllerBase controller,
@@ -20,7 +21,23 @@ internal static partial class SignInCompletion
         controller.HttpContext.User = await signIn.CreateUserPrincipalAsync(user);
         controller.HttpContext.IssueRequestToken();
         LogSignedIn(logger, user.Id);
-        return await MeResponse.ForAsync(users, user);
+        var unread = await UnreadCountAsync(controller.HttpContext, user);
+        return await MeResponse.ForAsync(users, user, unread);
+    }
+
+    /// <summary>
+    /// The chat badge for the signed-in user (also <c>GET /api/auth/me</c>): the customer's unread studio messages, or for
+    /// an admin whose session has the second factor all unread customer messages.
+    /// </summary>
+    public static async Task<int> UnreadCountAsync(HttpContext context, ApplicationUser user)
+    {
+        var chat = context.RequestServices.GetRequiredService<ChatService>();
+        if (context.User.IsInRole(Roles.Admin))
+        {
+            return context.User.HasMultiFactor() ? await chat.StudioUnreadAsync(context.RequestAborted) : 0;
+        }
+
+        return await chat.CustomerUnreadAsync(user.Id, context.RequestAborted);
     }
 
     [LoggerMessage(Level = LogLevel.Information, Message = "User {UserId} signed in")]

@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { LegalDocumentId } from './content/legal';
 import {
+  adminAreaGuard,
   adminGuard,
   anonymousGuard,
   authGuard,
@@ -77,6 +78,16 @@ export const routes: Routes = [
     path: 'chat',
     canActivate: [authGuard],
     loadComponent: () => import('./chat/chat-page').then((m) => m.ChatPage),
+  },
+  {
+    path: 'admin/conversations',
+    canActivate: [adminAreaGuard],
+    loadComponent: () => import('./admin/conversations-page').then((m) => m.ConversationsPage),
+  },
+  {
+    path: 'admin/conversations/:id',
+    canActivate: [adminAreaGuard],
+    loadComponent: () => import('./admin/conversation-page').then((m) => m.ConversationPage),
   },
   {
     path: 'admin/2fa-setup',

@@ -452,3 +452,22 @@ After that date the build fails again; an entry that is no longer reported is fl
   button sends.
 - System messages show "Update about your order" until Phase 5 renders each order event.
 
+## 2026-11-18 — Phase 4: the admin chat in Angular
+
+- **One chat implementation for both sides.** The customer's page and the admin's conversation page share
+  `ChatSession` (messages, paging, live merge, read receipts; the side decides which read field counts),
+  `ChatThread` (the scrolling list, older pages, the photo viewer), `ChatMessageView` (one bubble, seen from a side)
+  and `ChatComposer` (text and photos; the page decides where the message goes).
+- **`/admin/conversations`**: unread first, then the newest, with a preview and a name/email search (300 ms after
+  typing stops). It reloads itself after chat events (once per burst of events) instead of patching rows, which keeps
+  the server's order and counts authoritative.
+- **`/admin/conversations/:id`**: the conversation from the studio's side, with a customer panel (name, email, email
+  language, since when, whether email notifications are on); on a phone the panel is folded above the chat. Orders
+  and "Create order" join it in Phase 5. Deleted accounts show no composer.
+- **`adminAreaGuard`** sends an admin without 2FA to the setup, because every admin endpoint would refuse them.
+  Admins land on the conversations after signing in; the user menu shows "Conversations" (with the badge) instead of
+  "Chat".
+- **The SignalR connection is renewed when 2FA is turned on** (or roles change): the server decides on connecting
+  whether a connection joins the admins' group.
+- **Sign-in responses now carry the unread badge** too, not only `GET /api/auth/me`.
+

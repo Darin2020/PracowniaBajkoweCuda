@@ -121,6 +121,30 @@ describe('ChatRealtime', () => {
     expect(reloads).toBe(1);
   });
 
+  it('reconnects when an admin turns 2FA on, so the server adds them to the admins', async () => {
+    await signIn({ authenticated: true, ...ANNA, roles: ['Admin'] });
+    expect(connections).toHaveLength(1);
+
+    const enabling = auth.refresh();
+    http
+      .expectOne('/api/auth/me')
+      .flush({ authenticated: true, ...ANNA, roles: ['Admin'], twoFactorEnabled: true });
+    await enabling;
+    await settle();
+
+    expect(connections[0].stopped).toBe(1);
+    expect(connections).toHaveLength(2);
+  });
+
+  it('keeps the connection when only the unread count changes', async () => {
+    await signIn({ authenticated: true, ...ANNA });
+
+    auth.setUnreadCount(5);
+    await settle();
+
+    expect(connections).toHaveLength(1);
+  });
+
   it('disconnects on sign-out', async () => {
     const realtime = await signIn({ authenticated: true, ...ANNA });
 

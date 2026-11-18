@@ -107,6 +107,8 @@ describe('AuthService', () => {
   it('sends admins without 2FA to the setup, customers to the chat', () => {
     expect(auth.homeFor(ANNA)).toBe('/chat');
     expect(auth.homeFor({ ...ANNA, roles: ['Admin'] })).toBe('/admin/2fa-setup');
-    expect(auth.homeFor({ ...ANNA, roles: ['Admin'], twoFactorEnabled: true })).toBe('/account');
+    expect(auth.homeFor({ ...ANNA, roles: ['Admin'], twoFactorEnabled: true })).toBe(
+      '/admin/conversations',
+    );
   });
 });

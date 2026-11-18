@@ -34,6 +34,10 @@
           <context context-type="linenumber">24,26</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
+          <context context-type="linenumber">74,75</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/auth/complete-profile-page.ts</context>
           <context context-type="linenumber">62,63</context>
         </context-group>
@@ -100,6 +104,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/account/account-page.html</context>
           <context context-type="linenumber">61,62</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
+          <context context-type="linenumber">79,80</context>
         </context-group>
       </trans-unit>
       <trans-unit id="account.saved" datatype="html">
@@ -218,6 +226,10 @@
           <context context-type="linenumber">190,194</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversations-page.ts</context>
+          <context context-type="linenumber">48,49</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/admin/two-factor-setup-page.ts</context>
           <context context-type="linenumber">141,144</context>
         </context-group>
@@ -226,8 +238,8 @@
           <context context-type="linenumber">123,126</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">33,34</context>
+          <context context-type="sourcefile">src/app/chat/chat-thread.ts</context>
+          <context context-type="linenumber">44,45</context>
         </context-group>
       </trans-unit>
       <trans-unit id="account.twoFactor" datatype="html">
@@ -380,6 +392,178 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/account/account-page.ts</context>
           <context context-type="linenumber">64</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.conversation.back" datatype="html">
+        <source>← All conversations</source>
+        <target state="needs-review-translation">← Toutes les conversations</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
+          <context context-type="linenumber">36,38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="chat.reconnecting" datatype="html">
+        <source>Reconnecting…</source>
+        <target state="needs-review-translation">Reconnexion…</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
+          <context context-type="linenumber">40,44</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/chat/chat-page.html</context>
+          <context context-type="linenumber">17,20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.conversation.empty" datatype="html">
+        <source>No messages yet.</source>
+        <target state="needs-review-translation">Aucun message pour l’instant.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
+          <context context-type="linenumber">56,58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.conversation.deletedHint" datatype="html">
+        <source> This account has been deleted; replies cannot reach it. </source>
+        <target state="needs-review-translation">Ce compte a été supprimé ; les réponses ne lui parviendront pas.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
+          <context context-type="linenumber">60,62</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.conversation.customer" datatype="html">
+        <source>Customer</source>
+        <target state="needs-review-translation">Client</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
+          <context context-type="linenumber">69,71</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
+          <context context-type="linenumber">120</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.conversation.name" datatype="html">
+        <source>Name</source>
+        <target state="needs-review-translation">Nom</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
+          <context context-type="linenumber">71,72</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.conversation.since" datatype="html">
+        <source>Writing since</source>
+        <target state="needs-review-translation">Écrit depuis</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
+          <context context-type="linenumber">81,82</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.conversation.emails" datatype="html">
+        <source>Email notifications</source>
+        <target state="needs-review-translation">Notifications par e-mail</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
+          <context context-type="linenumber">83,85</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.conversation.emailsOn" datatype="html">
+        <source>On</source>
+        <target state="needs-review-translation">Activées</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
+          <context context-type="linenumber">86,88</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.conversation.emailsOff" datatype="html">
+        <source>Off</source>
+        <target state="needs-review-translation">Désactivées</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
+          <context context-type="linenumber">88,90</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.conversations.deleted" datatype="html">
+        <source>Deleted account</source>
+        <target state="needs-review-translation">Compte supprimé</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
+          <context context-type="linenumber">121</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversations-page.ts</context>
+          <context context-type="linenumber">110</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.conversations.title" datatype="html">
+        <source>Conversations</source>
+        <target state="needs-review-translation">Conversations</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
+          <context context-type="linenumber">125</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversations-page.ts</context>
+          <context context-type="linenumber">109</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.conversations.search" datatype="html">
+        <source>Search by name or email</source>
+        <target state="needs-review-translation">Rechercher par nom ou e-mail</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversations-page.ts</context>
+          <context context-type="linenumber">31,34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.conversations.none" datatype="html">
+        <source>No conversations yet.</source>
+        <target state="needs-review-translation">Aucune conversation pour l’instant.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversations-page.ts</context>
+          <context context-type="linenumber">50,53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="chat.orderUpdate" datatype="html">
+        <source>Update about your order</source>
+        <target state="needs-review-translation">Nouvelles de votre commande</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversations-page.ts</context>
+          <context context-type="linenumber">69,70</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/chat/chat-message.ts</context>
+          <context context-type="linenumber">19,20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.conversations.photos" datatype="html">
+        <source>Photos: <x id="INTERPOLATION" equiv-text="{{ conversation.lastMessageImageCount }}"/></source>
+        <target state="needs-review-translation">Photos : <x id="INTERPOLATION" equiv-text="{{ conversation.lastMessageImageCount }}"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversations-page.ts</context>
+          <context context-type="linenumber">74,75</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="nav.unread" datatype="html">
+        <source>unread messages</source>
+        <target state="needs-review-translation">messages non lus</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversations-page.ts</context>
+          <context context-type="linenumber">82,83</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/layout/top-bar.html</context>
+          <context context-type="linenumber">68,69</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/layout/top-bar.html</context>
+          <context context-type="linenumber">76,77</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.conversations.more" datatype="html">
+        <source> Show more </source>
+        <target state="needs-review-translation">Afficher plus</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversations-page.ts</context>
+          <context context-type="linenumber">99,101</context>
         </context-group>
       </trans-unit>
       <trans-unit id="twoFactor.enabled" datatype="html">
@@ -922,6 +1106,78 @@
           <context context-type="linenumber">119</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="chat.uploading" datatype="html">
+        <source>Uploading…</source>
+        <target state="needs-review-translation">Envoi…</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/chat/chat-composer.ts</context>
+          <context context-type="linenumber">51,53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="chat.removePhoto" datatype="html">
+        <source>Remove photo <x id="INTERPOLATION" equiv-text="{{ image.name }}"/></source>
+        <target state="needs-review-translation">Retirer la photo <x id="INTERPOLATION" equiv-text="{{ image.name }}"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/chat/chat-composer.ts</context>
+          <context context-type="linenumber">63,64</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="chat.addPhotos" datatype="html">
+        <source>Add photos</source>
+        <target state="needs-review-translation">Ajouter des photos</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/chat/chat-composer.ts</context>
+          <context context-type="linenumber">82,83</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="chat.messageLabel" datatype="html">
+        <source>Message</source>
+        <target state="needs-review-translation">Message</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/chat/chat-composer.ts</context>
+          <context context-type="linenumber">97,99</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="chat.placeholder" datatype="html">
+        <source>Write a message…</source>
+        <target state="needs-review-translation">Écrire un message…</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/chat/chat-composer.ts</context>
+          <context context-type="linenumber">103,104</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="chat.send" datatype="html">
+        <source>Send</source>
+        <target state="needs-review-translation">Envoyer</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/chat/chat-composer.ts</context>
+          <context context-type="linenumber">112,113</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="chat.photoAlt" datatype="html">
+        <source>Photo <x id="INTERPOLATION" equiv-text="{{ position + 1 }}"/> of <x id="INTERPOLATION_1" equiv-text="{{ item.images.length }}"/></source>
+        <target state="needs-review-translation">Photo <x id="INTERPOLATION" equiv-text="{{ position + 1 }}"/> sur <x id="INTERPOLATION_1" equiv-text="{{ message.images.length }}"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/chat/chat-message.ts</context>
+          <context context-type="linenumber">36,37</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="chat.read" datatype="html">
+        <source>Read</source>
+        <target state="needs-review-translation">Lu</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/chat/chat-message.ts</context>
+          <context context-type="linenumber">50,51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="chat.sent" datatype="html">
+        <source>Sent</source>
+        <target state="needs-review-translation">Envoyé</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/chat/chat-message.ts</context>
+          <context context-type="linenumber">52,54</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="chat.confirmFirst" datatype="html">
         <source> Please confirm your email address first: open the link we sent to <x id="INTERPOLATION" equiv-text="{{ user.email }}"/>. </source>
         <target state="needs-review-translation">Veuillez d'abord confirmer votre adresse e-mail : ouvrez le lien envoyé à <x id="INTERPOLATION" equiv-text="{{ user.email }}"/>.</target>
@@ -938,28 +1194,12 @@
           <context context-type="linenumber">9,11</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="chat.reconnecting" datatype="html">
-        <source>Reconnecting…</source>
-        <target state="needs-review-translation">Reconnexion…</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">17,20</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="chat.loadingOlder" datatype="html">
-        <source>Loading earlier messages…</source>
-        <target state="needs-review-translation">Chargement des messages précédents…</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">26,28</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="chat.emptyTitle" datatype="html">
         <source>Tell us about your toy</source>
         <target state="needs-review-translation">Parlez-nous de votre jouet</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">36,37</context>
+          <context context-type="linenumber">24,25</context>
         </context-group>
       </trans-unit>
       <trans-unit id="chat.emptyText" datatype="html">
@@ -967,95 +1207,7 @@
         <target state="needs-review-translation">Pour qui est-il, à quoi doit-il ressembler, quelle taille ? Les photos et les dessins aident beaucoup. Nous répondons généralement dans la journée.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">38,40</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="chat.orderUpdate" datatype="html">
-        <source>Update about your order</source>
-        <target state="needs-review-translation">Nouvelles de votre commande</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">51,52</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="chat.studio" datatype="html">
-        <source>Pracownia Bajkowe Cuda</source>
-        <target state="needs-review-translation">Pracownia Bajkowe Cuda</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">59,61</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="chat.photoAlt" datatype="html">
-        <source>Photo <x id="INTERPOLATION" equiv-text="{{ position + 1 }}"/> of <x id="INTERPOLATION_1" equiv-text="{{ message.images.length }}"/></source>
-        <target state="needs-review-translation">Photo <x id="INTERPOLATION" equiv-text="{{ position + 1 }}"/> sur <x id="INTERPOLATION_1" equiv-text="{{ message.images.length }}"/></target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">77,78</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="chat.read" datatype="html">
-        <source>Read</source>
-        <target state="needs-review-translation">Lu</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">93,94</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="chat.sent" datatype="html">
-        <source>Sent</source>
-        <target state="needs-review-translation">Envoyé</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">95,96</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="chat.uploading" datatype="html">
-        <source>Uploading…</source>
-        <target state="needs-review-translation">Envoi…</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">112,114</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="chat.removePhoto" datatype="html">
-        <source>Remove photo <x id="INTERPOLATION" equiv-text="{{ image.name }}"/></source>
-        <target state="needs-review-translation">Retirer la photo <x id="INTERPOLATION" equiv-text="{{ image.name }}"/></target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">124,125</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="chat.addPhotos" datatype="html">
-        <source>Add photos</source>
-        <target state="needs-review-translation">Ajouter des photos</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">143,144</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="chat.messageLabel" datatype="html">
-        <source>Message</source>
-        <target state="needs-review-translation">Message</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">158,160</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="chat.placeholder" datatype="html">
-        <source>Write a message…</source>
-        <target state="needs-review-translation">Écrire un message…</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">164,165</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="chat.send" datatype="html">
-        <source>Send</source>
-        <target state="needs-review-translation">Envoyer</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">173,174</context>
+          <context context-type="linenumber">26,28</context>
         </context-group>
       </trans-unit>
       <trans-unit id="chat.emailCheckbox" datatype="html">
@@ -1063,7 +1215,7 @@
         <target state="needs-review-translation">Envoyer les réponses par e-mail</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">185,188</context>
+          <context context-type="linenumber">41,44</context>
         </context-group>
       </trans-unit>
       <trans-unit id="chat.emailQuestion" datatype="html">
@@ -1071,7 +1223,7 @@
         <target state="needs-review-translation">Recevoir les réponses par e-mail ?</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">195,196</context>
+          <context context-type="linenumber">51,52</context>
         </context-group>
       </trans-unit>
       <trans-unit id="chat.emailExplanation" datatype="html">
@@ -1079,7 +1231,7 @@
         <target state="needs-review-translation">Nous vous préviendrons par e-mail quand nous répondrons, vous n’aurez pas à garder la page ouverte. Vous pouvez changer cela sous la zone de message à tout moment.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">197,200</context>
+          <context context-type="linenumber">53,56</context>
         </context-group>
       </trans-unit>
       <trans-unit id="chat.emailYes" datatype="html">
@@ -1087,7 +1239,7 @@
         <target state="needs-review-translation">Oui, volontiers</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">207,209</context>
+          <context context-type="linenumber">63,65</context>
         </context-group>
       </trans-unit>
       <trans-unit id="chat.emailNo" datatype="html">
@@ -1095,7 +1247,7 @@
         <target state="needs-review-translation">Non, merci</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/chat/chat-page.html</context>
-          <context context-type="linenumber">215,217</context>
+          <context context-type="linenumber">71,73</context>
         </context-group>
       </trans-unit>
       <trans-unit id="chat.title" datatype="html">
@@ -1103,15 +1255,31 @@
         <target state="needs-review-translation">Chat</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/chat/chat-page.ts</context>
-          <context context-type="linenumber">64</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="chat.studio" datatype="html">
+        <source>Pracownia Bajkowe Cuda</source>
+        <target state="needs-review-translation">Pracownia Bajkowe Cuda</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/chat/chat-page.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="chat.loadingOlder" datatype="html">
+        <source>Loading earlier messages…</source>
+        <target state="needs-review-translation">Chargement des messages précédents…</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/chat/chat-thread.ts</context>
+          <context context-type="linenumber">37,39</context>
         </context-group>
       </trans-unit>
       <trans-unit id="chat.viewerPhotoAlt" datatype="html">
         <source>Photo <x id="INDEX" equiv-text="position + 1"/> of <x id="TOTAL" equiv-text="message.images.length"/></source>
         <target state="needs-review-translation">Photo <x id="INDEX" equiv-text="position + 1"/> sur <x id="TOTAL" equiv-text="message.images.length"/></target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/chat/chat-page.ts</context>
-          <context context-type="linenumber">180</context>
+          <context context-type="sourcefile">src/app/chat/chat-thread.ts</context>
+          <context context-type="linenumber">121</context>
         </context-group>
       </trans-unit>
       <trans-unit id="about.heading" datatype="html">
@@ -1918,20 +2086,20 @@
           <context context-type="linenumber">55,56</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="nav.conversations" datatype="html">
+        <source>Conversations</source>
+        <target state="needs-review-translation">Conversations</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/layout/top-bar.html</context>
+          <context context-type="linenumber">65,66</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="nav.chat" datatype="html">
         <source>Chat</source>
         <target state="needs-review-translation">Chat</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/public/layout/top-bar.html</context>
-          <context context-type="linenumber">64,65</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="nav.unread" datatype="html">
-        <source>unread messages</source>
-        <target state="needs-review-translation">messages non lus</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/public/layout/top-bar.html</context>
-          <context context-type="linenumber">67,68</context>
+          <context context-type="linenumber">73,74</context>
         </context-group>
       </trans-unit>
       <trans-unit id="nav.account" datatype="html">
@@ -1939,7 +2107,7 @@
         <target state="needs-review-translation">Votre compte</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/public/layout/top-bar.html</context>
-          <context context-type="linenumber">73,75</context>
+          <context context-type="linenumber">83,85</context>
         </context-group>
       </trans-unit>
       <trans-unit id="nav.twoFactor" datatype="html">
@@ -1947,7 +2115,7 @@
         <target state="needs-review-translation">Configurer l'authentification à deux facteurs</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/public/layout/top-bar.html</context>
-          <context context-type="linenumber">83,85</context>
+          <context context-type="linenumber">93,95</context>
         </context-group>
       </trans-unit>
       <trans-unit id="nav.signOut" datatype="html">
@@ -1955,7 +2123,7 @@
         <target state="needs-review-translation">Se déconnecter</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/public/layout/top-bar.html</context>
-          <context context-type="linenumber">94,95</context>
+          <context context-type="linenumber">104,105</context>
         </context-group>
       </trans-unit>
       <trans-unit id="nav.signIn" datatype="html">
@@ -1963,7 +2131,7 @@
         <target state="needs-review-translation">Se connecter</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/public/layout/top-bar.html</context>
-          <context context-type="linenumber">105,108</context>
+          <context context-type="linenumber">115,118</context>
         </context-group>
       </trans-unit>
       <trans-unit id="nav.about" datatype="html">

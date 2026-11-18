@@ -60,13 +60,23 @@
           </button>
           <ul id="user-menu" class="user-menu__list" [class.user-menu__list--open]="userMenuOpen()">
             <li>
-              <a class="nav-link" routerLink="/chat" (click)="closeMenu()"
-                ><span i18n="@@nav.chat">Chat</span>
-                @if (user.unreadCount > 0) {
-                  <span class="badge">{{ user.unreadCount }}</span>
-                  <span class="visually-hidden" i18n="@@nav.unread">unread messages</span>
-                }
-              </a>
+              @if (auth.isAdmin()) {
+                <a class="nav-link" routerLink="/admin/conversations" (click)="closeMenu()"
+                  ><span i18n="@@nav.conversations">Conversations</span>
+                  @if (user.unreadCount > 0) {
+                    <span class="badge">{{ user.unreadCount }}</span>
+                    <span class="visually-hidden" i18n="@@nav.unread">unread messages</span>
+                  }
+                </a>
+              } @else {
+                <a class="nav-link" routerLink="/chat" (click)="closeMenu()"
+                  ><span i18n="@@nav.chat">Chat</span>
+                  @if (user.unreadCount > 0) {
+                    <span class="badge">{{ user.unreadCount }}</span>
+                    <span class="visually-hidden" i18n="@@nav.unread">unread messages</span>
+                  }
+                </a>
+              }
             </li>
             <li>
               <a class="nav-link" routerLink="/account" (click)="closeMenu()" i18n="@@nav.account"

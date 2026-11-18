@@ -186,7 +186,7 @@ export class AuthService {
       return '/admin/2fa-setup';
     }
 
-    return user?.roles.includes(ADMIN_ROLE) ? '/account' : '/chat';
+    return user?.roles.includes(ADMIN_ROLE) ? '/admin/conversations' : '/chat';
   }
 
   private apply(response: MeResponse): void {
