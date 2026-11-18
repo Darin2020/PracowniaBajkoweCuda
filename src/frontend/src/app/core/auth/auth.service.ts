@@ -69,6 +69,11 @@ export class AuthService {
     return this.current();
   }
 
+  /** The chat badge changed (pushed by the server, or the user read the messages). */
+  setUnreadCount(count: number): void {
+    this.current.update((user) => (user ? { ...user, unreadCount: Math.max(0, count) } : user));
+  }
+
   /** Forgets the user without a request, when the API has said the session is gone (401). */
   clear(): void {
     this.apply({ authenticated: false });
@@ -194,6 +199,7 @@ export class AuthService {
         preferredLanguage: response.preferredLanguage,
         roles: response.roles ?? [],
         twoFactorEnabled: response.twoFactorEnabled,
+        unreadCount: response.unreadCount ?? 0,
       });
     } else {
       this.current.set(null);

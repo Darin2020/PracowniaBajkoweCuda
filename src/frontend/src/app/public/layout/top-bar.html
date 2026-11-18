@@ -54,12 +54,19 @@
           >
             <span class="visually-hidden" i18n="@@nav.userMenu">Account menu:</span>
             {{ user.displayName }}
+            @if (user.unreadCount > 0) {
+              <span class="badge" aria-hidden="true">{{ user.unreadCount }}</span>
+            }
           </button>
           <ul id="user-menu" class="user-menu__list" [class.user-menu__list--open]="userMenuOpen()">
             <li>
-              <a class="nav-link" routerLink="/chat" (click)="closeMenu()" i18n="@@nav.chat"
-                >Chat</a
-              >
+              <a class="nav-link" routerLink="/chat" (click)="closeMenu()"
+                ><span i18n="@@nav.chat">Chat</span>
+                @if (user.unreadCount > 0) {
+                  <span class="badge">{{ user.unreadCount }}</span>
+                  <span class="visually-hidden" i18n="@@nav.unread">unread messages</span>
+                }
+              </a>
             </li>
             <li>
               <a class="nav-link" routerLink="/account" (click)="closeMenu()" i18n="@@nav.account"

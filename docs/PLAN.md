@@ -546,8 +546,8 @@ Each phase ends with: green CI, updated README/DECISIONS, acceptance criteria de
 - [x] Domain: Conversation, Message, Attachment. Migrations
 - [x] Upload pipeline (magic-byte validation, re-encode, thumbnails, Blob), `/api/files` with access checks, orphan cleanup
 - [x] Customer chat API + SignalR hub, read receipts, unread counts
-- [ ] Email digest notifications (debounced), first-message dialog, "send replies to my email" checkbox
-- [ ] Angular customer chat (infinite scroll, attachments with preview, fullscreen viewer, reconnect handling)
+- [x] Email digest notifications (debounced), first-message dialog, "send replies to my email" checkbox
+- [x] Angular customer chat (infinite scroll, attachments with preview, fullscreen viewer, reconnect handling)
 - [ ] Angular admin: conversation list + conversation view with customer side panel
 - [ ] Integration tests: IDOR on messages/files, rate limits, upload validation, notification batching
 - **AC:** customer ↔ admin real-time conversation with photos works on mobile. Emails arrive batched according to the rules.

@@ -1,8 +1,1 @@
-[
-  {
-    "id": "GHSA-fc5q-39xc-vjpf",
-    "package": "picomatch",
-    "reason": "ReDoS in glob matching, no patched version yet (<= 4.0.7). Used only by build and test tooling (Vite, Vitest, Angular CLI, tinyglobby) with patterns from this repository; not shipped to the browser or the container.",
-    "reviewBy": "2026-12-15"
-  }
-]
+[]

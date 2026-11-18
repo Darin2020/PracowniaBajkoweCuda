@@ -11,10 +11,16 @@ export interface SessionUser {
   readonly preferredLanguage: string;
   readonly roles: readonly string[];
   readonly twoFactorEnabled: boolean;
+  /** The chat badge: unread studio messages for a customer, unread customer messages for an admin with 2FA. */
+  readonly unreadCount: number;
 }
 
+/** The sign-in responses carry the same summary, without the unread count (it is asked for separately). */
 export type MeResponse =
-  { readonly authenticated: false } | ({ readonly authenticated: true } & SessionUser);
+  | { readonly authenticated: false }
+  | ({ readonly authenticated: true } & Omit<SessionUser, 'unreadCount'> & {
+        readonly unreadCount?: number;
+      });
 
 export interface TwoFactorRequiredResponse {
   readonly requiresTwoFactor: true;

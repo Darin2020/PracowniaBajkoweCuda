@@ -14,6 +14,7 @@ export const ANNA: SessionUser = {
   preferredLanguage: 'pl',
   roles: [],
   twoFactorEnabled: false,
+  unreadCount: 0,
 };
 
 /** HttpClient with the app's interceptor, answered by HttpTestingController, in the Polish build. */

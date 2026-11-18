@@ -92,6 +92,25 @@ export function errorMessage(error: ApiError | string): string {
       return $localize`:@@error.notAuthenticated:Please sign in to continue.`;
     case 'antiforgery.invalid':
       return $localize`:@@error.antiforgery:Your session has changed. Reload the page and try again.`;
+    case 'chat.empty_message':
+      return $localize`:@@error.chatEmpty:Write a message or add a photo.`;
+    case 'chat.message_too_long':
+      return $localize`:@@error.chatTooLong:A message can have at most 2,000 characters.`;
+    case 'chat.too_many_attachments':
+      return $localize`:@@error.chatTooManyImages:You can send at most 5 photos in one message.`;
+    case 'chat.attachment_unavailable':
+      return $localize`:@@error.chatImageUnavailable:A photo is no longer available. Remove it and add it again.`;
+    case 'chat.email_not_confirmed':
+      return $localize`:@@error.chatEmailNotConfirmed:Please confirm your email address first.`;
+    case 'files.too_large':
+      return $localize`:@@error.fileTooLarge:The photo is too large. The limit is 10 MB.`;
+    case 'files.unsupported_type':
+      return $localize`:@@error.fileType:Only JPEG, PNG and WebP photos can be sent.`;
+    case 'files.too_many_pixels':
+      return $localize`:@@error.fileTooManyPixels:The photo has too many pixels. Please send a smaller one.`;
+    case 'files.unreadable':
+    case 'files.missing':
+      return $localize`:@@error.fileUnreadable:The photo could not be read. Please try another one.`;
     case 'rate_limited':
       return $localize`:@@error.rateLimited:Too many attempts. Please wait a minute and try again.`;
     case 'validation_failed':
