@@ -545,7 +545,7 @@ Each phase ends with: green CI, updated README/DECISIONS, acceptance criteria de
 ### Phase 4 — Chat
 - [x] Domain: Conversation, Message, Attachment. Migrations
 - [x] Upload pipeline (magic-byte validation, re-encode, thumbnails, Blob), `/api/files` with access checks, orphan cleanup
-- [ ] Customer chat API + SignalR hub, read receipts, unread counts
+- [x] Customer chat API + SignalR hub, read receipts, unread counts
 - [ ] Email digest notifications (debounced), first-message dialog, "send replies to my email" checkbox
 - [ ] Angular customer chat (infinite scroll, attachments with preview, fullscreen viewer, reconnect handling)
 - [ ] Angular admin: conversation list + conversation view with customer side panel

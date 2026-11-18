@@ -15,15 +15,17 @@ public sealed record MeResponse(
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] bool? EmailConfirmed = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? PreferredLanguage = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<string>? Roles = null,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] bool? TwoFactorEnabled = null)
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] bool? TwoFactorEnabled = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? UnreadCount = null)
 {
     public static MeResponse Anonymous { get; } = new(Authenticated: false);
 
     /// <summary>
     /// The summary of a signed-in user. An admin with <c>twoFactorEnabled: false</c> must set up 2FA before the admin
-    /// endpoints answer (they return <c>auth.mfa_required</c>).
+    /// endpoints answer (they return <c>auth.mfa_required</c>). <paramref name="unreadCount"/> is the chat badge (§3.4):
+    /// the customer's unread studio messages, or for an admin with 2FA all unread customer messages.
     /// </summary>
-    public static async Task<MeResponse> ForAsync(UserManager<ApplicationUser> users, ApplicationUser user) => new(
+    public static async Task<MeResponse> ForAsync(UserManager<ApplicationUser> users, ApplicationUser user, int? unreadCount = null) => new(
         Authenticated: true,
         Id: user.Id,
         Email: user.Email,
@@ -31,7 +33,8 @@ public sealed record MeResponse(
         EmailConfirmed: user.EmailConfirmed,
         PreferredLanguage: user.PreferredLanguage,
         Roles: [.. await users.GetRolesAsync(user)],
-        TwoFactorEnabled: user.TwoFactorEnabled);
+        TwoFactorEnabled: user.TwoFactorEnabled,
+        UnreadCount: unreadCount);
 }
 
 /// <summary><c>POST /api/auth/login</c> when the account has 2FA: continue with <c>POST /api/auth/2fa/login</c>.</summary>

@@ -10,7 +10,18 @@ public sealed class BrowserHandler : DelegatingHandler
 {
     public static readonly Uri BaseAddress = new("https://localhost");
 
-    public CookieContainer Cookies { get; } = new();
+    public BrowserHandler()
+        : this(new CookieContainer())
+    {
+    }
+
+    /// <summary>A second handler of the same browser (for example for the SignalR client), sharing its cookies.</summary>
+    public BrowserHandler(CookieContainer cookies)
+    {
+        Cookies = cookies;
+    }
+
+    public CookieContainer Cookies { get; }
 
     /// <summary>Set to false to send unsafe requests without the antiforgery header.</summary>
     public bool SendAntiforgeryHeader { get; set; } = true;

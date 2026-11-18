@@ -153,7 +153,7 @@ public sealed class PublicSiteTests(SiteFactory factory) : IClassFixture<SiteFac
     [Theory]
     [InlineData("/api/does-not-exist")]
     [InlineData("/api")]
-    [InlineData("/hubs/chat")]
+    [InlineData("/hubs/unknown")]
     [InlineData("/API/Whatever")]
     public async Task Unknown_backend_path_is_a_problem_details_404(string path)
     {
@@ -165,7 +165,7 @@ public sealed class PublicSiteTests(SiteFactory factory) : IClassFixture<SiteFac
 
     [Theory]
     [InlineData("/api/does-not-exist")]
-    [InlineData("/hubs/chat")]
+    [InlineData("/hubs/unknown")]
     public async Task Backend_paths_never_fall_back_to_html_even_for_a_browser(string path)
     {
         using var response = await GetAsync(path, ("Accept", "text/html,application/xhtml+xml"));

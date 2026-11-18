@@ -388,3 +388,26 @@ After that date the build fails again; an entry that is no longer reported is fl
   addresses, "localhost" and the emulator's default ports, so the test fixture uses the container's IP address when
   tests run inside a container (host.docker.internal).
 
+## 2026-11-18 — Phase 4: chat API and real-time events
+
+- **Customers never send a conversation id.** `/api/chat` finds the signed-in customer's conversation by their user id,
+  so there is nothing to tamper with; a message id from another conversation answers `404 chat.message_not_found`.
+  Admins address conversations by id under `/api/admin/conversations` (Admin policy, so 2FA).
+- **The first message starts the conversation** (PLAN §3.4). Two first messages at once (two tabs) are handled: the
+  unique index on the customer refuses the second conversation and the message goes into the first.
+- **Images are sent by id** after uploading. Only the sender's own, not yet sent uploads are accepted; anything else
+  answers `400 chat.attachment_unavailable` (one code, so ids cannot be probed).
+- **History** is newest first with a cursor (the oldest message id of the previous page), ordered by time then id.
+- **Read state per side**: `POST read { upToMessageId }` marks everything up to that message read for the reader's
+  side. Unread counts: the customer's unread studio messages; for admins, unread customer messages per conversation
+  and in total. `GET /api/auth/me` now includes `unreadCount` for the top-bar badge (for admins only with 2FA).
+- **The admin list** shows conversations with unread messages first, then by the newest message, with a preview of the
+  last message; `search` matches the customer's name or email. Its cursor is an offset, because the order changes as
+  messages arrive.
+- **SignalR** (`/hubs/chat`) only pushes: `MessageReceived`, `MessagesRead`, `UnreadCountChanged`. A customer's
+  connections are addressed by their user id (also their other tabs get their own messages, so tabs stay in step);
+  admins with 2FA join the `admins` group when they connect. Connections are kept in memory, which is right for one
+  replica per environment; more replicas would need a backplane.
+- **`POST /api/chat/messages` is limited to 20 per minute per user** (PLAN §8.3).
+- **Order events** (`OrderUpdated`) and system messages arrive with Phase 5; email digests in the next part of Phase 4.
+
