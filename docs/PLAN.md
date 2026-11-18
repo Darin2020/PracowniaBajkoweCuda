@@ -532,8 +532,8 @@ Each phase ends with: green CI, updated README/DECISIONS, acceptance criteria de
 
 ### Phase 3 — Accounts & security baseline
 - [x] Domain/Infrastructure: `ApplicationUser`, EF Core DbContext, first migration, migration Job in CD
-- [ ] BFF cookie auth, antiforgery, `/api/auth/*`, `/api/account/*`, ProblemDetails error codes
-- [ ] Email outbox + dispatcher + SMTP/ACS senders + localized transactional templates
+- [x] BFF cookie auth, antiforgery, `/api/auth/*`, `/api/account/*`, ProblemDetails error codes
+- [x] Email outbox + dispatcher + SMTP/ACS senders + localized transactional templates
 - [ ] Google + Facebook login (config-gated), account linking rules, complete-profile step
 - [ ] Admin seeding, mandatory TOTP 2FA for admins, audit log
 - [ ] Rate limiting, lockout, password policy, re-authentication, data export, account deletion
