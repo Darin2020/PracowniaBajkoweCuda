@@ -6,6 +6,7 @@ using BajkoweCuda.Api.Observability;
 using BajkoweCuda.Api.Problems;
 using BajkoweCuda.Api.Security;
 using BajkoweCuda.Infrastructure.Accounts;
+using BajkoweCuda.Infrastructure.Chat;
 using BajkoweCuda.Infrastructure.Emails;
 using BajkoweCuda.Infrastructure.Persistence;
 
@@ -34,6 +35,7 @@ builder.Services.AddHealth();
 builder.Services.AddPublicSite(builder.Configuration);
 builder.Services.AddAuth(builder.Configuration, builder.Environment);
 builder.Services.AddAccounts(builder.Configuration);
+builder.Services.AddChat(builder.Configuration);
 builder.Services.AddRateLimits(builder.Configuration);
 builder.Services
     .AddControllers(options =>

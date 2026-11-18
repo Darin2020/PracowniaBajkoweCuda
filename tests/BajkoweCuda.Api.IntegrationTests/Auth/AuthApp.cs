@@ -13,10 +13,10 @@ using Microsoft.Extensions.DependencyInjection;
 namespace BajkoweCuda.Api.IntegrationTests.Auth;
 
 /// <summary>
-/// The application with its own migrated database and a capturing email sender, shared by the tests of a class.
+/// The application with its own migrated database, file storage (Azurite) and a capturing email sender, shared by the tests of a class.
 /// Tests use a fresh email address each, so they do not interfere with each other.
 /// </summary>
-public sealed partial class AuthApp(SqlServerFixture sqlServer) : IAsyncLifetime
+public sealed partial class AuthApp(SqlServerFixture sqlServer, AzuriteFixture azurite) : IAsyncLifetime
 {
     public const string Password = "correct horse battery";
 
@@ -33,9 +33,11 @@ public sealed partial class AuthApp(SqlServerFixture sqlServer) : IAsyncLifetime
     public async ValueTask InitializeAsync()
     {
         var connectionString = await sqlServer.CreateDatabaseAsync();
+        var storage = await azurite.GetConnectionStringAsync();
         Factory = _site.WithWebHostBuilder(builder =>
         {
             builder.UseSetting("ConnectionStrings:Sql", connectionString);
+            builder.UseSetting("Storage:ConnectionString", storage);
             builder.UseSetting("Legal:TermsVersion", "test-terms");
             // The tests sign in far more often than a person would; RateLimitTests checks the real limits.
             builder.UseSetting("RateLimiting:AuthPerMinute", "100000");

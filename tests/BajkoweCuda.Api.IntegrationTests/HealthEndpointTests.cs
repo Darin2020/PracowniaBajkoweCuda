@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BajkoweCuda.Api.IntegrationTests;
 
-public class HealthEndpointTests(SiteFactory factory, SqlServerFixture sqlServer) : IClassFixture<SiteFactory>
+public class HealthEndpointTests(SiteFactory factory, SqlServerFixture sqlServer, AzuriteFixture azurite) : IClassFixture<SiteFactory>
 {
     private static CancellationToken Ct => TestContext.Current.CancellationToken;
 
@@ -44,10 +44,10 @@ public class HealthEndpointTests(SiteFactory factory, SqlServerFixture sqlServer
 
     [Fact]
     [Trait("Category", SqlServerFixture.Category)]
-    public async Task Ready_returns_200_when_the_database_is_reachable()
+    public async Task Ready_returns_200_when_the_database_and_the_storage_are_reachable()
     {
         var connectionString = await sqlServer.CreateDatabaseAsync();
-        var app = factory.WithSettings(("ConnectionStrings:Sql", connectionString));
+        var app = factory.WithSettings(("ConnectionStrings:Sql", connectionString), ("Storage:ConnectionString", await azurite.GetConnectionStringAsync()));
         await using (var scope = app.Services.CreateAsyncScope())
         {
             await scope.ServiceProvider.GetRequiredService<DatabaseMigrator>().RunAsync(Ct);

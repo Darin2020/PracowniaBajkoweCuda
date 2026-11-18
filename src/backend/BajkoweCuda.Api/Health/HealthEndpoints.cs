@@ -1,3 +1,4 @@
+using BajkoweCuda.Infrastructure.Chat;
 using BajkoweCuda.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
@@ -12,7 +13,9 @@ internal static class HealthEndpoints
 
     public static IServiceCollection AddHealth(this IServiceCollection services)
     {
-        services.AddHealthChecks().AddDbContextCheck<AppDbContext>("database", tags: [ReadyTag]);
+        services.AddHealthChecks()
+            .AddDbContextCheck<AppDbContext>("database", tags: [ReadyTag])
+            .AddStorageCheck(ReadyTag);
 
         return services;
     }
