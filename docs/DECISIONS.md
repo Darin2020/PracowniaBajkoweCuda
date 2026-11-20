@@ -541,3 +541,24 @@ After that date the build fails again; an entry that is no longer reported is fl
   appsettings.json), amounts formatted for the customer's language.
 - **Audit**: every create, edit, step and photo change is written to the audit log.
 
+## 2026-11-20 — Phase 5: the order pages (Angular)
+
+- **Customer**: `/orders` (list: thumbnail, number, title, status badge, price) and `/orders/:id` (reference image,
+  description, price, the payment instructions while payment is awaited, timeline, gallery of the finished toy,
+  cancellation reason). The confirmation email links to `/orders/:id`. "My orders" appears in the account menu once
+  `hasOrders` is true; an `OrderUpdated` event for a confirmed order turns it on without reloading.
+- **System messages** are rendered by the client from their payload in the reader's language: a headline per event
+  ("Order BC-0012 has been shipped"), the amount and payment instructions after a confirmation, the reason after a
+  cancellation, and a link to the order (the customer's or the admin's page, by side).
+- **Admin**: "Orders" in the account menu → `/admin/orders` with a status filter kept in the address (`?status=`);
+  `/admin/orders/:id` with one primary button for the next step, cancelling behind a reason form, editing (terms only
+  before payment, the note until the order is final), and photo management (upload several, move earlier/later,
+  remove) while the toy is made or ready. "Mark as ready" stays disabled until there is a photo.
+- **Create order** lives in the side panel of the conversation, next to the customer's orders. The reference image is
+  picked from the images of the loaded history (the order page's edit form searches the newest three pages) or
+  uploaded through the chat upload endpoint; after creating, the admin lands on the draft to check and confirm it.
+- **Concurrency**: every change sends the `rowVersion` the admin saw. On `409` the page shows the error and reloads
+  the order. Live `OrderUpdated` events reload the open order page, except while the admin is editing.
+- **`OrderSummary` gained `customerName`** so the admin list shows whose order it is (the customer only ever receives
+  summaries of their own orders, so it is their own name).
+

@@ -11,10 +11,11 @@ and customers follow those orders.
 The project is also a portfolio piece for **Docker, Azure and CI/CD**: one container, infrastructure as code,
 and a build-once / promote pipeline.
 
-> **Status:** Phases 1 and 2 are done: the prerendered one-page site in five languages runs from the Docker image and
-> deploys to Azure (staging, then production after approval). Phase 3 (accounts) is nearly done: registration with
-> email confirmation, sign-in with a password or Google, 2FA for admins, the account page with data export and
-> deletion. The chat and orders come next. Texts, prices, contact details and pictures are
+> **Status:** Phases 1–4 are done: the prerendered one-page site in five languages, accounts (password or Google,
+> 2FA for admins, data export and deletion) and the real-time chat with photos and email digests, deployed to Azure
+> (staging, then production after approval). Phase 5 (orders) is built: the owner creates an order from a
+> conversation and moves it through payment, sewing, photos and shipping, and the customer follows it under "My
+> orders"; its acceptance on staging is pending. Texts, prices, contact details, payment details and pictures are
 > **placeholders**. The roadmap and the full specification are in [docs/PLAN.md](docs/PLAN.md); decisions are logged
 > in [docs/DECISIONS.md](docs/DECISIONS.md).
 
@@ -77,6 +78,8 @@ src/backend/BajkoweCuda.Api              HTTP API, SignalR hub, static hosting, 
 src/frontend                             Angular workspace
   src/app/content                        texts, prices, image lists (edit here, then redeploy)
   src/app/public, shared, core           landing and legal pages, carousel/viewer, SEO and locale helpers
+  src/app/auth, account, chat, orders    signed-in pages of the customer
+  src/app/admin                          the studio: conversations, orders, 2FA setup
   src/locale                             translations (XLIFF) for de, fr, es, pl
 tests/                                   unit and integration tests
 scripts/smoke-test.sh                    checks a running instance (used by CI)
