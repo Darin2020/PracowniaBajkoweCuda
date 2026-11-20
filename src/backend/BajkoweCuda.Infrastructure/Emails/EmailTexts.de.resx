@@ -38,4 +38,14 @@
   <data name="ChatDigest_Photos" xml:space="preserve"><value>Fotos: {0}</value></data>
   <data name="ChatDigest_More" xml:space="preserve"><value>Weitere ungelesene Nachrichten: {0}</value></data>
   <data name="ChatDigest_Action" xml:space="preserve"><value>Chat öffnen</value></data>
+  <data name="OrderConfirmed_Subject" xml:space="preserve"><value>Bestellung {orderNumber}: Zahlungsinformationen</value></data>
+  <data name="OrderConfirmed_Heading" xml:space="preserve"><value>Ihre Bestellung ist bestätigt</value></data>
+  <data name="OrderConfirmed_Body" xml:space="preserve"><value>Wir haben Ihre Bestellung {orderNumber} „{title}“ über {amount} bestätigt. Wir beginnen zu nähen, sobald die Zahlung eingegangen ist:</value></data>
+  <data name="OrderConfirmed_Action" xml:space="preserve"><value>Bestellung ansehen</value></data>
+  <data name="ChatDigest_order_confirmed" xml:space="preserve"><value>Bestellung {0} ist bestätigt: Die Zahlungsinformationen stehen im Chat</value></data>
+  <data name="ChatDigest_order_paid" xml:space="preserve"><value>Zahlung für Bestellung {0} erhalten: Wir beginnen mit der Arbeit</value></data>
+  <data name="ChatDigest_order_ready" xml:space="preserve"><value>Bestellung {0} ist fertig: Sehen Sie sich die Fotos an</value></data>
+  <data name="ChatDigest_order_shipped" xml:space="preserve"><value>Bestellung {0} wurde verschickt</value></data>
+  <data name="ChatDigest_order_completed" xml:space="preserve"><value>Bestellung {0} ist abgeschlossen. Vielen Dank!</value></data>
+  <data name="ChatDigest_order_cancelled" xml:space="preserve"><value>Bestellung {0} wurde storniert</value></data>
 </root>

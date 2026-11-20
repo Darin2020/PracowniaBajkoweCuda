@@ -153,6 +153,8 @@ public sealed class ChatDigests(
                 message.Id,
                 message.Body,
                 message.Kind,
+                message.SystemEventType,
+                message.SystemEventPayload,
                 Images = db.Attachments.Count(attachment => attachment.MessageId == message.Id),
             })
             .ToListAsync(cancellationToken);
@@ -172,7 +174,9 @@ public sealed class ChatDigests(
                 message.Kind == MessageKind.System,
                 message.Body.Length <= ExcerptLength ? message.Body : string.Concat(message.Body.AsSpan(0, ExcerptLength - 1), "…"),
                 message.Images,
-                [.. inline.Where(image => image.MessageId == message.Id).Select(image => image.Image.ContentId)]))],
+                [.. inline.Where(image => image.MessageId == message.Id).Select(image => image.Image.ContentId)],
+                message.SystemEventType,
+                OrderNumberOf(message.SystemEventPayload)))],
             total - listed.Count,
             payload.GetValueOrDefault(EmailRenderer.LinkKey) ?? throw new InvalidOperationException("A chat notification needs a link."))
             with { Images = [.. inline.Select(image => image.Image)] };
@@ -210,6 +214,25 @@ public sealed class ChatDigests(
         }
 
         return images;
+    }
+
+    /// <summary>The order number in the data of an order system message, if there is one.</summary>
+    private static string? OrderNumberOf(string? payload)
+    {
+        if (payload is null)
+        {
+            return null;
+        }
+
+        try
+        {
+            using var json = System.Text.Json.JsonDocument.Parse(payload);
+            return json.RootElement.TryGetProperty("number", out var number) ? number.GetString() : null;
+        }
+        catch (System.Text.Json.JsonException)
+        {
+            return null;
+        }
     }
 
     /// <summary>Admins who can be emailed. The role is synced from Admin:Emails at sign-in (§3.3).</summary>

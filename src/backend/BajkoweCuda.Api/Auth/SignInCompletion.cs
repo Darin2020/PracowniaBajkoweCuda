@@ -1,5 +1,6 @@
 using BajkoweCuda.Infrastructure.Chat;
 using BajkoweCuda.Infrastructure.Identity;
+using BajkoweCuda.Infrastructure.Orders;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,8 +23,12 @@ internal static partial class SignInCompletion
         controller.HttpContext.IssueRequestToken();
         LogSignedIn(logger, user.Id);
         var unread = await UnreadCountAsync(controller.HttpContext, user);
-        return await MeResponse.ForAsync(users, user, unread);
+        return await MeResponse.ForAsync(users, user, unread, await HasOrdersAsync(controller.HttpContext, user));
     }
+
+    /// <summary>Whether the "My orders" tab is shown (§3.5): the customer has an order that is not a draft.</summary>
+    public static Task<bool> HasOrdersAsync(HttpContext context, ApplicationUser user) =>
+        context.RequestServices.GetRequiredService<OrderService>().CustomerHasOrdersAsync(user.Id, context.RequestAborted);
 
     /// <summary>
     /// The chat badge for the signed-in user (also <c>GET /api/auth/me</c>): the customer's unread studio messages, or for

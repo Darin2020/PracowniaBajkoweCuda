@@ -1,5 +1,6 @@
 using BajkoweCuda.Application.Files;
 using BajkoweCuda.Domain.Chat;
+using BajkoweCuda.Domain.Orders;
 using BajkoweCuda.Infrastructure.Imaging;
 using BajkoweCuda.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +22,8 @@ public sealed partial class Attachments(
     ILogger<Attachments> logger)
 {
     /// <summary>Returns the new attachment, or one of <see cref="ImageErrors"/>.</summary>
-    public async Task<(Attachment? Attachment, string? Error)> UploadAsync(Guid ownerUserId, ReadOnlyMemory<byte> file, CancellationToken cancellationToken)
+    public async Task<(Attachment? Attachment, string? Error)> UploadAsync(
+        Guid ownerUserId, ReadOnlyMemory<byte> file, CancellationToken cancellationToken, string container = FileContainers.Attachments)
     {
         var (image, error) = ImageProcessor.Process(file.Span);
         if (image is null)
@@ -30,7 +32,6 @@ public sealed partial class Attachments(
         }
 
         var now = time.GetUtcNow();
-        var container = FileContainers.Attachments;
         // Random names, unrelated to the attachment id and never taken from the uploaded file (§8.4).
         var blobName = $"{Guid.NewGuid():N}.webp";
         var thumbnailName = $"{Guid.NewGuid():N}.webp";
@@ -56,7 +57,8 @@ public sealed partial class Attachments(
     }
 
     /// <summary>
-    /// The file, if this user may read it: the uploader; the customer of the conversation it was sent in; or an admin
+    /// The file, if this user may read it: the uploader; the customer of the conversation it was sent in; the customer
+    /// of an order (not a draft) it belongs to; or an admin
     /// in a session that passed the admin policy (decided by the caller). Anyone else gets <c>null</c>, the same as
     /// for an id that does not exist, so ids cannot be probed.
     /// </summary>
@@ -75,10 +77,13 @@ public sealed partial class Attachments(
                     .Where(message => message.Id == attachment.MessageId)
                     .Join(db.Conversations, message => message.ConversationId, conversation => conversation.Id, (_, conversation) => (Guid?)conversation.CustomerId)
                     .FirstOrDefault(),
+                // Photos and the reference image of the user's own orders, once they are no longer drafts.
+                InCustomerOrder = db.Orders.Any(order => order.CustomerId == userId && order.Status != OrderStatus.Draft
+                    && (order.ReferenceImageId == attachment.Id || db.OrderPhotos.Any(photo => photo.OrderId == order.Id && photo.AttachmentId == attachment.Id))),
             })
             .SingleOrDefaultAsync(cancellationToken);
 
-        if (row is null || !(isAdmin || row.OwnerUserId == userId || row.CustomerId == userId))
+        if (row is null || !(isAdmin || row.OwnerUserId == userId || row.CustomerId == userId || row.InCustomerOrder))
         {
             return null;
         }

@@ -78,6 +78,8 @@ expect_status /api/admin/audit 401
 expect_status /api/chat 401
 expect_status /api/admin/conversations 401
 expect_status /hubs/chat 401
+expect_status /api/orders 401
+expect_status /api/admin/orders 401
 expect_status /api/version 200
 if [ -n "${EXPECTED_VERSION:-}" ]; then
   expect_contains /api/version "\"version\":\"$EXPECTED_VERSION\""

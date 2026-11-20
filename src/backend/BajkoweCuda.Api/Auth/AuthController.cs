@@ -54,7 +54,8 @@ public sealed partial class AuthController(
             return MeResponse.Anonymous;
         }
 
-        return await MeResponse.ForAsync(users, user, await SignInCompletion.UnreadCountAsync(HttpContext, user));
+        return await MeResponse.ForAsync(
+            users, user, await SignInCompletion.UnreadCountAsync(HttpContext, user), await SignInCompletion.HasOrdersAsync(HttpContext, user));
     }
 
     [HttpPost("register")]

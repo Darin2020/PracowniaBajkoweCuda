@@ -38,4 +38,14 @@
   <data name="ChatDigest_Photos" xml:space="preserve"><value>Zdjęcia: {0}</value></data>
   <data name="ChatDigest_More" xml:space="preserve"><value>Pozostałe nieprzeczytane wiadomości: {0}</value></data>
   <data name="ChatDigest_Action" xml:space="preserve"><value>Otwórz czat</value></data>
+  <data name="OrderConfirmed_Subject" xml:space="preserve"><value>Zamówienie {orderNumber}: dane do płatności</value></data>
+  <data name="OrderConfirmed_Heading" xml:space="preserve"><value>Twoje zamówienie jest potwierdzone</value></data>
+  <data name="OrderConfirmed_Body" xml:space="preserve"><value>Potwierdziliśmy Twoje zamówienie {orderNumber} „{title}” na kwotę {amount}. Zaczynamy szyć, gdy tylko wpłynie płatność:</value></data>
+  <data name="OrderConfirmed_Action" xml:space="preserve"><value>Zobacz zamówienie</value></data>
+  <data name="ChatDigest_order_confirmed" xml:space="preserve"><value>Zamówienie {0} jest potwierdzone: dane do płatności są na czacie</value></data>
+  <data name="ChatDigest_order_paid" xml:space="preserve"><value>Otrzymaliśmy płatność za zamówienie {0}: zaczynamy pracę</value></data>
+  <data name="ChatDigest_order_ready" xml:space="preserve"><value>Zamówienie {0} jest gotowe: zobacz zdjęcia</value></data>
+  <data name="ChatDigest_order_shipped" xml:space="preserve"><value>Zamówienie {0} zostało wysłane</value></data>
+  <data name="ChatDigest_order_completed" xml:space="preserve"><value>Zamówienie {0} jest zakończone. Dziękujemy!</value></data>
+  <data name="ChatDigest_order_cancelled" xml:space="preserve"><value>Zamówienie {0} zostało anulowane</value></data>
 </root>

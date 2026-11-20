@@ -510,3 +510,34 @@ After that date the build fails again; an entry that is no longer reported is fl
 - **Images used by orders are never "abandoned uploads"**: the daily cleanup skips attachments referenced as order
   photos or reference images.
 
+## 2026-11-20 — Phase 5: the order API, system messages and the confirmation email
+
+**Owner's decision**
+- **The order confirmation email is always sent**, with the payment instructions, whatever the customer's "send replies
+  to my email" setting (PLAN §3.6 would send it only with notifications on; the Phase 5 acceptance asks for chat and
+  email). The other order steps (paid, ready, shipped, completed, cancelled) reach the customer by email only through
+  the chat digest, so only with notifications on.
+
+**Implementation**
+- **Admin API** `/api/admin/orders` (Admin policy): create from a conversation, list (status and conversation filters),
+  detail, edit (only the fields sent), the six steps, photos (multipart upload into the private `order-photos`
+  container, re-encoded like chat images; delete; reorder). Edits send the `rowVersion` the admin saw; someone else's
+  change in between answers `409 orders.conflict`.
+- **Error mapping**: a step or edit the status does not allow (`orders.invalid_transition`, `orders.not_editable`,
+  `orders.photo_required`, `orders.photos_locked`) is `409`; bad input `400`; unknown order or conversation `404`.
+- **The reference image** must be an image of the same conversation, or a fresh upload of the admin; anything else
+  answers `orders.image_unavailable`.
+- **Every step posts a system message** in the conversation (`order.confirmed`, `order.paid`, ...) whose payload holds
+  the order number, title, price, status, the cancellation reason and, on confirmation, the payment instructions in the
+  customer's language. The client renders it; the chat digest names the event ("Order BC-0012 has been shipped").
+  SignalR pushes the message and `OrderUpdated` (admins always, the customer once the order is no longer a draft).
+- **Customer API** `/api/orders`: the customer's own orders that are not drafts; someone else's order and a draft give
+  the same `404 orders.not_found`. The detail has the timeline from the confirmation on, the photos, the cancellation
+  reason, and the payment instructions while payment is awaited; never the internal note. `GET /api/auth/me` (and
+  the sign-in responses) say `hasOrders`, which shows the "My orders" tab.
+- **File access**: the customer can open the photos and reference image of their own orders once they are not
+  drafts.
+- **Payment instructions** come from `PaymentInstructions:Templates:{lang}` (Key Vault in Azure; placeholders in
+  appsettings.json), amounts formatted for the customer's language.
+- **Audit**: every create, edit, step and photo change is written to the audit log.
+
