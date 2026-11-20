@@ -549,8 +549,9 @@ Each phase ends with: green CI, updated README/DECISIONS, acceptance criteria de
 - [x] Email digest notifications (debounced), first-message dialog, "send replies to my email" checkbox
 - [x] Angular customer chat (infinite scroll, attachments with preview, fullscreen viewer, reconnect handling)
 - [x] Angular admin: conversation list + conversation view with customer side panel
-- [ ] Integration tests: IDOR on messages/files, rate limits, upload validation, notification batching
+- [x] Integration tests: IDOR on messages/files, rate limits, upload validation, notification batching
 - **AC:** customer ↔ admin real-time conversation with photos works on mobile. Emails arrive batched according to the rules.
+  ✅ Verified on staging on 2026-11-20 (emails land in spam until the custom domain, Phase 8).
 
 ### Phase 5 — Orders
 - [ ] Domain order state machine + unit tests (every transition)
