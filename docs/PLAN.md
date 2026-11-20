@@ -554,7 +554,7 @@ Each phase ends with: green CI, updated README/DECISIONS, acceptance criteria de
   ✅ Verified on staging on 2026-11-20 (emails land in spam until the custom domain, Phase 8).
 
 ### Phase 5 — Orders
-- [ ] Domain order state machine + unit tests (every transition)
+- [x] Domain order state machine + unit tests (every transition)
 - [ ] Admin order API (create from conversation, edit, transitions, photos), payment-instructions template from config
 - [ ] System messages + `OrderUpdated` SignalR events + emails via the chat digest
 - [ ] Customer *My orders* list + detail (timeline, photos). Tab shown only when orders exist
