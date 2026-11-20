@@ -4,11 +4,14 @@ using Microsoft.Extensions.Logging;
 
 namespace BajkoweCuda.Infrastructure.Chat;
 
-/// <summary>Deletes chat uploads that were never sent (docs/PLAN.md §5), once an hour, in batches.</summary>
+/// <summary>
+/// Deletes chat uploads that were never sent (docs/PLAN.md §5), once a day, in batches. Not more often: every run reads
+/// the database, and a serverless database only pauses after an hour without any query.
+/// </summary>
 internal sealed partial class AttachmentCleanup(IServiceScopeFactory scopes, TimeProvider time, ILogger<AttachmentCleanup> logger) : BackgroundService
 {
     private const int BatchSize = 100;
-    private static readonly TimeSpan Interval = TimeSpan.FromHours(1);
+    private static readonly TimeSpan Interval = TimeSpan.FromDays(1);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -35,7 +38,7 @@ internal sealed partial class AttachmentCleanup(IServiceScopeFactory scopes, Tim
             }
             catch (Exception error) when (error is not OperationCanceledException)
             {
-                // The database or storage may be away for a moment (serverless SQL resuming); try again next hour.
+                // The database or storage may be away for a moment (serverless SQL resuming); try again tomorrow.
                 LogFailed(logger, error);
             }
         }
