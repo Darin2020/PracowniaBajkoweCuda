@@ -214,6 +214,21 @@ are in the `AuditLog` table; admins read them through `GET /api/admin/audit`. To
 `429 rate_limited` with `Retry-After`: sign-in and similar 10/min per IP, emails 3/hour per IP and per address. Limits
 are per replica, in memory, and reset on restart.
 
+### Orders and payment instructions
+- When an admin confirms an order, the customer gets the payment instructions in the chat (a system message) and by
+  email (always, whatever their notification setting). The text comes from the setting
+  `PaymentInstructions:Templates:{en|de|fr|es|pl}` with the placeholders `{OrderNumber}`, `{Amount}` and `{Currency}`.
+- **The real texts hold the bank details: keep them in Key Vault, not in the repository.** appsettings.json only has
+  placeholders that say so. Set one secret per language in each vault (PowerShell, after `az login`):
+  ```powershell
+  $kv = "kv-bajkowe-prod-dbimgw"   # or kv-bajkowe-stag-zvqndl
+  az keyvault secret set --vault-name $kv --name "PaymentInstructions--Templates--pl" --file .\payment-pl.txt --output none
+  ```
+  (the same for `en`, `de`, `fr`, `es`; a missing language falls back to English). The app reads Key Vault at start:
+  restart the revision or deploy after changing a text.
+- Order numbers (`BC-0012`) come from the SQL sequence `OrderNumbers`. Every step is in the audit log
+  (`orders.created`, `orders.confirmed`, ...) and in `OrderStatusChanges`.
+
 ### Chat and real-time events (SignalR)
 - The hub is `/hubs/chat` on the same origin, with the session cookie; browsers use WebSockets through the Container
   Apps ingress (long polling as a fallback). It only pushes events; messages are sent through the REST API.

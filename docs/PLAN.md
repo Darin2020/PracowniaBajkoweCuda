@@ -555,8 +555,8 @@ Each phase ends with: green CI, updated README/DECISIONS, acceptance criteria de
 
 ### Phase 5 — Orders
 - [x] Domain order state machine + unit tests (every transition)
-- [ ] Admin order API (create from conversation, edit, transitions, photos), payment-instructions template from config
-- [ ] System messages + `OrderUpdated` SignalR events + emails via the chat digest
+- [x] Admin order API (create from conversation, edit, transitions, photos), payment-instructions template from config
+- [x] System messages + `OrderUpdated` SignalR events + emails via the chat digest
 - [ ] Customer *My orders* list + detail (timeline, photos). Tab shown only when orders exist
 - [ ] Angular admin: create-order panel in the conversation (pick a reference image from attachments), orders list with status filter, order detail with transition buttons and photo management
 - [ ] Integration tests: drafts invisible to customers, cross-customer access denied, invalid transitions → 409 with error code
