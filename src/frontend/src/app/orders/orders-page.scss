@@ -1,0 +1,75 @@
+// Shared by the customer's and the studio's order lists.
+.orders {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.order {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  color: inherit;
+  text-decoration: none;
+
+  &:hover {
+    border-color: var(--color-primary);
+  }
+}
+
+.order__image {
+  flex: none;
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--radius-small);
+  object-fit: cover;
+}
+
+.order__image--empty {
+  background: var(--color-surface-tinted);
+}
+
+.order__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.order__number {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.order__title {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.order__date,
+.order__customer {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+.order__side {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.order__price {
+  font-weight: 600;
+}

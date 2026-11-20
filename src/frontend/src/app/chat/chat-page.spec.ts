@@ -2,20 +2,12 @@ import { HttpTestingController, TestRequest } from '@angular/common/http/testing
 import { LOCALE_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { Subject } from 'rxjs';
 import { AuthService } from '../core/auth/auth.service';
 import { ChatRealtime } from '../core/chat/chat-realtime.service';
-import { ChatMessage, ReadReceipt } from '../core/chat/chat.models';
-import { message } from '../testing/chat-testing';
+import { ChatMessage } from '../core/chat/chat.models';
+import { FakeRealtime, message } from '../testing/chat-testing';
 import { ANNA, provideApiTesting } from '../testing/auth-testing';
 import { ChatPage } from './chat-page';
-
-class FakeRealtime {
-  readonly messages = new Subject<ChatMessage>();
-  readonly reads = new Subject<ReadReceipt>();
-  readonly reconnected = new Subject<void>();
-  readonly state = () => 'connected';
-}
 
 describe('ChatPage', () => {
   let http: HttpTestingController;

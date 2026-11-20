@@ -80,6 +80,26 @@ export const routes: Routes = [
     loadComponent: () => import('./chat/chat-page').then((m) => m.ChatPage),
   },
   {
+    path: 'orders',
+    canActivate: [authGuard],
+    loadComponent: () => import('./orders/orders-page').then((m) => m.OrdersPage),
+  },
+  {
+    path: 'orders/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./orders/order-page').then((m) => m.OrderPage),
+  },
+  {
+    path: 'admin/orders',
+    canActivate: [adminAreaGuard],
+    loadComponent: () => import('./admin/orders-page').then((m) => m.AdminOrdersPage),
+  },
+  {
+    path: 'admin/orders/:id',
+    canActivate: [adminAreaGuard],
+    loadComponent: () => import('./admin/order-page').then((m) => m.AdminOrderPage),
+  },
+  {
     path: 'admin/conversations',
     canActivate: [adminAreaGuard],
     loadComponent: () => import('./admin/conversations-page').then((m) => m.ConversationsPage),

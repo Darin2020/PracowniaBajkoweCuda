@@ -15,6 +15,7 @@ export const ANNA: SessionUser = {
   roles: [],
   twoFactorEnabled: false,
   unreadCount: 0,
+  hasOrders: false,
 };
 
 /** HttpClient with the app's interceptor, answered by HttpTestingController, in the Polish build. */

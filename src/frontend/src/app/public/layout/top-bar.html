@@ -78,6 +78,23 @@
                 </a>
               }
             </li>
+            @if (auth.isAdmin()) {
+              <li>
+                <a
+                  class="nav-link"
+                  routerLink="/admin/orders"
+                  (click)="closeMenu()"
+                  i18n="@@nav.orders"
+                  >Orders</a
+                >
+              </li>
+            } @else if (user.hasOrders) {
+              <li>
+                <a class="nav-link" routerLink="/orders" (click)="closeMenu()" i18n="@@nav.myOrders"
+                  >My orders</a
+                >
+              </li>
+            }
             <li>
               <a class="nav-link" routerLink="/account" (click)="closeMenu()" i18n="@@nav.account"
                 >Your account</a

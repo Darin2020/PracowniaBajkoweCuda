@@ -1,0 +1,49 @@
+// Shared by the customer's and the studio's order pages.
+h2 {
+  margin-bottom: 0.5rem;
+  font-size: 1.125rem;
+}
+
+.order-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.order-header__number {
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.order-header__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.order-header__price {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.pre {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.order-body {
+  display: grid;
+  gap: 1.5rem;
+
+  app-photo-gallery {
+    display: block;
+    max-width: 16rem;
+  }
+}
+
+@media (min-width: 40rem) {
+  .order-body:has(> :nth-child(2)) {
+    grid-template-columns: 16rem 1fr;
+  }
+}

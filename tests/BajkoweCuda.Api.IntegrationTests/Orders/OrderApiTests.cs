@@ -206,6 +206,7 @@ public sealed class OrderApiTests(AuthApp app) : IClassFixture<AuthApp>
 
         byConversation.GetProperty("items").EnumerateArray().Select(item => item.GetProperty("id").GetGuid()).ShouldBe([confirmedId, draftId]);
         awaiting.GetProperty("items").EnumerateArray().Select(item => item.GetProperty("id").GetGuid()).ShouldBe([confirmedId]);
+        byConversation.GetProperty("items")[0].GetProperty("customerName").GetString().ShouldBe("Anna");
     }
 
     [Fact]

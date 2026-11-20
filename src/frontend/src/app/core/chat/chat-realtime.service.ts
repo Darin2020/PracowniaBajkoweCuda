@@ -11,6 +11,7 @@ import {
 import { Observable, Subject } from 'rxjs';
 import { ADMIN_ROLE } from '../auth/auth.models';
 import { AuthService } from '../auth/auth.service';
+import { OrderSummary } from '../orders/order.models';
 import { ChatMessage, ReadReceipt } from './chat.models';
 
 export type RealtimeState = 'disconnected' | 'connecting' | 'connected' | 'reconnecting';
@@ -66,11 +67,14 @@ export class ChatRealtime {
   private readonly messageEvents = new Subject<ChatMessage>();
   private readonly readEvents = new Subject<ReadReceipt>();
   private readonly reconnectEvents = new Subject<void>();
+  private readonly orderEvents = new Subject<OrderSummary>();
 
   readonly state = signal<RealtimeState>('disconnected');
   readonly messages: Observable<ChatMessage> = this.messageEvents.asObservable();
   readonly reads: Observable<ReadReceipt> = this.readEvents.asObservable();
   readonly reconnected: Observable<void> = this.reconnectEvents.asObservable();
+  /** An order was created or changed (admins: every order; customers: their own, once confirmed). */
+  readonly orders: Observable<OrderSummary> = this.orderEvents.asObservable();
 
   constructor() {
     if (!this.browser) {
@@ -113,6 +117,13 @@ export class ChatRealtime {
     connection.on('MessageReceived', (message: ChatMessage) => this.messageEvents.next(message));
     connection.on('MessagesRead', (receipt: ReadReceipt) => this.readEvents.next(receipt));
     connection.on('UnreadCountChanged', (count: number) => this.auth.setUnreadCount(count));
+    connection.on('OrderUpdated', (order: OrderSummary) => {
+      if (order.status !== 'Draft' && !this.auth.isAdmin()) {
+        this.auth.setHasOrders();
+      }
+
+      this.orderEvents.next(order);
+    });
     connection.onreconnecting(() => this.state.set('reconnecting'));
     connection.onreconnected(() => {
       this.state.set('connected');

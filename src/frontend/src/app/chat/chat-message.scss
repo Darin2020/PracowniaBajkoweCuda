@@ -22,14 +22,32 @@
 }
 
 .message--system {
-  flex-direction: row;
-  gap: 0.5rem;
   align-self: center;
-  border-radius: 999px;
-  background: transparent;
+  align-items: center;
+  max-width: min(92%, 30rem);
+  border-radius: var(--radius-small);
+  background: var(--color-background);
   box-shadow: inset 0 0 0 1px var(--color-border);
+  font-size: 0.9375rem;
+  text-align: center;
+}
+
+.message__event {
+  font-weight: 600;
+}
+
+.message__order-title {
   color: var(--color-text-muted);
-  font-size: 0.875rem;
+}
+
+.message__instructions {
+  align-self: stretch;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  overflow-wrap: anywhere;
+  text-align: start;
+  white-space: pre-wrap;
 }
 
 .message__author {

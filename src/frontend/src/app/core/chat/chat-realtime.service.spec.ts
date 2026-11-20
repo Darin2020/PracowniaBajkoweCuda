@@ -5,7 +5,7 @@ import { ANNA, provideApiTesting } from '../../testing/auth-testing';
 import { AuthService } from '../auth/auth.service';
 import { CHAT_CONNECTION_FACTORY, ChatConnection, ChatRealtime } from './chat-realtime.service';
 import { ChatMessage } from './chat.models';
-import { message } from '../../testing/chat-testing';
+import { message, orderSummary } from '../../testing/chat-testing';
 
 /** Plays the server's side of a SignalR connection. */
 class FakeConnection implements ChatConnection {
@@ -100,6 +100,18 @@ describe('ChatRealtime', () => {
 
     expect(received.map((item) => item.id)).toEqual(['m1']);
     expect(auth.user()?.unreadCount).toBe(3);
+  });
+
+  it('passes order events on and shows "My orders" once an order is confirmed', async () => {
+    const realtime = await signIn({ authenticated: true, ...ANNA });
+    const received: string[] = [];
+    realtime.orders.subscribe((order) => received.push(order.id));
+    expect(auth.user()?.hasOrders).toBe(false);
+
+    connections[0].emit('OrderUpdated', orderSummary('o1'));
+
+    expect(received).toEqual(['o1']);
+    expect(auth.user()?.hasOrders).toBe(true);
   });
 
   it('does not connect for visitors or unconfirmed accounts', async () => {

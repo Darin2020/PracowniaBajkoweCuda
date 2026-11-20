@@ -2,18 +2,10 @@ import { HttpTestingController } from '@angular/common/http/testing';
 import { LOCALE_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { Subject } from 'rxjs';
 import { ChatRealtime } from '../core/chat/chat-realtime.service';
-import { ChatMessage, ReadReceipt } from '../core/chat/chat.models';
 import { provideApiTesting } from '../testing/auth-testing';
-import { message } from '../testing/chat-testing';
+import { FakeRealtime, message } from '../testing/chat-testing';
 import { ConversationsPage } from './conversations-page';
-
-class FakeRealtime {
-  readonly messages = new Subject<ChatMessage>();
-  readonly reads = new Subject<ReadReceipt>();
-  readonly reconnected = new Subject<void>();
-}
 
 const conversation = (id: string, name: string, unreadCount: number) => ({
   id,
