@@ -380,6 +380,10 @@ public sealed partial class OrderService(
             .OfType<Guid>()
             .ToList();
         var images = await ImagesAsync(thumbnailIds, cancellationToken);
+        var customerIds = orders.Select(order => order.CustomerId).Distinct().ToList();
+        var names = await db.Users.AsNoTracking()
+            .Where(user => customerIds.Contains(user.Id))
+            .ToDictionaryAsync(user => user.Id, user => user.DisplayName, cancellationToken);
 
         return [.. orders.Select(order =>
         {
@@ -392,6 +396,7 @@ public sealed partial class OrderService(
                 OrderPrice.From(order.Price),
                 order.CreatedAt,
                 order.CustomerId,
+                names.GetValueOrDefault(order.CustomerId) ?? string.Empty,
                 order.ConversationId,
                 thumbnailId is { } id && images.TryGetValue(id, out var image) ? image : null);
         })];

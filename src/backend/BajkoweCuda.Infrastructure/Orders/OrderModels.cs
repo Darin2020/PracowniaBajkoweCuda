@@ -22,6 +22,7 @@ public sealed record OrderSummary(
     OrderPrice Price,
     DateTimeOffset CreatedAt,
     Guid CustomerId,
+    string CustomerName,
     Guid? ConversationId,
     ChatImage? Thumbnail);
 
