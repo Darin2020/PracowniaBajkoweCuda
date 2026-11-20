@@ -86,12 +86,15 @@ public sealed partial class Attachments(
         return new ReadableFile(row.Container, thumbnail ? row.ThumbnailBlobName : row.BlobName, row.ContentType);
     }
 
-    /// <summary>Deletes uploads that were never sent within a day (§5), rows and blobs. Returns how many.</summary>
+    /// <summary>Deletes uploads that were neither sent nor used by an order within a day (§5), rows and blobs. Returns how many.</summary>
     public async Task<int> DeleteAbandonedAsync(int batchSize, CancellationToken cancellationToken)
     {
         var cutoff = time.GetUtcNow() - Attachment.UnsentLifetime;
         var abandoned = await db.Attachments
             .Where(attachment => attachment.MessageId == null && attachment.CreatedAt <= cutoff)
+            // Images used by orders (photos of the finished toy, reference images) are not abandoned.
+            .Where(attachment => !db.OrderPhotos.Any(photo => photo.AttachmentId == attachment.Id)
+                && !db.Orders.Any(order => order.ReferenceImageId == attachment.Id))
             .OrderBy(attachment => attachment.CreatedAt)
             .Take(batchSize)
             .ToListAsync(cancellationToken);
