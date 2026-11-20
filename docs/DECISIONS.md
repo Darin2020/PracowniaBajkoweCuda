@@ -491,3 +491,22 @@ After that date the build fails again; an entry that is no longer reported is fl
   "Connection Timeout Expired ... post-login phase": the deployment of 2026-11-20 failed that way in the migration job
   while the database was resuming. 60 s covers a resume; EF Core's retry policy still covers dropped connections.
 
+## 2026-11-20 — Phase 5: the order model
+
+- **The state machine lives in the domain** (`Order`): Draft → AwaitingPayment → InProgress → Ready → Shipped →
+  Completed, and Cancel (with a reason for the customer) from any status that is not final. Each step is a method that
+  checks the current status, sets its timestamp and records an `OrderStatusChange` (the customer timeline and the
+  audit trail); creating the draft is the first entry. A step from the wrong status throws `orders.invalid_transition`
+  (the API will answer 409). Unit tests try every step from every status.
+- **Edit rules**: title, description, price and reference image only before payment (Draft, AwaitingPayment); the
+  internal note until the order ends; photos of the finished toy only while it is being made or ready (at most 20,
+  "Ready" needs at least one and keeps at least one).
+- **Money** is a value type: positive euros with at most two decimals, stored as `PriceAmount decimal(10,2)` and
+  `PriceCurrency` (an EF Core complex property).
+- **Order numbers** come from the SQL sequence `OrderNumbers` (shown as `BC-0012`); ids are GUID v7. A `rowversion`
+  column gives optimistic concurrency between admins.
+- **Deleting a customer account keeps their orders** (PLAN §8.6): the customer row stays anonymized, and the order loses
+  its conversation and reference image through `ON DELETE SET NULL` (both are deleted with the account).
+- **Images used by orders are never "abandoned uploads"**: the daily cleanup skips attachments referenced as order
+  photos or reference images.
+
