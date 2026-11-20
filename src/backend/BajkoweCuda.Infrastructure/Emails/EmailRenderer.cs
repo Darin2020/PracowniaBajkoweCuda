@@ -122,7 +122,21 @@ public static class EmailRenderer
             }
 
             var line = string.Join(" · ", parts);
-            html.Append(CultureInfo.InvariantCulture, $"<p style=\"font-size:15px;line-height:1.5;margin:0 0 12px;padding:12px 16px;background:#fbeee4;border-radius:8px;white-space:pre-line\">{Html.Encode(line)}</p>");
+            html.Append("<div style=\"margin:0 0 12px;padding:12px 16px;background:#fbeee4;border-radius:8px\">")
+                .Append(CultureInfo.InvariantCulture, $"<p style=\"font-size:15px;line-height:1.5;margin:0;white-space:pre-line\">{Html.Encode(line)}</p>");
+            if (item.ImageContentIds is { Count: > 0 } images)
+            {
+                html.Append("<p style=\"margin:8px 0 0\">");
+                foreach (var id in images)
+                {
+                    // Content ids are made by the application (letters, digits, dashes); encoded anyway.
+                    html.Append(CultureInfo.InvariantCulture, $"<img src=\"cid:{Html.Encode(id)}\" alt=\"\" width=\"120\" style=\"width:120px;height:auto;border-radius:6px;margin:0 6px 6px 0;vertical-align:top\">");
+                }
+
+                html.Append("</p>");
+            }
+
+            html.Append("</div>");
             text.AppendLine(CultureInfo.InvariantCulture, $"> {line}").AppendLine();
         }
 
@@ -157,5 +171,8 @@ public static class EmailRenderer
             : throw new InvalidOperationException("An email link must be an absolute http(s) URL.");
 }
 
-/// <summary>One unread message in a chat notification: an excerpt, how many photos, or an order update.</summary>
-public sealed record DigestItem(bool IsSystem, string Excerpt, int ImageCount);
+/// <summary>
+/// One unread message in a chat notification: an excerpt, how many photos (and, for the first few, their thumbnails as
+/// inline images), or an order update.
+/// </summary>
+public sealed record DigestItem(bool IsSystem, string Excerpt, int ImageCount, IReadOnlyList<string>? ImageContentIds = null);

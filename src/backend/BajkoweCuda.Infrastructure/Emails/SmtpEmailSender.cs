@@ -15,7 +15,14 @@ internal sealed class SmtpEmailSender(IOptions<EmailOptions> options) : IEmailSe
         message.From.Add(MailboxAddress.Parse(settings.From));
         message.To.Add(MailboxAddress.Parse(email.To));
         message.Subject = email.Subject;
-        message.Body = new BodyBuilder { HtmlBody = email.HtmlBody, TextBody = email.TextBody }.ToMessageBody();
+        var body = new BodyBuilder { HtmlBody = email.HtmlBody, TextBody = email.TextBody };
+        foreach (var image in email.Images ?? [])
+        {
+            var resource = body.LinkedResources.Add($"{image.ContentId}.jpg", image.Content, ContentType.Parse(image.ContentType));
+            resource.ContentId = image.ContentId;
+        }
+
+        message.Body = body.ToMessageBody();
 
         using var client = new SmtpClient();
         await client.ConnectAsync(settings.Smtp.Host, settings.Smtp.Port, SecureSocketOptions.StartTlsWhenAvailable, cancellationToken);

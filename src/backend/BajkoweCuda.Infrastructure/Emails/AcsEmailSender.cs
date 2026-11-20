@@ -20,6 +20,13 @@ internal sealed class AcsEmailSender(IOptions<EmailOptions> options, TokenCreden
     {
         var content = new EmailContent(email.Subject) { Html = email.HtmlBody, PlainText = email.TextBody };
         var message = new EmailMessage(options.Value.From, email.To, content);
+        foreach (var image in email.Images ?? [])
+        {
+            message.Attachments.Add(new EmailAttachment($"{image.ContentId}.jpg", image.ContentType, BinaryData.FromBytes(image.Content))
+            {
+                ContentId = image.ContentId,
+            });
+        }
 
         // Started: ACS has accepted the message. Waiting for final delivery would hold the dispatcher for minutes.
         await _client.Value.SendAsync(WaitUntil.Started, message, cancellationToken);

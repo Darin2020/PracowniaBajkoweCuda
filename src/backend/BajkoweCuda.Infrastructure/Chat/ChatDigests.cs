@@ -1,8 +1,10 @@
 using System.Text.Json;
 using BajkoweCuda.Application.Chat;
+using BajkoweCuda.Application.Files;
 using BajkoweCuda.Domain.Chat;
 using BajkoweCuda.Infrastructure.Emails;
 using BajkoweCuda.Infrastructure.Identity;
+using BajkoweCuda.Infrastructure.Imaging;
 using BajkoweCuda.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -16,7 +18,13 @@ namespace BajkoweCuda.Infrastructure.Chat;
 /// Recipients: the admins for customer messages (always), the customer for studio and system messages (only with
 /// "send replies to my email" on).
 /// </summary>
-public sealed class ChatDigests(AppDbContext db, IChatLinks links, EmailDispatchSignal signal, IOptions<EmailOptions> options, TimeProvider time)
+public sealed class ChatDigests(
+    AppDbContext db,
+    IChatLinks links,
+    IFileStore files,
+    EmailDispatchSignal signal,
+    IOptions<EmailOptions> options,
+    TimeProvider time)
 {
     public const string Template = "ChatDigest";
 
@@ -24,6 +32,10 @@ public sealed class ChatDigests(AppDbContext db, IChatLinks links, EmailDispatch
     public const int MaxListed = 10;
 
     public const int ExcerptLength = 200;
+
+    /// <summary>Photos shown in one email, and their size; the rest are counted.</summary>
+    public const int MaxInlineImages = 6;
+    public const int InlineImageSize = 320;
 
     /// <summary>Queues the notifications for a message just posted in the conversation.</summary>
     public async Task QueueAsync(Guid conversationId, ChatSide from, CancellationToken cancellationToken)
@@ -138,11 +150,13 @@ public sealed class ChatDigests(AppDbContext db, IChatLinks links, EmailDispatch
             .Take(MaxListed)
             .Select(message => new
             {
+                message.Id,
                 message.Body,
                 message.Kind,
                 Images = db.Attachments.Count(attachment => attachment.MessageId == message.Id),
             })
             .ToListAsync(cancellationToken);
+        var inline = await ThumbnailsAsync([.. listed.Select(message => message.Id)], cancellationToken);
 
         var customerName = forCustomer
             ? null
@@ -157,9 +171,45 @@ public sealed class ChatDigests(AppDbContext db, IChatLinks links, EmailDispatch
             [.. listed.Select(message => new DigestItem(
                 message.Kind == MessageKind.System,
                 message.Body.Length <= ExcerptLength ? message.Body : string.Concat(message.Body.AsSpan(0, ExcerptLength - 1), "…"),
-                message.Images))],
+                message.Images,
+                [.. inline.Where(image => image.MessageId == message.Id).Select(image => image.Image.ContentId)]))],
             total - listed.Count,
-            payload.GetValueOrDefault(EmailRenderer.LinkKey) ?? throw new InvalidOperationException("A chat notification needs a link."));
+            payload.GetValueOrDefault(EmailRenderer.LinkKey) ?? throw new InvalidOperationException("A chat notification needs a link."))
+            with { Images = [.. inline.Select(image => image.Image)] };
+    }
+
+    /// <summary>
+    /// The first photos of the listed messages, as small JPEGs inside the email: the files themselves are private and
+    /// need a session, which an email client does not have. A photo that cannot be read is left out; the email still
+    /// says how many there are.
+    /// </summary>
+    private async Task<List<(Guid MessageId, InlineImage Image)>> ThumbnailsAsync(List<Guid> messageIds, CancellationToken cancellationToken)
+    {
+        var ids = messageIds.Select(id => (Guid?)id).ToList();
+        var attachments = await db.Attachments.AsNoTracking()
+            .Where(attachment => ids.Contains(attachment.MessageId))
+            .OrderBy(attachment => attachment.CreatedAt).ThenBy(attachment => attachment.Id)
+            .Take(MaxInlineImages)
+            .ToListAsync(cancellationToken);
+
+        var images = new List<(Guid, InlineImage)>();
+        foreach (var attachment in attachments)
+        {
+            await using var stream = await files.OpenReadAsync(attachment.Container, attachment.ThumbnailBlobName, cancellationToken);
+            if (stream is null)
+            {
+                continue;
+            }
+
+            using var buffer = new MemoryStream();
+            await stream.CopyToAsync(buffer, cancellationToken);
+            if (ImageProcessor.ToEmailJpeg(buffer.GetBuffer().AsSpan(0, (int)buffer.Length), InlineImageSize) is { } jpeg)
+            {
+                images.Add((attachment.MessageId!.Value, new InlineImage($"photo-{attachment.Id:N}", "image/jpeg", jpeg)));
+            }
+        }
+
+        return images;
     }
 
     /// <summary>Admins who can be emailed. The role is synced from Admin:Emails at sign-in (§3.3).</summary>

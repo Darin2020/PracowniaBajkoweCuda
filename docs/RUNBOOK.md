@@ -112,6 +112,13 @@ What costs money while idle: the container registry (Basic) and the production r
 Staging scales to zero. Both databases use the free serverless offer and pause when the monthly free
 allowance is used up.
 
+**The first request after a quiet hour is slow (up to ~30 s).** Staging has no replica while nobody uses it, so the
+first visit starts a container; and both serverless databases pause after an hour without queries, so the first
+signed-in request waits for the database to resume. Public pages need no database and come back as soon as the
+container runs. This is the price of the free/serverless setup; keeping a staging replica (`minReplicas = 1`) or an
+always-on database removes it for a monthly cost. Background jobs must not query the database more often than every
+few hours, or it never pauses (the upload cleanup runs once a day for this reason).
+
 To move the production database to the always-on **Basic (DTU)** tier, set `sqlUseFreeOffer = false` in
 `infra/main.prod.bicepparam`. Azure cannot convert a free-offer database in place: export the data first,
 delete the database, deploy, then import. Do it before real data exists, or plan a maintenance window.
@@ -148,7 +155,10 @@ everything was read or the customer turned notifications off. Admins are always 
 customers only with "Send replies to my email" on. Locally, `CHAT_DIGEST_DELAY_MINUTES=0 docker compose --profile app up -d`
 sends them at once.
 
-The sender is `DoNotReply@<azure-managed-domain>` until a custom domain exists (Phase 8). The app identity sends with
+The sender is `DoNotReply@<azure-managed-domain>` until a custom domain exists (Phase 8). **Expect these emails in
+the spam folder until then**: the shared `azurecomm.net` domain has no reputation of its own and cannot carry our own
+SPF/DKIM/DMARC records. Phase 8 links the custom domain to Communication Services (SPF, DKIM and DMARC records), which
+is the fix. Meanwhile, marking an email "Not spam" helps for that mailbox. The app identity sends with
 the "Communication and Email Service Owner" role on the Communication Services resource.
 
 ### Admins and 2FA
@@ -218,7 +228,7 @@ are per replica, in memory, and reset on restart.
   names: a display copy (max 1600 px) and a thumbnail (max 480 px). The uploaded original is never stored.
 - Nobody reads the container directly: the app streams files through `/api/files/{id}` after an access check. Do not
   enable public access or SAS links on the storage account.
-- Uploads that are never sent with a message are deleted after 24 hours (hourly job in the app, logged as
+- Uploads that are never sent with a message are deleted after 24 hours (daily job in the app, logged as
   "Deleted N abandoned chat uploads"). Deleting an account deletes its conversation and images; a blob that cannot be
   deleted at that moment is logged as an error with its name, and can be removed by hand.
 - `/health/ready` also checks the storage account (the smoke test after each deployment calls it).

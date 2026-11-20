@@ -70,6 +70,43 @@ public static class ImageProcessor
         return (new ProcessedImage(display, width, height, thumbnail), null);
     }
 
+    /// <summary>
+    /// A stored image as a small JPEG for an email (at most maxSide px): mail clients show JPEG everywhere, WebP not.
+    /// Returns null if the image cannot be read.
+    /// </summary>
+    public static byte[]? ToEmailJpeg(ReadOnlySpan<byte> image, int maxSide)
+    {
+        using var data = SKData.CreateCopy(image);
+        using var codec = SKCodec.Create(data);
+        if (codec is null)
+        {
+            return null;
+        }
+
+        using var decoded = Decode(codec, maxSide);
+        if (decoded is null)
+        {
+            return null;
+        }
+
+        var scale = Math.Min(1.0, (double)maxSide / Math.Max(decoded.Width, decoded.Height));
+        var width = Math.Max(1, (int)Math.Round(decoded.Width * scale));
+        var height = Math.Max(1, (int)Math.Round(decoded.Height * scale));
+
+        // JPEG has no transparency: draw on white.
+        using var surface = new SKBitmap(new SKImageInfo(width, height, SKColorType.Rgba8888, SKAlphaType.Opaque));
+        using (var canvas = new SKCanvas(surface))
+        {
+            canvas.Clear(SKColors.White);
+            using var source = SKImage.FromBitmap(decoded);
+            canvas.DrawImage(source, new SKRect(0, 0, width, height), new SKSamplingOptions(SKCubicResampler.Mitchell));
+        }
+
+        using var result = SKImage.FromBitmap(surface);
+        using var jpeg = result.Encode(SKEncodedImageFormat.Jpeg, 80);
+        return jpeg.ToArray();
+    }
+
     /// <summary>The format announced by the file's signature, or <c>null</c> for anything else.</summary>
     public static SKEncodedImageFormat? Detect(ReadOnlySpan<byte> file)
     {

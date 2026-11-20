@@ -471,3 +471,16 @@ After that date the build fails again; an entry that is no longer reported is fl
   whether a connection joins the admins' group.
 - **Sign-in responses now carry the unread badge** too, not only `GET /api/auth/me`.
 
+## 2026-11-20 — Chat emails show the photos; the cleanup runs daily
+
+- **Chat notifications carry the first six photos inline** (`cid:` images, JPEG, 320 px, made from the stored
+  thumbnails when the email is due). Links to `/api/files` cannot work in an email: the files are private and a mail
+  client has no session. JPEG, not WebP, because not every mail client shows WebP. A photo that cannot be read is
+  left out; the text still counts all photos.
+- **The upload cleanup runs once a day instead of every hour.** Every run queries the database, and the serverless
+  database pauses only after an hour without queries: an hourly job would keep it awake around the clock and use up
+  the free monthly allowance within days, after which the free-offer database pauses for the rest of the month.
+- **Spam and slow first loads are known and documented (RUNBOOK)**: emails from the shared Azure-managed domain land
+  in spam until the custom domain (Phase 8); the first request after a quiet hour waits for the container (staging)
+  and the database to start.
+

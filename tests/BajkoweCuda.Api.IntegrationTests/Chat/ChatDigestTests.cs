@@ -55,6 +55,11 @@ public sealed class ChatDigestTests : IClassFixture<AuthApp>, IAsyncDisposable
         var email = await _app.Emails.WaitForAsync(admin.Email, "New message from Anna");
         email.TextBody.ShouldContain("I would like a fox.");
         email.TextBody.ShouldContain("Orange, with a scarf. · Photos: 1");
+        // The photo itself travels inside the email as a small JPEG (the file needs a session, a mail client has none).
+        var photo = email.Images.ShouldHaveSingleItem();
+        photo.ContentType.ShouldBe("image/jpeg");
+        TestImages.Describe(photo.Content).Format.ShouldBe(SkiaSharp.SKEncodedImageFormat.Jpeg);
+        email.HtmlBody.ShouldContain($"cid:{photo.ContentId}");
         email.TextBody.ShouldContain($"/en/admin/conversations/{conversationId}");
         (await DigestsAsync(conversationId, admin.UserId)).Single().Status.ShouldBe(EmailStatus.Sent);
     }
