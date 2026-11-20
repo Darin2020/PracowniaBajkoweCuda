@@ -20,4 +20,10 @@ public enum EmailTemplate
 
     /// <summary>Confirms that the account and its personal data were deleted. No payload.</summary>
     AccountDeleted,
+
+    /// <summary>
+    /// An order was confirmed: its number, title and price, and the payment instructions. Always sent, unlike the chat
+    /// notifications (docs/DECISIONS.md). Payload: <c>link</c>, <c>orderNumber</c>, <c>title</c>, <c>amount</c>, <c>details</c>.
+    /// </summary>
+    OrderConfirmed,
 }

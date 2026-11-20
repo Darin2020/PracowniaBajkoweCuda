@@ -15,6 +15,9 @@ public static class EmailRenderer
 {
     public const string LinkKey = "link";
 
+    /// <summary>A longer text shown as its own block under the body, line breaks kept (the payment instructions).</summary>
+    public const string DetailsKey = "details";
+
     private static readonly ResourceManager Texts =
         new("BajkoweCuda.Infrastructure.Emails.EmailTexts", typeof(EmailRenderer).Assembly);
 
@@ -31,9 +34,11 @@ public static class EmailRenderer
         string Text(string key) =>
             Texts.GetString(key, culture) ?? throw new InvalidOperationException($"Missing email text '{key}'.");
 
-        var subject = Text($"{template}_Subject");
-        var heading = Text($"{template}_Heading");
-        var body = Text($"{template}_Body");
+        // Texts may name payload values as {key} (for example {orderNumber}); the values are HTML-encoded below.
+        string Fill(string text) => payload.Aggregate(text, (current, pair) => current.Replace("{" + pair.Key + "}", pair.Value, StringComparison.Ordinal));
+        var subject = Fill(Text($"{template}_Subject"));
+        var heading = Fill(Text($"{template}_Heading"));
+        var body = Fill(Text($"{template}_Body"));
         var action = Texts.GetString($"{template}_Action", culture);
         var link = payload.TryGetValue(LinkKey, out var value) ? RequireWebLink(value) : null;
         if (action is not null && link is null)
@@ -50,16 +55,25 @@ public static class EmailRenderer
 
         var text = new StringBuilder().AppendLine(heading).AppendLine().AppendLine(body);
 
+        if (payload.TryGetValue(DetailsKey, out var details) && details.Length > 0)
+        {
+            html.Append(CultureInfo.InvariantCulture, $"<p style=\"font-size:15px;line-height:1.5;padding:12px 16px;background:#fbeee4;border-radius:8px;white-space:pre-line\">{Html.Encode(details)}</p>");
+            text.AppendLine().AppendLine(details);
+        }
+
+        // Account emails answer something the reader may not have asked for; order emails do not.
+        var ignoreNote = template != EmailTemplate.OrderConfirmed;
         if (action is not null && link is not null)
         {
             var encodedLink = Html.Encode(link);
             html.Append(CultureInfo.InvariantCulture, $"<p style=\"margin:24px 0\"><a href=\"{encodedLink}\" style=\"display:inline-block;background:#b5543c;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:8px\">{Html.Encode(action)}</a></p>")
-                .Append(CultureInfo.InvariantCulture, $"<p style=\"font-size:13px;color:#6b5b53\">{Html.Encode(Text("Common_LinkFallback"))}<br><a href=\"{encodedLink}\" style=\"color:#6b5b53;word-break:break-all\">{encodedLink}</a></p>")
-                .Append(CultureInfo.InvariantCulture, $"<p style=\"font-size:13px;color:#6b5b53\">{Html.Encode(Text("Common_IgnoreIfNotYou"))}</p>");
-            text.AppendLine()
-                .AppendLine(CultureInfo.InvariantCulture, $"{action}: {link}")
-                .AppendLine()
-                .AppendLine(Text("Common_IgnoreIfNotYou"));
+                .Append(CultureInfo.InvariantCulture, $"<p style=\"font-size:13px;color:#6b5b53\">{Html.Encode(Text("Common_LinkFallback"))}<br><a href=\"{encodedLink}\" style=\"color:#6b5b53;word-break:break-all\">{encodedLink}</a></p>");
+            text.AppendLine().AppendLine(CultureInfo.InvariantCulture, $"{action}: {link}");
+            if (ignoreNote)
+            {
+                html.Append(CultureInfo.InvariantCulture, $"<p style=\"font-size:13px;color:#6b5b53\">{Html.Encode(Text("Common_IgnoreIfNotYou"))}</p>");
+                text.AppendLine().AppendLine(Text("Common_IgnoreIfNotYou"));
+            }
         }
 
         var signature = Text("Common_Signature");
@@ -109,7 +123,10 @@ public static class EmailRenderer
             var parts = new List<string>();
             if (item.IsSystem)
             {
-                parts.Add(Text("ChatDigest_OrderUpdate"));
+                var eventKey = item.SystemEvent is null ? null : "ChatDigest_" + item.SystemEvent.Replace('.', '_');
+                parts.Add(eventKey is not null && item.OrderNumber is not null && Texts.GetString(eventKey, culture) is { } eventText
+                    ? string.Format(culture, eventText, item.OrderNumber)
+                    : Text("ChatDigest_OrderUpdate"));
             }
             else if (item.Excerpt.Length > 0)
             {
@@ -175,4 +192,10 @@ public static class EmailRenderer
 /// One unread message in a chat notification: an excerpt, how many photos (and, for the first few, their thumbnails as
 /// inline images), or an order update.
 /// </summary>
-public sealed record DigestItem(bool IsSystem, string Excerpt, int ImageCount, IReadOnlyList<string>? ImageContentIds = null);
+public sealed record DigestItem(
+    bool IsSystem,
+    string Excerpt,
+    int ImageCount,
+    IReadOnlyList<string>? ImageContentIds = null,
+    string? SystemEvent = null,
+    string? OrderNumber = null);

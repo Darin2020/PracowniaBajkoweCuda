@@ -25,6 +25,8 @@ public sealed class AccountLinks(PublicSiteOptions site) : IChatLinks
     public string AdminConversation(Guid conversationId, string language) =>
         $"{site.Origin}/{Language(language)}/admin/conversations/{conversationId}";
 
+    public string CustomerOrder(Guid orderId, string language) => $"{site.Origin}/{Language(language)}/orders/{orderId}";
+
     /// <summary>Identity tokens contain characters that are not URL-safe; they travel Base64Url-encoded.</summary>
     public static string EncodeToken(string token) => WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 

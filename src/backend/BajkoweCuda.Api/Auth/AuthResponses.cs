@@ -16,7 +16,8 @@ public sealed record MeResponse(
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? PreferredLanguage = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<string>? Roles = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] bool? TwoFactorEnabled = null,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? UnreadCount = null)
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? UnreadCount = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] bool? HasOrders = null)
 {
     public static MeResponse Anonymous { get; } = new(Authenticated: false);
 
@@ -25,7 +26,7 @@ public sealed record MeResponse(
     /// endpoints answer (they return <c>auth.mfa_required</c>). <paramref name="unreadCount"/> is the chat badge (§3.4):
     /// the customer's unread studio messages, or for an admin with 2FA all unread customer messages.
     /// </summary>
-    public static async Task<MeResponse> ForAsync(UserManager<ApplicationUser> users, ApplicationUser user, int? unreadCount = null) => new(
+    public static async Task<MeResponse> ForAsync(UserManager<ApplicationUser> users, ApplicationUser user, int? unreadCount = null, bool? hasOrders = null) => new(
         Authenticated: true,
         Id: user.Id,
         Email: user.Email,
@@ -34,7 +35,8 @@ public sealed record MeResponse(
         PreferredLanguage: user.PreferredLanguage,
         Roles: [.. await users.GetRolesAsync(user)],
         TwoFactorEnabled: user.TwoFactorEnabled,
-        UnreadCount: unreadCount);
+        UnreadCount: unreadCount,
+        HasOrders: hasOrders);
 }
 
 /// <summary><c>POST /api/auth/login</c> when the account has 2FA: continue with <c>POST /api/auth/2fa/login</c>.</summary>

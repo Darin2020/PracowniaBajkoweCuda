@@ -1,5 +1,6 @@
 using BajkoweCuda.Api.Auth;
 using BajkoweCuda.Infrastructure.Chat;
+using BajkoweCuda.Infrastructure.Orders;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
@@ -16,6 +17,8 @@ public interface IChatClient
     Task MessagesRead(ReadReceipt receipt);
 
     Task UnreadCountChanged(int count);
+
+    Task OrderUpdated(OrderSummary order);
 }
 
 /// <summary>
@@ -55,6 +58,24 @@ public sealed class ChatEvents(IHubContext<ChatHub, IChatClient> hub, ChatServic
         else
         {
             await hub.Clients.Group(ChatHub.AdminsGroup).UnreadCountChanged(await chat.StudioUnreadAsync(cancellationToken));
+        }
+    }
+
+    /// <summary>
+    /// An order changed: the admins hear it always, the customer once it is no longer a draft; a system message posted
+    /// with the change arrives like any message.
+    /// </summary>
+    public async Task OrderChangedAsync(OrderChange change, CancellationToken cancellationToken)
+    {
+        if (change.SystemMessage is { } message)
+        {
+            await MessagePostedAsync(change.Summary.CustomerId, message, cancellationToken);
+        }
+
+        await hub.Clients.Group(ChatHub.AdminsGroup).OrderUpdated(change.Summary);
+        if (change.VisibleToCustomer)
+        {
+            await hub.Clients.User(change.Summary.CustomerId.ToString()).OrderUpdated(change.Summary);
         }
     }
 

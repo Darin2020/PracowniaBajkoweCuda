@@ -8,4 +8,7 @@ public interface IChatLinks
 
     /// <summary>One conversation in the admin area (<c>/{lang}/admin/conversations/{id}</c>).</summary>
     string AdminConversation(Guid conversationId, string language);
+
+    /// <summary>One of the customer's orders (<c>/{lang}/orders/{id}</c>).</summary>
+    string CustomerOrder(Guid orderId, string language);
 }
