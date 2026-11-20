@@ -123,7 +123,7 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
             { name: 'AZURE_CLIENT_ID', value: identityClientId }
             {
               name: 'ConnectionStrings__Sql'
-              value: 'Server=tcp:${sqlServerFqdn},1433;Database=${sqlDatabaseName};Authentication=Active Directory Managed Identity;User Id=${identityClientId};Encrypt=True;TrustServerCertificate=False'
+              value: 'Server=tcp:${sqlServerFqdn},1433;Database=${sqlDatabaseName};Authentication=Active Directory Managed Identity;User Id=${identityClientId};Encrypt=True;TrustServerCertificate=False;Connect Timeout=60'
             }
             { name: 'Storage__BlobServiceUri', value: blobServiceUri }
             { name: 'KeyVault__Uri', value: keyVaultUri }
