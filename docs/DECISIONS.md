@@ -484,3 +484,10 @@ After that date the build fails again; an entry that is no longer reported is fl
   in spam until the custom domain (Phase 8); the first request after a quiet hour waits for the container (staging)
   and the database to start.
 
+## 2026-11-20 — 60-second SQL connect timeout in Azure
+
+- The connection strings of the app and of the migration job set `Connect Timeout=60` (default 15 s). A paused
+  serverless database takes longer than 15 s to resume, so the first connection after a quiet hour failed with
+  "Connection Timeout Expired ... post-login phase": the deployment of 2026-11-20 failed that way in the migration job
+  while the database was resuming. 60 s covers a resume; EF Core's retry policy still covers dropped connections.
+
