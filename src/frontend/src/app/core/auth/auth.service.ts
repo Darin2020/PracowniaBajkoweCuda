@@ -74,6 +74,11 @@ export class AuthService {
     this.current.update((user) => (user ? { ...user, unreadCount: Math.max(0, count) } : user));
   }
 
+  /** The customer's first order was confirmed (pushed by the server): show the "My orders" tab. */
+  setHasOrders(): void {
+    this.current.update((user) => (user && !user.hasOrders ? { ...user, hasOrders: true } : user));
+  }
+
   /** Forgets the user without a request, when the API has said the session is gone (401). */
   clear(): void {
     this.apply({ authenticated: false });
@@ -200,6 +205,7 @@ export class AuthService {
         roles: response.roles ?? [],
         twoFactorEnabled: response.twoFactorEnabled,
         unreadCount: response.unreadCount ?? 0,
+        hasOrders: response.hasOrders ?? false,
       });
     } else {
       this.current.set(null);

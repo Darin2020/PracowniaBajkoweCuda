@@ -111,6 +111,34 @@ export function errorMessage(error: ApiError | string): string {
     case 'files.unreadable':
     case 'files.missing':
       return $localize`:@@error.fileUnreadable:The photo could not be read. Please try another one.`;
+    case 'orders.not_found':
+      return $localize`:@@error.orderNotFound:This order does not exist or is not available.`;
+    case 'orders.conflict':
+      return $localize`:@@error.orderConflict:Someone else has just changed this order. The page now shows the latest version: check it and try again.`;
+    case 'orders.invalid_transition':
+      return $localize`:@@error.orderInvalidTransition:This step is not possible in the order's current status.`;
+    case 'orders.not_editable':
+      return $localize`:@@error.orderNotEditable:The terms of the order cannot change any more.`;
+    case 'orders.photo_required':
+      return $localize`:@@error.orderPhotoRequired:Add at least one photo of the finished toy first.`;
+    case 'orders.photos_locked':
+      return $localize`:@@error.orderPhotosLocked:Photos can be changed only while the toy is being made or is ready.`;
+    case 'orders.reason_required':
+      return $localize`:@@error.orderReasonRequired:Write the reason for the customer.`;
+    case 'orders.title_required':
+      return $localize`:@@error.orderTitleRequired:The order needs a title.`;
+    case 'orders.too_long':
+      return $localize`:@@error.orderTooLong:A text is too long.`;
+    case 'orders.invalid_price':
+      return $localize`:@@error.orderInvalidPrice:Enter a price above zero, with at most two decimals.`;
+    case 'orders.too_many_photos':
+      return $localize`:@@error.orderTooManyPhotos:An order can have at most 20 photos.`;
+    case 'orders.photo_not_found':
+      return $localize`:@@error.orderPhotoNotFound:This photo has already been removed.`;
+    case 'orders.conversation_not_found':
+      return $localize`:@@error.orderConversationNotFound:The conversation does not exist any more.`;
+    case 'orders.image_unavailable':
+      return $localize`:@@error.orderImageUnavailable:This image cannot be used for the order. Choose one from the conversation or upload it again.`;
     case 'rate_limited':
       return $localize`:@@error.rateLimited:Too many attempts. Please wait a minute and try again.`;
     case 'validation_failed':

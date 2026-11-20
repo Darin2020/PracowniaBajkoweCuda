@@ -57,6 +57,16 @@ describe('TopBar', () => {
     expect(links).toEqual(['/pl/chat', '/pl/account']);
   });
 
+  it('shows "My orders" to a customer who has orders', async () => {
+    const fixture = await render({ authenticated: true, ...ANNA, hasOrders: true });
+    const element = fixture.nativeElement as HTMLElement;
+
+    const links = Array.from(element.querySelectorAll('#user-menu a')).map((link) =>
+      link.getAttribute('href'),
+    );
+    expect(links).toEqual(['/pl/chat', '/pl/orders', '/pl/account']);
+  });
+
   it('gives admins the conversations instead of the chat', async () => {
     const fixture = await render({
       authenticated: true,
@@ -68,6 +78,7 @@ describe('TopBar', () => {
 
     expect(element.querySelector('a[href="/pl/admin/conversations"]')?.textContent).toContain('4');
     expect(element.querySelector('a[href="/pl/chat"]')).toBeNull();
+    expect(element.querySelector('a[href="/pl/admin/orders"]')).not.toBeNull();
   });
 
   it('reminds an admin without 2FA to set it up', async () => {

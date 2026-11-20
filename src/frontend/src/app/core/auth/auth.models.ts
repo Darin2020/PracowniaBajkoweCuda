@@ -13,13 +13,16 @@ export interface SessionUser {
   readonly twoFactorEnabled: boolean;
   /** The chat badge: unread studio messages for a customer, unread customer messages for an admin with 2FA. */
   readonly unreadCount: number;
+  /** A customer with an order that is not a draft: the "My orders" tab is shown. */
+  readonly hasOrders: boolean;
 }
 
 /** The sign-in responses carry the same summary, without the unread count (it is asked for separately). */
 export type MeResponse =
   | { readonly authenticated: false }
-  | ({ readonly authenticated: true } & Omit<SessionUser, 'unreadCount'> & {
+  | ({ readonly authenticated: true } & Omit<SessionUser, 'unreadCount' | 'hasOrders'> & {
         readonly unreadCount?: number;
+        readonly hasOrders?: boolean;
       });
 
 export interface TwoFactorRequiredResponse {

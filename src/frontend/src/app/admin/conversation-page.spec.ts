@@ -1,21 +1,12 @@
 import { HttpTestingController } from '@angular/common/http/testing';
 import { LOCALE_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { Router, provideRouter, withComponentInputBinding } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { Subject } from 'rxjs';
 import { ChatRealtime } from '../core/chat/chat-realtime.service';
-import { ChatMessage, ReadReceipt } from '../core/chat/chat.models';
 import { provideApiTesting } from '../testing/auth-testing';
-import { message } from '../testing/chat-testing';
+import { FakeRealtime, message } from '../testing/chat-testing';
 import { ConversationPage } from './conversation-page';
-
-class FakeRealtime {
-  readonly messages = new Subject<ChatMessage>();
-  readonly reads = new Subject<ReadReceipt>();
-  readonly reconnected = new Subject<void>();
-  readonly state = () => 'connected';
-}
 
 describe('ConversationPage', () => {
   let http: HttpTestingController;
@@ -27,7 +18,10 @@ describe('ConversationPage', () => {
       providers: [
         provideApiTesting(),
         provideRouter(
-          [{ path: 'admin/conversations/:id', component: ConversationPage }],
+          [
+            { path: 'admin/conversations/:id', component: ConversationPage },
+            { path: 'admin/orders/:id', children: [] },
+          ],
           withComponentInputBinding(),
         ),
         { provide: ChatRealtime, useValue: realtime },
@@ -44,6 +38,9 @@ describe('ConversationPage', () => {
   async function open() {
     const harness = await RouterTestingHarness.create('/admin/conversations/c1');
     await settle();
+    http
+      .expectOne((request) => request.url === '/api/admin/orders')
+      .flush({ items: [], nextCursor: null });
     http.expectOne('/api/admin/conversations/c1').flush({
       id: 'c1',
       customer: {
@@ -105,6 +102,49 @@ describe('ConversationPage', () => {
       (item) => item.textContent?.trim(),
     );
     expect(bodies).toEqual(['A fox, please', 'Orange, please']);
+  });
+
+  it('creates a draft from the conversation, with one of its images as the reference', async () => {
+    const harness = await open();
+    http.expectOne('/api/admin/conversations/c1/read').flush(null);
+    const element = harness.routeNativeElement!;
+    harness.detectChanges();
+
+    Array.from(element.querySelectorAll<HTMLButtonElement>('.side button'))
+      .find((button) => button.textContent?.includes('Create order'))!
+      .click();
+    harness.detectChanges();
+    // NgModel writes its first value a tick after rendering.
+    await settle();
+
+    const set = (selector: string, value: string) => {
+      const field = element.querySelector<HTMLInputElement | HTMLTextAreaElement>(selector)!;
+      field.value = value;
+      field.dispatchEvent(new Event('input'));
+    };
+    set('input[name="title"]', 'Fox with a scarf');
+    set('input[name="price"]', '149.9');
+    harness.detectChanges();
+    element
+      .querySelector<HTMLFormElement>('app-order-form form')!
+      .dispatchEvent(new Event('submit'));
+
+    const request = http.expectOne(
+      (item) => item.method === 'POST' && item.url === '/api/admin/orders',
+    );
+    expect(request.request.body).toEqual({
+      conversationId: 'c1',
+      title: 'Fox with a scarf',
+      description: null,
+      price: 149.9,
+      referenceAttachmentId: null,
+      adminNote: null,
+    });
+    request.flush({ id: 'o9' });
+    await settle();
+    await settle();
+
+    expect(TestBed.inject(Router).url).toBe('/admin/orders/o9');
   });
 
   it('sends a reply to this conversation', async () => {

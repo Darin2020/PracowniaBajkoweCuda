@@ -35,7 +35,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
-          <context context-type="linenumber">74,75</context>
+          <context context-type="linenumber">82,83</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/auth/complete-profile-page.ts</context>
@@ -107,7 +107,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
-          <context context-type="linenumber">79,80</context>
+          <context context-type="linenumber">87,88</context>
         </context-group>
       </trans-unit>
       <trans-unit id="account.saved" datatype="html">
@@ -230,6 +230,14 @@
           <context context-type="linenumber">48,49</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">302,305</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/orders-page.ts</context>
+          <context context-type="linenumber">63,64</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/admin/two-factor-setup-page.ts</context>
           <context context-type="linenumber">141,144</context>
         </context-group>
@@ -240,6 +248,14 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/chat/chat-thread.ts</context>
           <context context-type="linenumber">44,45</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/orders/order-page.ts</context>
+          <context context-type="linenumber">92,95</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/orders/orders-page.ts</context>
+          <context context-type="linenumber">31,32</context>
         </context-group>
       </trans-unit>
       <trans-unit id="account.twoFactor" datatype="html">
@@ -399,7 +415,7 @@
         <target state="needs-review-translation">← Toutes les conversations</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
-          <context context-type="linenumber">36,38</context>
+          <context context-type="linenumber">43,45</context>
         </context-group>
       </trans-unit>
       <trans-unit id="chat.reconnecting" datatype="html">
@@ -407,7 +423,7 @@
         <target state="needs-review-translation">Reconnexion…</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
-          <context context-type="linenumber">40,44</context>
+          <context context-type="linenumber">47,51</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/chat/chat-page.html</context>
@@ -419,7 +435,7 @@
         <target state="needs-review-translation">Aucun message pour l’instant.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
-          <context context-type="linenumber">56,58</context>
+          <context context-type="linenumber">63,65</context>
         </context-group>
       </trans-unit>
       <trans-unit id="admin.conversation.deletedHint" datatype="html">
@@ -427,7 +443,7 @@
         <target state="needs-review-translation">Ce compte a été supprimé ; les réponses ne lui parviendront pas.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
-          <context context-type="linenumber">60,62</context>
+          <context context-type="linenumber">67,69</context>
         </context-group>
       </trans-unit>
       <trans-unit id="admin.conversation.customer" datatype="html">
@@ -435,11 +451,11 @@
         <target state="needs-review-translation">Client</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
-          <context context-type="linenumber">69,71</context>
+          <context context-type="linenumber">77,79</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
-          <context context-type="linenumber">120</context>
+          <context context-type="linenumber">186</context>
         </context-group>
       </trans-unit>
       <trans-unit id="admin.conversation.name" datatype="html">
@@ -447,7 +463,7 @@
         <target state="needs-review-translation">Nom</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
-          <context context-type="linenumber">71,72</context>
+          <context context-type="linenumber">79,80</context>
         </context-group>
       </trans-unit>
       <trans-unit id="admin.conversation.since" datatype="html">
@@ -455,7 +471,7 @@
         <target state="needs-review-translation">Écrit depuis</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
-          <context context-type="linenumber">81,82</context>
+          <context context-type="linenumber">89,90</context>
         </context-group>
       </trans-unit>
       <trans-unit id="admin.conversation.emails" datatype="html">
@@ -463,7 +479,7 @@
         <target state="needs-review-translation">Notifications par e-mail</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
-          <context context-type="linenumber">83,85</context>
+          <context context-type="linenumber">91,93</context>
         </context-group>
       </trans-unit>
       <trans-unit id="admin.conversation.emailsOn" datatype="html">
@@ -471,7 +487,7 @@
         <target state="needs-review-translation">Activées</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
-          <context context-type="linenumber">86,88</context>
+          <context context-type="linenumber">94,95</context>
         </context-group>
       </trans-unit>
       <trans-unit id="admin.conversation.emailsOff" datatype="html">
@@ -479,7 +495,47 @@
         <target state="needs-review-translation">Désactivées</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
-          <context context-type="linenumber">88,90</context>
+          <context context-type="linenumber">96,98</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.conversation.orders" datatype="html">
+        <source>Orders</source>
+        <target state="needs-review-translation">Commandes</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
+          <context context-type="linenumber">105,106</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.conversation.noOrders" datatype="html">
+        <source>No orders yet.</source>
+        <target state="needs-review-translation">Aucune commande pour l'instant.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
+          <context context-type="linenumber">126,129</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.conversation.newOrder" datatype="html">
+        <source>New order</source>
+        <target state="needs-review-translation">Nouvelle commande</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
+          <context context-type="linenumber">130,132</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.conversation.createDraft" datatype="html">
+        <source>Create draft</source>
+        <target state="needs-review-translation">Créer le brouillon</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
+          <context context-type="linenumber">133,134</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.conversation.createOrder" datatype="html">
+        <source> Create order </source>
+        <target state="needs-review-translation">Créer une commande</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
+          <context context-type="linenumber">146,148</context>
         </context-group>
       </trans-unit>
       <trans-unit id="admin.conversations.deleted" datatype="html">
@@ -487,11 +543,19 @@
         <target state="needs-review-translation">Compte supprimé</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
-          <context context-type="linenumber">121</context>
+          <context context-type="linenumber">187</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/admin/conversations-page.ts</context>
           <context context-type="linenumber">110</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">328</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/orders-page.ts</context>
+          <context context-type="linenumber">131</context>
         </context-group>
       </trans-unit>
       <trans-unit id="admin.conversations.title" datatype="html">
@@ -499,7 +563,7 @@
         <target state="needs-review-translation">Conversations</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/admin/conversation-page.ts</context>
-          <context context-type="linenumber">125</context>
+          <context context-type="linenumber">191</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/admin/conversations-page.ts</context>
@@ -531,7 +595,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/chat/chat-message.ts</context>
-          <context context-type="linenumber">19,20</context>
+          <context context-type="linenumber">43,45</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/orders/order.models.ts</context>
+          <context context-type="linenumber">239</context>
         </context-group>
       </trans-unit>
       <trans-unit id="admin.conversations.photos" datatype="html">
@@ -564,6 +632,362 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/admin/conversations-page.ts</context>
           <context context-type="linenumber">99,101</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/orders-page.ts</context>
+          <context context-type="linenumber">115,117</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.form.title" datatype="html">
+        <source>Title</source>
+        <target state="needs-review-translation">Titre</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-form.ts</context>
+          <context context-type="linenumber">49,51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.form.description" datatype="html">
+        <source>Description for the customer</source>
+        <target state="needs-review-translation">Description pour le client</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-form.ts</context>
+          <context context-type="linenumber">63,66</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.form.price" datatype="html">
+        <source>Price (EUR)</source>
+        <target state="needs-review-translation">Prix (EUR)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-form.ts</context>
+          <context context-type="linenumber">77,79</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.form.reference" datatype="html">
+        <source>Reference image</source>
+        <target state="needs-review-translation">Image de référence</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-form.ts</context>
+          <context context-type="linenumber">93,94</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.form.noImages" datatype="html">
+        <source> No images in the conversation yet. You can upload one. </source>
+        <target state="needs-review-translation">Aucune image dans la conversation pour l'instant. Vous pouvez en envoyer une.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-form.ts</context>
+          <context context-type="linenumber">96,98</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.form.noReference" datatype="html">
+        <source>None</source>
+        <target state="needs-review-translation">Aucune</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-form.ts</context>
+          <context context-type="linenumber">107,109</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.form.imageAlt" datatype="html">
+        <source>Image <x id="INTERPOLATION" equiv-text="{{ position + 1 }}"/></source>
+        <target state="needs-review-translation">Image <x id="INTERPOLATION" equiv-text="{{ position + 1 }}"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-form.ts</context>
+          <context context-type="linenumber">121,122</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="chat.uploading" datatype="html">
+        <source>Uploading…</source>
+        <target state="needs-review-translation">Envoi…</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-form.ts</context>
+          <context context-type="linenumber">129,131</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">268,269</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/chat/chat-composer.ts</context>
+          <context context-type="linenumber">51,53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.form.upload" datatype="html">
+        <source>Upload an image</source>
+        <target state="needs-review-translation">Envoyer une image</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-form.ts</context>
+          <context context-type="linenumber">131,133</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.form.note" datatype="html">
+        <source>Internal note</source>
+        <target state="needs-review-translation">Note interne</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-form.ts</context>
+          <context context-type="linenumber">144,146</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">206,207</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.form.noteHint" datatype="html">
+        <source> Only the studio sees this note. </source>
+        <target state="needs-review-translation">Seul l'atelier voit cette note.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-form.ts</context>
+          <context context-type="linenumber">155,157</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="common.cancel" datatype="html">
+        <source> Cancel </source>
+        <target state="needs-review-translation">Annuler</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-form.ts</context>
+          <context context-type="linenumber">168,170</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.orders.back" datatype="html">
+        <source>← All orders</source>
+        <target state="needs-review-translation">← Toutes les commandes</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">57,59</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.order.customer" datatype="html">
+        <source>Customer:</source>
+        <target state="needs-review-translation">Client :</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">74,75</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.order.nextStep" datatype="html">
+        <source>Next step</source>
+        <target state="needs-review-translation">Étape suivante</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">91,92</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.order.confirmHint" datatype="html">
+        <source> The customer then sees the order and gets the payment instructions in the chat and by email. </source>
+        <target state="needs-review-translation">Le client voit alors la commande et reçoit les instructions de paiement dans le chat et par e-mail.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">105,107</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.order.photoFirst" datatype="html">
+        <source> Add at least one photo of the finished toy first. </source>
+        <target state="needs-review-translation">Ajoutez d'abord au moins une photo du jouet terminé.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">111,112</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.order.reason" datatype="html">
+        <source>Reason (the customer sees it)</source>
+        <target state="needs-review-translation">Motif (visible par le client)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">120,122</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.order.cancelConfirm" datatype="html">
+        <source> Cancel the order </source>
+        <target state="needs-review-translation">Annuler la commande</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">139,140</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.order.keep" datatype="html">
+        <source> Keep the order </source>
+        <target state="needs-review-translation">Garder la commande</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">147,148</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.cancelledBecause" datatype="html">
+        <source>The order was cancelled:</source>
+        <target state="needs-review-translation">La commande a été annulée :</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">167,168</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/orders/order-page.ts</context>
+          <context context-type="linenumber">47,48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.order.edit" datatype="html">
+        <source>Edit the order</source>
+        <target state="needs-review-translation">Modifier la commande</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">174,175</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.order.termsLocked" datatype="html">
+        <source> The order has been paid: only the internal note can change. </source>
+        <target state="needs-review-translation">La commande est payée : seule la note interne peut encore changer.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">177,179</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="common.save" datatype="html">
+        <source>Save</source>
+        <target state="needs-review-translation">Enregistrer</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">185</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.reference" datatype="html">
+        <source>Reference</source>
+        <target state="needs-review-translation">Référence</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">194,195</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/orders/order-page.ts</context>
+          <context context-type="linenumber">62,63</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.description" datatype="html">
+        <source>Description</source>
+        <target state="needs-review-translation">Description</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">199,200</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/orders/order-page.ts</context>
+          <context context-type="linenumber">69,70</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.order.editButton" datatype="html">
+        <source> Edit </source>
+        <target state="needs-review-translation">Modifier</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">214,215</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.order.photos" datatype="html">
+        <source>Photos of the finished toy</source>
+        <target state="needs-review-translation">Photos du jouet terminé</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">221,222</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.order.noPhotos" datatype="html">
+        <source>No photos yet.</source>
+        <target state="needs-review-translation">Aucune photo pour l'instant.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">224,226</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.order.moveEarlier" datatype="html">
+        <source>Move photo <x id="INTERPOLATION" equiv-text="{{ position + 1 }}"/> earlier</source>
+        <target state="needs-review-translation">Déplacer la photo <x id="INTERPOLATION" equiv-text="{{ position + 1 }}"/> avant</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">236,237</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.order.moveLater" datatype="html">
+        <source>Move photo <x id="INTERPOLATION" equiv-text="{{ position + 1 }}"/> later</source>
+        <target state="needs-review-translation">Déplacer la photo <x id="INTERPOLATION" equiv-text="{{ position + 1 }}"/> après</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">246,247</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.order.removePhoto" datatype="html">
+        <source>Remove photo <x id="INTERPOLATION" equiv-text="{{ position + 1 }}"/></source>
+        <target state="needs-review-translation">Supprimer la photo <x id="INTERPOLATION" equiv-text="{{ position + 1 }}"/></target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">256,257</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.order.addPhotos" datatype="html">
+        <source>Add photos</source>
+        <target state="needs-review-translation">Ajouter des photos</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">270,272</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.order.photosLater" datatype="html">
+        <source> Photos are added while the toy is being made. </source>
+        <target state="needs-review-translation">Les photos s'ajoutent pendant la confection du jouet.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">286,288</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.timeline" datatype="html">
+        <source>Progress</source>
+        <target state="needs-review-translation">Avancement</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">292,293</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/orders/order-page.ts</context>
+          <context context-type="linenumber">83,84</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.order.draftHint" datatype="html">
+        <source> This is a draft: the customer does not see it yet. </source>
+        <target state="needs-review-translation">Ceci est un brouillon : le client ne le voit pas encore.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">297,299</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.orders.title" datatype="html">
+        <source>Orders</source>
+        <target state="needs-review-translation">Commandes</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/order-page.ts</context>
+          <context context-type="linenumber">354</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/orders-page.ts</context>
+          <context context-type="linenumber">130</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.orders.filter" datatype="html">
+        <source>Status</source>
+        <target state="needs-review-translation">Statut</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/orders-page.ts</context>
+          <context context-type="linenumber">44,46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.orders.all" datatype="html">
+        <source>All orders</source>
+        <target state="needs-review-translation">Toutes les commandes</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/orders-page.ts</context>
+          <context context-type="linenumber">51,52</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="admin.orders.none" datatype="html">
+        <source> No orders here. Orders are created from a conversation. </source>
+        <target state="needs-review-translation">Aucune commande ici. Les commandes se créent depuis une conversation.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/admin/orders-page.ts</context>
+          <context context-type="linenumber">66,70</context>
         </context-group>
       </trans-unit>
       <trans-unit id="twoFactor.enabled" datatype="html">
@@ -1106,14 +1530,6 @@
           <context context-type="linenumber">119</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="chat.uploading" datatype="html">
-        <source>Uploading…</source>
-        <target state="needs-review-translation">Envoi…</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/chat/chat-composer.ts</context>
-          <context context-type="linenumber">51,53</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="chat.removePhoto" datatype="html">
         <source>Remove photo <x id="INTERPOLATION" equiv-text="{{ image.name }}"/></source>
         <target state="needs-review-translation">Retirer la photo <x id="INTERPOLATION" equiv-text="{{ image.name }}"/></target>
@@ -1154,12 +1570,28 @@
           <context context-type="linenumber">112,113</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="order.event.amount" datatype="html">
+        <source>Amount to pay:</source>
+        <target state="needs-review-translation">Montant à payer :</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/chat/chat-message.ts</context>
+          <context context-type="linenumber">29,30</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.event.open" datatype="html">
+        <source>View the order</source>
+        <target state="needs-review-translation">Voir la commande</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/chat/chat-message.ts</context>
+          <context context-type="linenumber">40,42</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="chat.photoAlt" datatype="html">
         <source>Photo <x id="INTERPOLATION" equiv-text="{{ position + 1 }}"/> of <x id="INTERPOLATION_1" equiv-text="{{ item.images.length }}"/></source>
         <target state="needs-review-translation">Photo <x id="INTERPOLATION" equiv-text="{{ position + 1 }}"/> sur <x id="INTERPOLATION_1" equiv-text="{{ message.images.length }}"/></target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/chat/chat-message.ts</context>
-          <context context-type="linenumber">36,37</context>
+          <context context-type="linenumber">63,64</context>
         </context-group>
       </trans-unit>
       <trans-unit id="chat.read" datatype="html">
@@ -1167,7 +1599,7 @@
         <target state="needs-review-translation">Lu</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/chat/chat-message.ts</context>
-          <context context-type="linenumber">50,51</context>
+          <context context-type="linenumber">77,78</context>
         </context-group>
       </trans-unit>
       <trans-unit id="chat.sent" datatype="html">
@@ -1175,7 +1607,7 @@
         <target state="needs-review-translation">Envoyé</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/chat/chat-message.ts</context>
-          <context context-type="linenumber">52,54</context>
+          <context context-type="linenumber">79,81</context>
         </context-group>
       </trans-unit>
       <trans-unit id="chat.confirmFirst" datatype="html">
@@ -1280,6 +1712,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/chat/chat-thread.ts</context>
           <context context-type="linenumber">121</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/orders/photo-gallery.ts</context>
+          <context context-type="linenumber">78</context>
         </context-group>
       </trans-unit>
       <trans-unit id="about.heading" datatype="html">
@@ -1866,12 +2302,124 @@
           <context context-type="linenumber">113</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="error.orderNotFound" datatype="html">
+        <source>This order does not exist or is not available.</source>
+        <target state="needs-review-translation">Cette commande n'existe pas ou n'est pas disponible.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/api/api-error.ts</context>
+          <context context-type="linenumber">115</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="error.orderConflict" datatype="html">
+        <source>Someone else has just changed this order. The page now shows the latest version: check it and try again.</source>
+        <target state="needs-review-translation">Quelqu'un vient de modifier cette commande. La page affiche maintenant la dernière version : vérifiez-la et réessayez.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/api/api-error.ts</context>
+          <context context-type="linenumber">117</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="error.orderInvalidTransition" datatype="html">
+        <source>This step is not possible in the order&apos;s current status.</source>
+        <target state="needs-review-translation">Cette étape n'est pas possible dans le statut actuel de la commande.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/api/api-error.ts</context>
+          <context context-type="linenumber">119</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="error.orderNotEditable" datatype="html">
+        <source>The terms of the order cannot change any more.</source>
+        <target state="needs-review-translation">Les conditions de la commande ne peuvent plus changer.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/api/api-error.ts</context>
+          <context context-type="linenumber">121</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="error.orderPhotoRequired" datatype="html">
+        <source>Add at least one photo of the finished toy first.</source>
+        <target state="needs-review-translation">Ajoutez d'abord au moins une photo du jouet terminé.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/api/api-error.ts</context>
+          <context context-type="linenumber">123</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="error.orderPhotosLocked" datatype="html">
+        <source>Photos can be changed only while the toy is being made or is ready.</source>
+        <target state="needs-review-translation">Les photos ne peuvent changer que pendant la confection du jouet ou lorsqu'il est prêt.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/api/api-error.ts</context>
+          <context context-type="linenumber">125</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="error.orderReasonRequired" datatype="html">
+        <source>Write the reason for the customer.</source>
+        <target state="needs-review-translation">Indiquez le motif pour le client.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/api/api-error.ts</context>
+          <context context-type="linenumber">127</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="error.orderTitleRequired" datatype="html">
+        <source>The order needs a title.</source>
+        <target state="needs-review-translation">La commande doit avoir un titre.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/api/api-error.ts</context>
+          <context context-type="linenumber">129</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="error.orderTooLong" datatype="html">
+        <source>A text is too long.</source>
+        <target state="needs-review-translation">Un texte est trop long.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/api/api-error.ts</context>
+          <context context-type="linenumber">131</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="error.orderInvalidPrice" datatype="html">
+        <source>Enter a price above zero, with at most two decimals.</source>
+        <target state="needs-review-translation">Saisissez un prix supérieur à zéro, avec au plus deux décimales.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/api/api-error.ts</context>
+          <context context-type="linenumber">133</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="error.orderTooManyPhotos" datatype="html">
+        <source>An order can have at most 20 photos.</source>
+        <target state="needs-review-translation">Une commande peut avoir au plus 20 photos.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/api/api-error.ts</context>
+          <context context-type="linenumber">135</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="error.orderPhotoNotFound" datatype="html">
+        <source>This photo has already been removed.</source>
+        <target state="needs-review-translation">Cette photo a déjà été supprimée.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/api/api-error.ts</context>
+          <context context-type="linenumber">137</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="error.orderConversationNotFound" datatype="html">
+        <source>The conversation does not exist any more.</source>
+        <target state="needs-review-translation">La conversation n'existe plus.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/api/api-error.ts</context>
+          <context context-type="linenumber">139</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="error.orderImageUnavailable" datatype="html">
+        <source>This image cannot be used for the order. Choose one from the conversation or upload it again.</source>
+        <target state="needs-review-translation">Cette image ne peut pas être utilisée pour la commande. Choisissez-en une dans la conversation ou envoyez-la à nouveau.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/api/api-error.ts</context>
+          <context context-type="linenumber">141</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="error.rateLimited" datatype="html">
         <source>Too many attempts. Please wait a minute and try again.</source>
         <target state="needs-review-translation">Trop de tentatives. Veuillez patienter une minute et réessayer.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/core/api/api-error.ts</context>
-          <context context-type="linenumber">115</context>
+          <context context-type="linenumber">143</context>
         </context-group>
       </trans-unit>
       <trans-unit id="error.validation" datatype="html">
@@ -1879,7 +2427,7 @@
         <target state="needs-review-translation">Certains champs ne sont pas correctement remplis.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/core/api/api-error.ts</context>
-          <context context-type="linenumber">117</context>
+          <context context-type="linenumber">145</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/forms/form-state.ts</context>
@@ -1891,7 +2439,7 @@
         <target state="needs-review-translation">Pas de connexion au serveur. Vérifiez votre connexion Internet et réessayez.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/core/api/api-error.ts</context>
-          <context context-type="linenumber">119</context>
+          <context context-type="linenumber">147</context>
         </context-group>
       </trans-unit>
       <trans-unit id="error.unknown" datatype="html">
@@ -1899,7 +2447,7 @@
         <target state="needs-review-translation">Une erreur s'est produite. Veuillez réessayer plus tard.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/core/api/api-error.ts</context>
-          <context context-type="linenumber">121</context>
+          <context context-type="linenumber">149</context>
         </context-group>
       </trans-unit>
       <trans-unit id="error.passwordTooShort" datatype="html">
@@ -1907,7 +2455,7 @@
         <target state="needs-review-translation">Le mot de passe doit comporter au moins 12 caractères.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/core/api/api-error.ts</context>
-          <context context-type="linenumber">127</context>
+          <context context-type="linenumber">155</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/forms/form-state.ts</context>
@@ -1919,7 +2467,227 @@
         <target state="needs-review-translation">Veuillez choisir un autre mot de passe.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/core/api/api-error.ts</context>
-          <context context-type="linenumber">128</context>
+          <context context-type="linenumber">156</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.status.draft" datatype="html">
+        <source>Draft</source>
+        <target state="needs-review-translation">Brouillon</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/orders/order.models.ts</context>
+          <context context-type="linenumber">151</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.status.awaitingPayment" datatype="html">
+        <source>Awaiting payment</source>
+        <target state="needs-review-translation">En attente de paiement</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/orders/order.models.ts</context>
+          <context context-type="linenumber">153</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.status.inProgress" datatype="html">
+        <source>In progress</source>
+        <target state="needs-review-translation">En cours</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/orders/order.models.ts</context>
+          <context context-type="linenumber">155</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.status.ready" datatype="html">
+        <source>Ready</source>
+        <target state="needs-review-translation">Prête</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/orders/order.models.ts</context>
+          <context context-type="linenumber">157</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.status.shipped" datatype="html">
+        <source>Shipped</source>
+        <target state="needs-review-translation">Expédiée</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/orders/order.models.ts</context>
+          <context context-type="linenumber">159</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.status.completed" datatype="html">
+        <source>Completed</source>
+        <target state="needs-review-translation">Terminée</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/orders/order.models.ts</context>
+          <context context-type="linenumber">161</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.status.cancelled" datatype="html">
+        <source>Cancelled</source>
+        <target state="needs-review-translation">Annulée</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/orders/order.models.ts</context>
+          <context context-type="linenumber">163</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.step.confirm" datatype="html">
+        <source>Confirm and send to the customer</source>
+        <target state="needs-review-translation">Confirmer et envoyer au client</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/orders/order.models.ts</context>
+          <context context-type="linenumber">170</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.step.markPaid" datatype="html">
+        <source>Payment received</source>
+        <target state="needs-review-translation">Paiement reçu</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/orders/order.models.ts</context>
+          <context context-type="linenumber">172</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.step.markReady" datatype="html">
+        <source>Mark as ready</source>
+        <target state="needs-review-translation">Marquer comme prête</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/orders/order.models.ts</context>
+          <context context-type="linenumber">174</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.step.markShipped" datatype="html">
+        <source>Mark as shipped</source>
+        <target state="needs-review-translation">Marquer comme expédiée</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/orders/order.models.ts</context>
+          <context context-type="linenumber">176</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.step.complete" datatype="html">
+        <source>Complete</source>
+        <target state="needs-review-translation">Terminer</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/orders/order.models.ts</context>
+          <context context-type="linenumber">178</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.step.cancel" datatype="html">
+        <source>Cancel the order</source>
+        <target state="needs-review-translation">Annuler la commande</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/orders/order.models.ts</context>
+          <context context-type="linenumber">180</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.event.confirmed" datatype="html">
+        <source>Order <x id="NUMBER" equiv-text="number"/> has been confirmed</source>
+        <target state="needs-review-translation">La commande <x id="NUMBER" equiv-text="number"/> a été confirmée</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/orders/order.models.ts</context>
+          <context context-type="linenumber">227</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.event.paid" datatype="html">
+        <source>Payment for order <x id="NUMBER" equiv-text="number"/> has been received. Work begins!</source>
+        <target state="needs-review-translation">Le paiement de la commande <x id="NUMBER" equiv-text="number"/> a été reçu. Nous commençons !</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/orders/order.models.ts</context>
+          <context context-type="linenumber">229</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.event.ready" datatype="html">
+        <source>Order <x id="NUMBER" equiv-text="number"/> is ready</source>
+        <target state="needs-review-translation">La commande <x id="NUMBER" equiv-text="number"/> est prête</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/orders/order.models.ts</context>
+          <context context-type="linenumber">231</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.event.shipped" datatype="html">
+        <source>Order <x id="NUMBER" equiv-text="number"/> has been shipped</source>
+        <target state="needs-review-translation">La commande <x id="NUMBER" equiv-text="number"/> a été expédiée</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/orders/order.models.ts</context>
+          <context context-type="linenumber">233</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.event.completed" datatype="html">
+        <source>Order <x id="NUMBER" equiv-text="number"/> is completed. Thank you!</source>
+        <target state="needs-review-translation">La commande <x id="NUMBER" equiv-text="number"/> est terminée. Merci !</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/orders/order.models.ts</context>
+          <context context-type="linenumber">235</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.event.cancelled" datatype="html">
+        <source>Order <x id="NUMBER" equiv-text="number"/> has been cancelled</source>
+        <target state="needs-review-translation">La commande <x id="NUMBER" equiv-text="number"/> a été annulée</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/core/orders/order.models.ts</context>
+          <context context-type="linenumber">237</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="orders.back" datatype="html">
+        <source>← My orders</source>
+        <target state="needs-review-translation">← Mes commandes</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/orders/order-page.ts</context>
+          <context context-type="linenumber">27,29</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.payment" datatype="html">
+        <source>How to pay</source>
+        <target state="needs-review-translation">Comment payer</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/orders/order-page.ts</context>
+          <context context-type="linenumber">54,55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.photos" datatype="html">
+        <source>Photos of your toy</source>
+        <target state="needs-review-translation">Photos de votre jouet</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/orders/order-page.ts</context>
+          <context context-type="linenumber">77,78</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.questions" datatype="html">
+        <source>Questions about the order?</source>
+        <target state="needs-review-translation">Une question sur la commande ?</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/orders/order-page.ts</context>
+          <context context-type="linenumber">88,89</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="order.writeUs" datatype="html">
+        <source>Write to us in the chat</source>
+        <target state="needs-review-translation">Écrivez-nous dans le chat</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/orders/order-page.ts</context>
+          <context context-type="linenumber">89,91</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="orders.title" datatype="html">
+        <source>My orders</source>
+        <target state="needs-review-translation">Mes commandes</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/orders/order-page.ts</context>
+          <context context-type="linenumber">108</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/orders/orders-page.ts</context>
+          <context context-type="linenumber">82</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="orders.none" datatype="html">
+        <source> You have no orders yet. Tell us about your idea in the chat and we will prepare one for you. </source>
+        <target state="needs-review-translation">Vous n'avez pas encore de commande. Parlez-nous de votre idée dans le chat et nous vous en préparerons une.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/orders/orders-page.ts</context>
+          <context context-type="linenumber">34,36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="orders.toChat" datatype="html">
+        <source>Open the chat</source>
+        <target state="needs-review-translation">Ouvrir le chat</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/orders/orders-page.ts</context>
+          <context context-type="linenumber">39,41</context>
         </context-group>
       </trans-unit>
       <trans-unit id="contact.cta" datatype="html">
@@ -2102,12 +2870,28 @@
           <context context-type="linenumber">73,74</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="nav.orders" datatype="html">
+        <source>Orders</source>
+        <target state="needs-review-translation">Commandes</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/layout/top-bar.html</context>
+          <context context-type="linenumber">88,90</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="nav.myOrders" datatype="html">
+        <source>My orders</source>
+        <target state="needs-review-translation">Mes commandes</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/public/layout/top-bar.html</context>
+          <context context-type="linenumber">94,96</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="nav.account" datatype="html">
         <source>Your account</source>
         <target state="needs-review-translation">Votre compte</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/public/layout/top-bar.html</context>
-          <context context-type="linenumber">83,85</context>
+          <context context-type="linenumber">100,102</context>
         </context-group>
       </trans-unit>
       <trans-unit id="nav.twoFactor" datatype="html">
@@ -2115,7 +2899,7 @@
         <target state="needs-review-translation">Configurer l'authentification à deux facteurs</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/public/layout/top-bar.html</context>
-          <context context-type="linenumber">93,95</context>
+          <context context-type="linenumber">110,112</context>
         </context-group>
       </trans-unit>
       <trans-unit id="nav.signOut" datatype="html">
@@ -2123,7 +2907,7 @@
         <target state="needs-review-translation">Se déconnecter</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/public/layout/top-bar.html</context>
-          <context context-type="linenumber">104,105</context>
+          <context context-type="linenumber">121,122</context>
         </context-group>
       </trans-unit>
       <trans-unit id="nav.signIn" datatype="html">
@@ -2131,7 +2915,7 @@
         <target state="needs-review-translation">Se connecter</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/public/layout/top-bar.html</context>
-          <context context-type="linenumber">115,118</context>
+          <context context-type="linenumber">132,135</context>
         </context-group>
       </trans-unit>
       <trans-unit id="nav.about" datatype="html">
