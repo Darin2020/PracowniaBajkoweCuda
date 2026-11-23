@@ -17,6 +17,21 @@ updates:
         patterns: ["Azure.*"]
       testing:
         patterns: ["xunit*", "Shouldly", "NSubstitute", "Testcontainers*", "Respawn"]
+      # The managed library only accepts a native libSkiaSharp of its own version: bump them together.
+      skiasharp:
+        patterns: ["SkiaSharp*"]
+    ignore:
+      # Packages released with ASP.NET Core / EF Core / Serilog follow the target framework's major (.NET 10 LTS).
+      # Their next major targets .NET 11 and drags Microsoft.Extensions.* 11 into the app; it comes with the
+      # framework upgrade. Patch and minor updates still arrive.
+      - dependency-name: "Microsoft.AspNetCore.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Microsoft.EntityFrameworkCore*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Serilog.AspNetCore"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: npm
     directory: /src/frontend
@@ -39,6 +54,9 @@ updates:
       # major or minor breaks `npm ci`. TypeScript is raised together with the Angular upgrade.
       - dependency-name: typescript
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      # The SignalR client is released with ASP.NET Core; its major follows the server's (.NET 10 LTS).
+      - dependency-name: "@microsoft/signalr"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /
