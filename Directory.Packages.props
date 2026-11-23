@@ -16,7 +16,7 @@
 
   <ItemGroup Label="Images">
     <!-- 3.x: the 4.x line is only days old. NoDependencies: the chiseled runtime image has no fontconfig. -->
-    <PackageVersion Include="SkiaSharp" Version="3.119.4" />
+    <PackageVersion Include="SkiaSharp" Version="4.157.0" />
     <PackageVersion Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.4" />
   </ItemGroup>
 
