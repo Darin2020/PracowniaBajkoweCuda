@@ -180,7 +180,8 @@ public static class ImageProcessor
         using var canvas = new SKCanvas(result);
         canvas.Clear(SKColors.Transparent);
         canvas.SetMatrix(matrix);
-        canvas.DrawBitmap(source, 0, 0);
+        // Only flips and quarter turns with whole-pixel offsets: every pixel lands exactly on one, no filtering needed.
+        canvas.DrawBitmap(source, 0, 0, SKSamplingOptions.Default);
         return result;
     }
 

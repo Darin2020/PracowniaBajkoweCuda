@@ -562,3 +562,24 @@ After that date the build fails again; an entry that is no longer reported is fl
 - **`OrderSummary` gained `customerName`** so the admin list shows whose order it is (the customer only ever receives
   summaries of their own orders, so it is their own name).
 
+## 2026-11-23 — Dependabot majors: SkiaSharp 4 and MailKit 5 now, the .NET 11 packages later
+
+- **SkiaSharp 4.157.0** (was 3.119.4). The 4.x line has been stable since the summer (4.150), so the reason for staying
+  on 3.x is gone. The only code change: `SKCanvas.DrawBitmap` without `SKSamplingOptions` is obsolete (an error with
+  warnings as errors); the orientation step passes `SKSamplingOptions.Default`, which is exact for flips and quarter
+  turns. Breaking changes that do not affect us: obsolete pre-v4 APIs removed, RAW/DNG decoding removed (we accept
+  JPEG, PNG and WebP only). `SkiaSharp.NativeAssets.Linux.NoDependencies` moves with it: Dependabot's PR bumped only
+  `SkiaSharp`, and the managed library refuses a native library of another milestone at run time. Dependabot now
+  groups `SkiaSharp*`.
+- **MailKit 5.0.0** (was 4.18.2; replaces the "MailKit 4.18" note of phase 2). The send overloads became extension
+  methods in `MailKit.IMailTransportExtensions`: `SmtpEmailSender` needs `using MailKit;`. Worth taking because
+  MailKit 5 no longer depends on BouncyCastle (it uses `MimeKit.Core`), so a large crypto library leaves the image.
+  MailKit only sends locally (Mailpit); Azure uses Communication Services.
+- **Deferred until the framework upgrade**: `Serilog.AspNetCore` 11, `Microsoft.AspNetCore.SignalR.Client` 11 and
+  `@microsoft/signalr` 11. They belong to the .NET 11 release (an STS; the project stays on .NET 10 LTS). On `net10.0`,
+  Serilog 11 pulls `Microsoft.Extensions.*` 11.0 packages over the shared framework's 10.0 assemblies, and
+  SignalR.Client 11 has no `net10.0` build (it falls back to `netstandard2.0`). The JavaScript client 11 is
+  wire-compatible (negotiate version 1, only additions such as token refresh) but is kept aligned with the server.
+  Dependabot ignores majors of `Microsoft.AspNetCore.*`, `Microsoft.EntityFrameworkCore*`, the EF Core health check,
+  `Serilog.AspNetCore` and `@microsoft/signalr`; patches and minors still arrive. `Microsoft.Extensions.TimeProvider.Testing`
+  (dotnet/extensions, ships a `net10.0` build) is not ignored.
