@@ -15,13 +15,14 @@
   </ItemGroup>
 
   <ItemGroup Label="Images">
-    <!-- 3.x: the 4.x line is only days old. NoDependencies: the chiseled runtime image has no fontconfig. -->
-    <PackageVersion Include="SkiaSharp" Version="3.119.4" />
-    <PackageVersion Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.4" />
+    <!-- Both at the same version: the managed library refuses a native libSkiaSharp from another milestone.
+         NoDependencies: the chiseled runtime image has no fontconfig. -->
+    <PackageVersion Include="SkiaSharp" Version="4.157.0" />
+    <PackageVersion Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.157.0" />
   </ItemGroup>
 
   <ItemGroup Label="Email">
-    <PackageVersion Include="MailKit" Version="4.18.2" />
+    <PackageVersion Include="MailKit" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup Label="Data">
