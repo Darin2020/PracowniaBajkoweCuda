@@ -216,6 +216,9 @@ Admin actions and security events (sign-ins, failed sign-ins, 2FA, password chan
 are in the `AuditLog` table; admins read them through `GET /api/admin/audit`. Too many requests answer
 `429 rate_limited` with `Retry-After`: sign-in and similar 10/min per IP, emails 3/hour per IP and per address. Limits
 are per replica, in memory, and reset on restart.
+- `scripts/abuse-check.sh <base-url>` checks the body limit, anonymous uploads, the sign-in rate limit and a short
+  burst of page requests against a running instance. It uses up the sign-in limit of your address for a minute, so
+  run it against staging only when nobody is testing there.
 
 ### Orders and payment instructions
 - When an admin confirms an order, the customer gets the payment instructions in the chat (a system message) and by

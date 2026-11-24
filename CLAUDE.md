@@ -26,6 +26,7 @@ Record the decisions you make along the way in `docs/DECISIONS.md` (short ADR-st
 docker compose up -d                       # SQL Server, Azurite, Mailpit (emails: http://localhost:8025)
 docker compose --profile app up -d --build # + `migrate` (one-shot) and the application image on http://localhost:8080
 scripts/smoke-test.sh http://localhost:8080 # checks a running instance (health/ready, redirect, pages per locale, headers)
+scripts/abuse-check.sh http://localhost:8080 # body limits, upload limit, sign-in rate limit, page burst (not in CI)
 dotnet build BajkoweCuda.sln
 dotnet test --solution BajkoweCuda.sln     # Microsoft.Testing.Platform runner (see global.json); DB tests need Docker
 dotnet run --project src/backend/BajkoweCuda.Api   # API on http://localhost:5080 (needs ConnectionStrings:Sql in user-secrets)

@@ -26,10 +26,17 @@ if (builder.Configuration["KeyVault:Uri"] is { Length: > 0 } keyVaultUri)
     builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), new Azure.Identity.DefaultAzureCredential());
 }
 
-builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.AddServerHeader = false;
+    // The backstop for bodies without Content-Length; RequestSizeGuardMiddleware refuses declared ones earlier.
+    // The image uploads raise the limit with [RequestSizeLimit] (docs/PLAN.md §8.2).
+    options.Limits.MaxRequestBodySize = RequestSizeGuardMiddleware.DefaultLimit;
+});
 
 builder.AddObservability();
 builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<BadRequestExceptionHandler>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddEmail(builder.Configuration);
@@ -66,6 +73,7 @@ if (!app.Environment.IsDevelopment())
 app.UseMiddleware<SecurityHeadersMiddleware>();
 app.UseRequestLogging();
 app.UsePublicSite();
+app.UseMiddleware<RequestSizeGuardMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
