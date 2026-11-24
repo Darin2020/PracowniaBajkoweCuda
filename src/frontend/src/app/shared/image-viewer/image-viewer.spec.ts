@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ContentImage } from '../../content/image';
 import { ImageViewer } from './image-viewer';
+import { expectAccessible } from '../../testing/axe';
 
 const IMAGES: readonly ContentImage[] = [
   { src: 'gallery/one.svg', alt: 'First toy', width: 800, height: 600 },
@@ -66,5 +67,11 @@ describe('ImageViewer', () => {
 
     expect(dialog.hasAttribute('open')).toBe(false);
     expect(element.querySelector('img')).toBeNull();
+  });
+
+  it('has no accessibility violations when open', async () => {
+    fixture.componentInstance.open(0);
+    fixture.detectChanges();
+    await expectAccessible(element);
   });
 });

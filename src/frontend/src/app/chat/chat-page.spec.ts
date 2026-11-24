@@ -8,6 +8,7 @@ import { ChatMessage } from '../core/chat/chat.models';
 import { FakeRealtime, message } from '../testing/chat-testing';
 import { ANNA, provideApiTesting } from '../testing/auth-testing';
 import { ChatPage } from './chat-page';
+import { expectAccessible } from '../testing/axe';
 
 describe('ChatPage', () => {
   let http: HttpTestingController;
@@ -218,5 +219,21 @@ describe('ChatPage', () => {
       'Too many attempts',
     );
     expect(textarea.value).toBe('Too fast');
+  });
+
+  it('has no accessibility violations', async () => {
+    const fixture = await open(
+      {
+        conversationId: 'c1',
+        emailNotificationsEnabled: true,
+        emailPromptAnswered: true,
+        unreadCount: 0,
+      },
+      [
+        message('m1', '2026-11-18T10:00:00Z', { body: 'A fox, please' }),
+        message('m2', '2026-11-18T10:05:00Z', { from: 'studio', body: 'What size?' }),
+      ],
+    );
+    await expectAccessible(element(fixture));
   });
 });

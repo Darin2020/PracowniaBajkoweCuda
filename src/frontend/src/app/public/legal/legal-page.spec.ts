@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { LEGAL_DOCUMENTS, LegalDocumentId } from '../../content/legal';
 import { PUBLIC_BASE_URL } from '../../core/public-base-url';
 import { LegalPage } from './legal-page';
+import { expectAccessible } from '../../testing/axe';
 
 describe('LegalPage', () => {
   beforeEach(() => {
@@ -40,5 +41,9 @@ describe('LegalPage', () => {
     expect(document.head.querySelector('link[rel="canonical"]')?.getAttribute('href')).toBe(
       'https://toys.test/en/terms',
     );
+  });
+
+  it('has no accessibility violations', async () => {
+    await expectAccessible(render('privacy'));
   });
 });

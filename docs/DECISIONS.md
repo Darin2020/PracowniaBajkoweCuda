@@ -635,3 +635,22 @@ After that date the build fails again; an entry that is no longer reported is fl
   a CDN or WAF (Phase 8+). The rate limiter counts per replica in memory, which is enough while each environment runs
   one replica.
 
+## 2026-11-24 — Phase 6: accessibility pass
+
+- **axe-core in the unit tests** (`src/frontend/src/app/testing/axe.ts`, `expectAccessible(element)`). It runs the
+  WCAG 2.x A/AA and best-practice rules.
+  - Every page has an axe test: the customer's chat and orders, the admin conversations, orders and order page (with
+    the cancel and edit forms open), sign-in, the top bar with the account menu open, and the shared widgets.
+  - Pages without their own spec are covered in `a11y-pages.spec.ts`: register, forgot or reset password, complete
+    profile, confirm email, account, 2FA setup, not found.
+  - A control test makes sure the helper really fails on violations.
+  - No violations were found.
+- **Colour contrast is checked outside jsdom**, which has no layout:
+  - Lighthouse CI covers the public pages (category ≥ 90, unchanged).
+  - The signed-in pages use the same colour tokens. Every text/background pair they use was computed against
+    WCAG AA. The lowest are the status badges: success 5.75:1, error 5.72:1 (AA needs 4.5:1).
+  - Lighthouse on signed-in pages would need a signed-in browser profile; not worth it while the tokens are shared.
+- **Already in place:** visible focus (`:focus-visible`), `prefers-reduced-motion`, native `<dialog>` for the image
+  viewer (focus trap, Escape), labelled icon buttons, `role="log"` for the chat, `role="status"`/`"alert"` for
+  messages.
+

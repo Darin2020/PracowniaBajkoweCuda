@@ -7,6 +7,7 @@ import { ChatRealtime } from '../core/chat/chat-realtime.service';
 import { provideApiTesting } from '../testing/auth-testing';
 import { FakeRealtime, orderSummary } from '../testing/chat-testing';
 import { AdminOrdersPage } from './orders-page';
+import { expectAccessible } from '../testing/axe';
 
 describe('AdminOrdersPage', () => {
   let http: HttpTestingController;
@@ -57,5 +58,18 @@ describe('AdminOrdersPage', () => {
     harness.detectChanges();
 
     expect(element.textContent).toContain('No orders here');
+  });
+
+  it('has no accessibility violations', async () => {
+    const harness = await RouterTestingHarness.create('/admin/orders');
+    http
+      .expectOne((request) => request.url === '/api/admin/orders')
+      .flush({
+        items: [orderSummary('o1'), orderSummary('o2', { status: 'Ready' })],
+        nextCursor: 'next',
+      });
+    await settle();
+    harness.detectChanges();
+    await expectAccessible(harness.routeNativeElement!);
   });
 });

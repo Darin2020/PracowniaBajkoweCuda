@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { COOKIE_NOTICE_STORAGE_KEY, CookieNotice } from './cookie-notice';
+import { expectAccessible } from '../../testing/axe';
 
 describe('CookieNotice', () => {
   beforeEach(() => {
@@ -41,5 +42,9 @@ describe('CookieNotice', () => {
     const element = (await render()).nativeElement as HTMLElement;
 
     expect(element.querySelector('aside')).toBeNull();
+  });
+
+  it('has no accessibility violations', async () => {
+    await expectAccessible((await render()).nativeElement as HTMLElement);
   });
 });

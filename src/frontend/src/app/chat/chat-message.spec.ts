@@ -5,6 +5,7 @@ import { ChatMessage } from '../core/chat/chat.models';
 import { message } from '../testing/chat-testing';
 import { ChatMessageView } from './chat-message';
 import { ChatSide } from './chat-session';
+import { expectAccessible } from '../testing/axe';
 
 describe('ChatMessageView', () => {
   beforeEach(() => {
@@ -70,5 +71,9 @@ describe('ChatMessageView', () => {
 
     expect(element.querySelector('.message__event')?.textContent).toContain('has been cancelled');
     expect(element.querySelector('.message__instructions')?.textContent).toContain('Out of fabric');
+  });
+
+  it('has no accessibility violations', async () => {
+    await expectAccessible(render(confirmed, 'customer'));
   });
 });
