@@ -115,6 +115,9 @@ echo "The build-time placeholder origin must never reach a visitor"
 expect_not_contains /pl/ 'public-base-url.invalid'
 expect_not_contains /sitemap.xml 'public-base-url.invalid'
 expect_not_contains /robots.txt 'public-base-url.invalid'
+echo "Nor the CSP nonce placeholder: every page gets its own nonce"
+expect_not_contains /pl/ '__CSP_NONCE__'
+expect_not_contains /de/chat '__CSP_NONCE__'
 
 echo "Client-side fallback and API"
 expect_status /de/chat 200
@@ -126,6 +129,8 @@ echo "Headers"
 expect_header /en/ "^content-security-policy: .*script-src 'self';"
 expect_header /en/ '^x-content-type-options: nosniff$'
 expect_header /en/ '^cache-control: no-cache$'
+expect_header /en/ "^content-security-policy: .*style-src 'self' 'nonce-[A-Za-z0-9+/=]{24}';"
+expect_header /en/ '^cross-origin-embedder-policy: require-corp$'
 
 if [ "$failures" -gt 0 ]; then
   echo "Smoke test FAILED: $failures check(s)."

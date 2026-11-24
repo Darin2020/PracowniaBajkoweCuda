@@ -54,6 +54,7 @@ internal static class PublicSiteExtensions
         }
 
         app.UseMiddleware<LocalizedSiteMiddleware>();
+        app.UseMiddleware<HtmlPageMiddleware>();
         app.UseStaticFiles(new StaticFileOptions { FileProvider = files, OnPrepareResponse = StaticAssetCaching.Apply });
 
         return app;

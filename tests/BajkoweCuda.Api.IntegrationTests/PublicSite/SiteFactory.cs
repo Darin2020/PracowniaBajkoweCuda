@@ -42,7 +42,13 @@ public sealed class SiteFactory : WebApplicationFactory<Program>
         $"<!doctype html><html lang=\"{locale}\"><head><link rel=\"canonical\" href=\"{origin}/{locale}/\">" +
         $"<meta property=\"og:image\" content=\"{origin}/{locale}/og-image.png\"></head><body>landing {locale} żółć</body></html>";
 
-    public static string Shell(string locale) => $"<!doctype html><html lang=\"{locale}\"><body>shell {locale}</body></html>";
+    /// <summary>Like the real build, the shell carries the CSP nonce placeholder that the server replaces per response.</summary>
+    public static string Shell(string locale) =>
+        $"<!doctype html><html lang=\"{locale}\"><head><style nonce=\"{NoncePlaceholder}\">p{{}}</style></head>" +
+        $"<body><app-root ngCspNonce=\"{NoncePlaceholder}\">shell {locale}</app-root></body></html>";
+
+    /// <summary>Must equal <c>CspNonce.Placeholder</c>.</summary>
+    public const string NoncePlaceholder = "__CSP_NONCE__";
 
     public static string Privacy(string locale, string origin = PublicOrigin) =>
         $"<!doctype html><html lang=\"{locale}\"><head><link rel=\"canonical\" href=\"{origin}/{locale}/privacy\"></head><body>privacy {locale}</body></html>";

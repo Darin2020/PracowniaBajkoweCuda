@@ -118,6 +118,8 @@ jobs:
     environment:
       name: staging
       url: ${{ steps.deploy.outputs.app-url }}
+    outputs:
+      app-url: ${{ steps.deploy.outputs.app-url }}
     permissions:
       contents: read
       id-token: write
@@ -144,9 +146,52 @@ jobs:
           sql-admin-object-id: ${{ secrets.SQL_ADMIN_OBJECT_ID }}
           admin-emails: ${{ secrets.ADMIN_EMAILS }}
 
+  # OWASP ZAP baseline (passive) scan of staging after every deployment (docs/PLAN.md §8.7). The report is an
+  # artifact; a high-risk alert fails the job and so holds back production. Tuning: .zap/rules.tsv.
+  zap:
+    name: ZAP baseline scan (staging)
+    needs: staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Scan
+        env:
+          TARGET: ${{ needs.staging.outputs.app-url }}
+          ZAP_IMAGE: ghcr.io/zaproxy/zaproxy:stable@sha256:9624669db72f54d86c4b46a7064518bd9bf79d8c61a4c31befa9923489f328af
+        run: |
+          set -euo pipefail
+          mkdir -p zap && cp .zap/rules.tsv zap/ && chmod -R a+rwx zap
+          # -I: warnings do not fail the scan; high-risk alerts are checked below.
+          docker run --rm --volume "$PWD/zap:/zap/wrk:rw" "$ZAP_IMAGE"             zap-baseline.py -t "$TARGET/en/" -c rules.tsv -J report.json -r report.html -I
+          high="$(jq '[.site[].alerts[] | select(.riskcode == "3")] | length' zap/report.json)"
+          medium="$(jq '[.site[].alerts[] | select(.riskcode == "2")] | length' zap/report.json)"
+          {
+            echo "### ZAP baseline"
+            echo "High: $high, medium: $medium (details in the zap-report artifact)"
+            jq -r '.site[].alerts[] | "- [\(.riskdesc)] \(.name) (\(.pluginid))"' zap/report.json
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$high" -gt 0 ]; then
+            echo "::error::ZAP found $high high-risk alert(s)."
+            exit 1
+          fi
+
+      - name: Upload the report
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: zap-report
+          path: zap/report.*
+          if-no-files-found: ignore
+
   production:
     name: Deploy to production
-    needs: [build, staging]
+    needs: [build, staging, zap]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     # The `production` environment has a required reviewer: the job waits here for approval.

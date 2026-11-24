@@ -70,7 +70,7 @@ See `docs/PLAN.md` §2 for the full table. Summary:
   treat as script.
 - **`style-src 'self' 'unsafe-inline'`.** Angular puts component styles into `<style>` elements, both in the prerendered
   HTML and at runtime. Removing `'unsafe-inline'` needs a per-request nonce, which static HTML files cannot carry
-  without server-side templating. Accepted for now; revisit in Phase 6 (security hardening).
+  without server-side templating. Accepted for now; revisit in Phase 6 (security hardening). *(Replaced in Phase 6 by a per-response nonce, see the 2026-11-24 entry.)*
 - **The CSP gate in CI is Lighthouse's `errors-in-console` audit**: a CSP violation is a console error, so the build fails.
 
 **Hosting in ASP.NET Core**
@@ -583,3 +583,28 @@ After that date the build fails again; an entry that is no longer reported is fl
   Dependabot ignores majors of `Microsoft.AspNetCore.*`, `Microsoft.EntityFrameworkCore*`, the EF Core health check,
   `Serilog.AspNetCore` and `@microsoft/signalr`; patches and minors still arrive. `Microsoft.Extensions.TimeProvider.Testing`
   (dotnet/extensions, ships a `net10.0` build) is not ignored.
+
+## 2026-11-24 — Phase 6: ZAP baseline in CD, CSP without 'unsafe-inline', cross-origin isolation
+
+- **ZAP baseline after every staging deployment** (`zap` job in `cd.yml`): a passive scan of `/en/` with the ZAP image
+  pinned by digest. The HTML and JSON reports are an artifact, the alerts are listed in the job summary, and a
+  high-risk alert fails the job, which holds back production (`production` needs `zap`). Informational rules that
+  are false positives for this site are ignored in `.zap/rules.tsv`, each with its reason.
+- **`style-src 'self' 'nonce-…'` instead of `'unsafe-inline'`.** The Angular build writes a placeholder into every
+  HTML file (`ngCspNonce` on `<app-root>`, which Angular copies as `nonce` onto its `<style>`, `<link>` and `<script>`
+  elements, and uses for the styles it adds at runtime). `HtmlPageMiddleware` replaces the placeholder with 128 random
+  bits per response, and the CSP header carries the same value. Style *attributes* in markup are therefore not
+  allowed; the templates have none, and Angular's `[style.x]` bindings use the CSSOM, which CSP does not restrict.
+  Lighthouse's console check in CI fails the build if a style is blocked.
+  - Cost: HTML pages no longer have `ETag`/`Last-Modified`, so a revisit downloads the page again instead of getting
+    a 304. The pages are a few kilobytes and compressed; the hashed bundles keep their year-long caching.
+- **`connect-src 'self'`** without `wss:`: in CSP Level 3 `'self'` also matches the same-origin WebSocket, which is the
+  only one the app opens (SignalR). ZAP flagged the bare scheme as a wildcard.
+- **`Cross-Origin-Embedder-Policy: require-corp` and `Cross-Origin-Resource-Policy: same-origin`** on every response:
+  the site loads nothing from other origins (sign-in with Google is a top-level redirect, not an embed), and nothing of
+  it should be embedded elsewhere, including the private images of `/api/files`.
+- **Cookies reviewed on staging**: the session, antiforgery and 2FA cookies are `__Host-`, `Secure`, `HttpOnly`;
+  `XSRF-TOKEN` is `Secure` and `SameSite=Strict` but readable by JavaScript, as the double-submit pattern needs. HSTS
+  stays at the framework's 30 days on the Azure host name; a longer `max-age` (and `includeSubDomains`) comes with the
+  custom domain in Phase 8.
+

@@ -49,7 +49,10 @@ Nothing to do: every merge to `main` runs CI, then CD.
       still runs the previous build.
    3. Bicep deployment with the new image for the app, wait until `/api/version` reports the new commit, smoke test
       (including `/health/ready`, which opens a database connection as the app identity).
-3. **Production**: waits for approval (**Actions → the CD run → Review deployments**), then the same steps
+3. **ZAP baseline scan** of staging (passive). The report is the `zap-report` artifact of the run, the alerts are in
+   the job summary. A high-risk alert fails the job and production is not offered. Fix the cause and merge again; if
+   an alert is a false positive, add its rule id to `.zap/rules.tsv` as `IGNORE` with the reason.
+4. **Production**: waits for approval (**Actions → the CD run → Review deployments**), then the same steps
    with the same image digest.
 
 Check what is running: `https://<app>/api/version` returns the git commit.

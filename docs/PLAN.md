@@ -561,9 +561,10 @@ Each phase ends with: green CI, updated README/DECISIONS, acceptance criteria de
 - [x] Angular admin: create-order panel in the conversation (pick a reference image from attachments), orders list with status filter, order detail with transition buttons and photo management
 - [x] Integration tests: drafts invisible to customers, cross-customer access denied, invalid transitions → 409 with error code
 - **AC:** full flow: chat → admin creates draft → confirm (customer gets payment info in chat + email) → paid → photos → ready → shipped → completed, visible to the customer at every step.
+  ✅ Verified on staging on 2026-11-23 (with the placeholder payment text; the real one goes into Key Vault before launch).
 
 ### Phase 6 — Security & quality hardening
-- [ ] ZAP baseline scan in CD, fix findings. Review CSP, headers and cookies with securityheaders.com-style checks
+- [x] ZAP baseline scan in CD, fix findings. Review CSP, headers and cookies with securityheaders.com-style checks
 - [ ] Review against an ASVS L2 checklist (`docs/SECURITY.md` with the status of each relevant item)
 - [ ] Load/abuse sanity checks (rate limits, large uploads)
 - [ ] Accessibility pass (axe in E2E or unit tests), Lighthouse ≥ 90 still holds
