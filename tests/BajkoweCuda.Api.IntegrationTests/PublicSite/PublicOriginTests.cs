@@ -47,17 +47,14 @@ public sealed class PublicOriginTests(SiteFactory factory) : IClassFixture<SiteF
     }
 
     [Fact]
-    public async Task Rewritten_page_supports_conditional_requests()
+    public async Task Pages_have_no_validators_because_every_response_carries_its_own_nonce()
     {
         using var client = factory.CreateSiteClient();
-        using var first = await GetAsync(client, "/en/");
-        var etag = first.Headers.ETag.ShouldNotBeNull();
+        using var response = await GetAsync(client, "/en/");
 
-        using var request = new HttpRequestMessage(HttpMethod.Get, new Uri("/en/", UriKind.Relative));
-        request.Headers.IfNoneMatch.Add(etag);
-        using var second = await client.SendAsync(request, Ct);
-
-        second.StatusCode.ShouldBe(HttpStatusCode.NotModified);
+        response.Headers.ETag.ShouldBeNull();
+        response.Content.Headers.LastModified.ShouldBeNull();
+        response.Headers.CacheControl?.NoCache.ShouldBeTrue();
     }
 
     [Fact]

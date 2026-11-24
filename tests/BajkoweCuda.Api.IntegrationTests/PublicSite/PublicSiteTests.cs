@@ -135,7 +135,7 @@ public sealed class PublicSiteTests(SiteFactory factory) : IClassFixture<SiteFac
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         response.Headers.CacheControl?.ToString().ShouldBe("no-cache");
-        (await BodyAsync(response)).ShouldBe(SiteFactory.Shell("fr"));
+        (await BodyAsync(response)).ShouldContain("shell fr");
     }
 
     [Theory]
@@ -257,9 +257,38 @@ public sealed class PublicSiteTests(SiteFactory factory) : IClassFixture<SiteFac
         response.Headers.GetValues("X-Content-Type-Options").ShouldHaveSingleItem().ShouldBe("nosniff");
         response.Headers.GetValues("Referrer-Policy").ShouldHaveSingleItem().ShouldBe("strict-origin-when-cross-origin");
         response.Headers.GetValues("Cross-Origin-Opener-Policy").ShouldHaveSingleItem().ShouldBe("same-origin");
+        response.Headers.GetValues("Cross-Origin-Embedder-Policy").ShouldHaveSingleItem().ShouldBe("require-corp");
+        response.Headers.GetValues("Cross-Origin-Resource-Policy").ShouldHaveSingleItem().ShouldBe("same-origin");
+        csp.ShouldContain("connect-src 'self';");
+        csp.ShouldNotContain("unsafe-inline");
+        csp.ShouldNotContain("*");
         response.Headers.GetValues("X-Frame-Options").ShouldHaveSingleItem().ShouldBe("DENY");
         response.Headers.GetValues("Permissions-Policy").ShouldHaveSingleItem().ShouldContain("camera=()");
         response.Headers.Contains("Server").ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task Inline_styles_need_the_nonce_that_the_page_carries_and_it_changes_per_response()
+    {
+        using var first = await GetAsync("/en/chat");
+        using var second = await GetAsync("/en/chat");
+
+        var nonce = StyleNonce(first);
+        var body = await first.Content.ReadAsStringAsync(Ct);
+        body.ShouldContain($"<style nonce=\"{nonce}\">");
+        body.ShouldContain($"ngCspNonce=\"{nonce}\"");
+        body.ShouldNotContain(SiteFactory.NoncePlaceholder);
+        nonce.Length.ShouldBe(24);
+        StyleNonce(second).ShouldNotBe(nonce);
+    }
+
+    private static string StyleNonce(HttpResponseMessage response)
+    {
+        var styleSrc = response.Headers.GetValues("Content-Security-Policy").Single()
+            .Split(';', StringSplitOptions.TrimEntries)
+            .Single(directive => directive.StartsWith("style-src", StringComparison.Ordinal));
+        styleSrc.ShouldStartWith("style-src 'self' 'nonce-");
+        return styleSrc["style-src 'self' 'nonce-".Length..^1];
     }
 
     [Fact]
