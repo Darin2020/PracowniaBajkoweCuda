@@ -5,6 +5,7 @@ import { Router, provideRouter } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { ANNA, provideApiTesting } from '../../testing/auth-testing';
 import { TopBar } from './top-bar';
+import { expectAccessible } from '../../testing/axe';
 
 @Component({ template: '' })
 class Blank {}
@@ -102,5 +103,13 @@ describe('TopBar', () => {
 
     expect(TestBed.inject(Router).url).toBe('/');
     expect(element.querySelector('.sign-in')).not.toBeNull();
+  });
+
+  it('has no accessibility violations, with the account menu open', async () => {
+    const fixture = await render({ authenticated: true, ...ANNA, hasOrders: true, unreadCount: 2 });
+    const element = fixture.nativeElement as HTMLElement;
+    element.querySelector<HTMLButtonElement>('.user-menu__toggle')!.click();
+    fixture.detectChanges();
+    await expectAccessible(element);
   });
 });

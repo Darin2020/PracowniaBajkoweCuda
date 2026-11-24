@@ -7,6 +7,7 @@ import { ChatRealtime } from '../core/chat/chat-realtime.service';
 import { provideApiTesting } from '../testing/auth-testing';
 import { FakeRealtime, image, orderSummary } from '../testing/chat-testing';
 import { OrdersPage } from './orders-page';
+import { expectAccessible } from '../testing/axe';
 
 describe('OrdersPage', () => {
   let http: HttpTestingController;
@@ -59,5 +60,15 @@ describe('OrdersPage', () => {
     await settle();
     harness.detectChanges();
     expect(harness.routeNativeElement!.querySelectorAll('.order')).toHaveLength(1);
+  });
+
+  it('has no accessibility violations', async () => {
+    const harness = await RouterTestingHarness.create('/orders');
+    http
+      .expectOne('/api/orders')
+      .flush([orderSummary('o1', { thumbnail: image('p1') }), orderSummary('o2')]);
+    await settle();
+    harness.detectChanges();
+    await expectAccessible(harness.routeNativeElement!);
   });
 });

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ContentImage } from '../../content/image';
 import { Carousel } from './carousel';
+import { expectAccessible } from '../../testing/axe';
 
 const IMAGES: readonly ContentImage[] = [
   { src: 'gallery/one.svg', alt: 'First toy', width: 800, height: 600 },
@@ -96,5 +97,9 @@ describe('Carousel', () => {
     element.querySelectorAll<HTMLButtonElement>('.slide__button')[1].click();
 
     expect(opened).toEqual([1]);
+  });
+
+  it('has no accessibility violations', async () => {
+    await expectAccessible(element);
   });
 });

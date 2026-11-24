@@ -6,6 +6,7 @@ import { ChatRealtime } from '../core/chat/chat-realtime.service';
 import { provideApiTesting } from '../testing/auth-testing';
 import { FakeRealtime, message } from '../testing/chat-testing';
 import { ConversationsPage } from './conversations-page';
+import { expectAccessible } from '../testing/axe';
 
 const conversation = (id: string, name: string, unreadCount: number) => ({
   id,
@@ -97,5 +98,10 @@ describe('ConversationsPage', () => {
     await vi.advanceTimersByTimeAsync(400);
 
     http.expectOne('/api/admin/conversations').flush({ items: [], nextCursor: null });
+  });
+
+  it('has no accessibility violations', async () => {
+    const fixture = await open();
+    await expectAccessible(fixture.nativeElement as HTMLElement);
   });
 });

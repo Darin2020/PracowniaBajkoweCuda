@@ -7,6 +7,7 @@ import { ChatRealtime } from '../core/chat/chat-realtime.service';
 import { provideApiTesting } from '../testing/auth-testing';
 import { FakeRealtime, message } from '../testing/chat-testing';
 import { ConversationPage } from './conversation-page';
+import { expectAccessible } from '../testing/axe';
 
 describe('ConversationPage', () => {
   let http: HttpTestingController;
@@ -175,5 +176,18 @@ describe('ConversationPage', () => {
     expect(element.querySelector('.message--mine .message__body')?.textContent).toContain(
       'Sure, in two weeks',
     );
+  });
+
+  it('has no accessibility violations, with the create-order form open', async () => {
+    const harness = await open();
+    http.expectOne('/api/admin/conversations/c1/read').flush(null);
+    const element = harness.routeNativeElement!;
+    await expectAccessible(element);
+
+    Array.from(element.querySelectorAll<HTMLButtonElement>('.side button'))
+      .find((button) => button.textContent?.includes('Create order'))!
+      .click();
+    harness.detectChanges();
+    await expectAccessible(element);
   });
 });

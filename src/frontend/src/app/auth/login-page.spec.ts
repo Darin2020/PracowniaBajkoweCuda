@@ -5,6 +5,7 @@ import { Router, provideRouter, withComponentInputBinding } from '@angular/route
 import { RouterTestingHarness } from '@angular/router/testing';
 import { ANNA, provideApiTesting } from '../testing/auth-testing';
 import { LoginPage } from './login-page';
+import { expectAccessible } from '../testing/axe';
 
 @Component({ template: '' })
 class Blank {}
@@ -121,5 +122,10 @@ describe('LoginPage', () => {
     expect(harness.routeNativeElement!.querySelector('[role=alert]')?.textContent).toContain(
       'already exists',
     );
+  });
+
+  it('has no accessibility violations', async () => {
+    const harness = await open('/login');
+    await expectAccessible(harness.routeNativeElement!);
   });
 });

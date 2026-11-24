@@ -8,6 +8,7 @@ import { AdminOrder } from '../core/orders/order.models';
 import { provideApiTesting } from '../testing/auth-testing';
 import { FakeRealtime, adminOrder, image, message, orderSummary } from '../testing/chat-testing';
 import { AdminOrderPage } from './order-page';
+import { expectAccessible } from '../testing/axe';
 
 describe('AdminOrderPage', () => {
   let http: HttpTestingController;
@@ -191,5 +192,34 @@ describe('AdminOrderPage', () => {
 
     expect(element.querySelector('app-order-form')).toBeNull();
     expect(element.textContent).toContain('€120.50');
+  });
+
+  it('has no accessibility violations: steps, photos and the edit form', async () => {
+    const harness = await open(
+      adminOrder('o1', {
+        status: 'InProgress',
+        referenceImage: image('ref'),
+        photos: [
+          { id: 'a', image: image('pa') },
+          { id: 'b', image: image('pb') },
+        ],
+        timeline: [{ status: 'AwaitingPayment', at: '2026-11-18T11:00:00Z', comment: null }],
+      }),
+    );
+    const element = harness.routeNativeElement!;
+    await expectAccessible(element);
+
+    button(element, 'Cancel the order').click();
+    harness.detectChanges();
+    await expectAccessible(element);
+
+    button(element, 'Keep the order').click();
+    button(element, 'Edit').click();
+    http
+      .expectOne((request) => request.url === '/api/admin/conversations/c1/messages')
+      .flush({ items: [], nextCursor: null });
+    await settle();
+    harness.detectChanges();
+    await expectAccessible(element);
   });
 });

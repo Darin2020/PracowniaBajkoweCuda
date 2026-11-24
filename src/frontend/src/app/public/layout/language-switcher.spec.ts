@@ -2,6 +2,7 @@ import { Component, LOCALE_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { LanguageSwitcher } from './language-switcher';
+import { expectAccessible } from '../../testing/axe';
 
 @Component({ template: '' })
 class Blank {}
@@ -74,5 +75,10 @@ describe('LanguageSwitcher', () => {
     german.click();
 
     expect(document.cookie).toContain('lang=de');
+  });
+
+  it('has no accessibility violations', async () => {
+    const fixture = await render('/');
+    await expectAccessible(fixture.nativeElement as HTMLElement);
   });
 });

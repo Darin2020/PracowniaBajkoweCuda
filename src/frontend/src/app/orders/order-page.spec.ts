@@ -7,6 +7,7 @@ import { ChatRealtime } from '../core/chat/chat-realtime.service';
 import { provideApiTesting } from '../testing/auth-testing';
 import { FakeRealtime, customerOrder, image, orderSummary } from '../testing/chat-testing';
 import { OrderPage } from './order-page';
+import { expectAccessible } from '../testing/axe';
 
 describe('OrderPage', () => {
   let http: HttpTestingController;
@@ -97,5 +98,10 @@ describe('OrderPage', () => {
     expect(harness.routeNativeElement!.querySelector('[role="alert"]')?.textContent).toContain(
       'This order does not exist',
     );
+  });
+
+  it('has no accessibility violations', async () => {
+    const harness = await open(customerOrder('o1', { photos: [image('p1'), image('p2')] }));
+    await expectAccessible(harness.routeNativeElement!);
   });
 });
