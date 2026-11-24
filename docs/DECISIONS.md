@@ -608,3 +608,30 @@ After that date the build fails again; an entry that is no longer reported is fl
   stays at the framework's 30 days on the Azure host name; a longer `max-age` (and `includeSubDomains`) comes with the
   custom domain in Phase 8.
 
+## 2026-11-24 — Phase 6: load and abuse sanity checks
+
+- **`scripts/abuse-check.sh <base-url>`** checks a running instance:
+  - the request body limit;
+  - anonymous uploads;
+  - the sign-in rate limit with `Retry-After`;
+  - a burst of 300 page requests, 25 at a time.
+
+  It is not part of CI, because it uses up the sign-in limit of the calling address for a minute.
+- **Findings, now fixed:**
+  - The request body limit was Kestrel's default of 30 MB for every endpoint, including anonymous sign-in. It is now
+    1 MB. The image uploads keep their own `[RequestSizeLimit]` (10.5 MB).
+  - A body over Kestrel's limit was answered with a 500. It is now a 413 with `code: request_too_large`
+    (`BadRequestExceptionHandler`).
+- **`RequestSizeGuardMiddleware`** refuses a declared `Content-Length` over the endpoint's limit before anything reads
+  the body, and closes the connection. Kestrel's limit stays as the backstop for chunked bodies. The guard also runs in
+  the integration tests, which do not use Kestrel.
+- **Results on the local `docker compose` app:**
+  - 2 MB sign-in → 413;
+  - 12 MB anonymous upload → 413;
+  - the 11th sign-in within a minute → 429 with `Retry-After`;
+  - a 1.9 MB image upload as a signed-in customer still works;
+  - 300 page requests: all 200, p95 25 ms.
+- **What this does not cover:** volumetric denial of service. That is left to the Container Apps ingress and, later,
+  a CDN or WAF (Phase 8+). The rate limiter counts per replica in memory, which is enough while each environment runs
+  one replica.
+
