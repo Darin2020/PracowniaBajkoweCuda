@@ -41,6 +41,14 @@ internal sealed class SecurityHeadersMiddleware(RequestDelegate next)
             headers["Cross-Origin-Embedder-Policy"] = "require-corp";
             headers["Cross-Origin-Resource-Policy"] = "same-origin";
 
+            // API responses carry personal data: never stored by the browser or a proxy unless the endpoint says
+            // otherwise (the images of /api/files are cached privately). ASVS 8.1.1, docs/SECURITY.md.
+            if (http.Request.Path.StartsWithSegments("/api", StringComparison.OrdinalIgnoreCase)
+                && string.IsNullOrEmpty(headers.CacheControl))
+            {
+                headers.CacheControl = "no-store";
+            }
+
             return Task.CompletedTask;
         }, context);
 

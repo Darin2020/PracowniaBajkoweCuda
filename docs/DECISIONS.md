@@ -654,3 +654,21 @@ After that date the build fails again; an entry that is no longer reported is fl
   viewer (focus trap, Escape), labelled icon buttons, `role="log"` for the chat, `role="status"`/`"alert"` for
   messages.
 
+## 2026-11-25 — Phase 6: ASVS L2 review (`docs/SECURITY.md`)
+
+- **ASVS 4.0.3**, chapter by chapter, with a status and evidence per requirement group. 4.0.3 rather than 5.0 because
+  pentest vendors and most tooling still map findings to 4.0.3 numbers.
+- **Fixed during the review:**
+  - API responses had no `Cache-Control` (only export and version had `no-store`). Every `/api` response is now
+    `no-store` unless the endpoint sets its own policy (`/api/files` stays `private`). ASVS 8.1.1.
+  - New test: deleting a customer who has orders keeps the orders, clears the conversation and the reference image
+    (from the erased chat) and keeps the studio's photos (PLAN §8.6). It worked; it was not tested.
+- **Accepted for now (in SECURITY.md §5):**
+  - No breached-password check yet (2.1.7), no show-password toggle or strength meter.
+  - Identity defaults: recovery codes stored unhashed, a TOTP code can be reused within its window.
+  - No session list (changing the password ends the other sessions), no extra step-up for admin operations.
+  - **Data services on public endpoints.** Azure SQL ("Allow Azure services"), Storage and Key Vault accept public
+    traffic, protected by Entra ID / RBAC with no keys or passwords anywhere. Private endpoints need a VNet-integrated
+    Container Apps environment, private DNS zones and endpoints per service, which together cost more than the rest
+    of the monthly budget. Revisit if the threat model changes.
+- **Open for the owner:** reporting contact, test accounts on staging, whether production is in scope.
