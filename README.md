@@ -85,7 +85,7 @@ tests/                                   unit and integration tests
 scripts/smoke-test.sh                    checks a running instance (used by CI)
 infra/                                   Bicep: shared.bicep (registry, Container Apps env), main.bicep (one environment), modules/
 scripts/azure-bootstrap.ps1              one-time Azure + GitHub OIDC setup
-docs/                                    PLAN.md, DECISIONS.md, RUNBOOK.md
+docs/                                    PLAN.md, DECISIONS.md, RUNBOOK.md, SECURITY.md
 .github/                                 workflows, Dependabot, PR template
 Dockerfile                               multi-stage build of the single image
 docker-compose.yml                       local SQL Server, Azurite, Mailpit (+ the app with --profile app)
@@ -194,6 +194,7 @@ flowchart LR
 - **Infrastructure as code** in [`infra/`](infra/): Container Apps, Azure SQL, Blob Storage, Key Vault,
   Communication Services Email, Log Analytics + Application Insights, and a cost budget per environment.
 - Setup, rollback and operations: [docs/RUNBOOK.md](docs/RUNBOOK.md).
+- Security (ASVS L2 status, pentest brief, reporting): [docs/SECURITY.md](docs/SECURITY.md).
 
 ## License
 

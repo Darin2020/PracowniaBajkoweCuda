@@ -565,7 +565,7 @@ Each phase ends with: green CI, updated README/DECISIONS, acceptance criteria de
 
 ### Phase 6 — Security & quality hardening
 - [x] ZAP baseline scan in CD, fix findings. Review CSP, headers and cookies with securityheaders.com-style checks
-- [ ] Review against an ASVS L2 checklist (`docs/SECURITY.md` with the status of each relevant item)
+- [x] Review against an ASVS L2 checklist (`docs/SECURITY.md` with the status of each relevant item)
 - [x] Load/abuse sanity checks (rate limits, large uploads)
 - [x] Accessibility pass (axe in E2E or unit tests), Lighthouse ≥ 90 still holds
 - **AC:** no high findings in ZAP/Trivy/CodeQL. `SECURITY.md` ready to hand to the external pentesters (scope, test accounts on staging, contact).
