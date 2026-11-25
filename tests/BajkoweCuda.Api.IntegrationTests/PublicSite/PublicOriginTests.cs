@@ -152,5 +152,15 @@ public sealed class PublicOriginTests(SiteFactory factory) : IClassFixture<SiteF
         body.Environment.ShouldNotBeNullOrWhiteSpace();
     }
 
+    [Fact]
+    public async Task Api_responses_are_not_stored_by_default()
+    {
+        using var client = factory.CreateSiteClient();
+        using var response = await GetAsync(client, "/api/account");
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        response.Headers.CacheControl?.NoStore.ShouldBeTrue();
+    }
+
     private sealed record VersionBody(string Version, string Environment);
 }

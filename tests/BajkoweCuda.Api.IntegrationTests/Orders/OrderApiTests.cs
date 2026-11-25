@@ -225,6 +225,33 @@ public sealed class OrderApiTests(AuthApp app) : IClassFixture<AuthApp>
         (await AuthApp.ProblemCodeAsync(withoutSecondFactor)).ShouldBe("auth.mfa_required");
     }
 
+    [Fact]
+    public async Task Deleting_the_customer_account_keeps_the_orders_anonymized()
+    {
+        var admin = await AdminAsync();
+        var customer = await CustomerWithChatAsync();
+        var id = (await CreateAsync(admin, customer, referenceAttachmentId: customer.ImageId)).GetProperty("id").GetGuid();
+        await StepAsync(admin, id, "confirm");
+        await StepAsync(admin, id, "mark-paid");
+        var photoId = (await AddPhotoAsync(admin, id)).GetProperty("id").GetGuid();
+
+        using (var deleted = await AuthApp.PostAsync(customer.Client, "/api/account/delete", new { password = AuthApp.Password }))
+        {
+            deleted.StatusCode.ShouldBe(HttpStatusCode.NoContent, await deleted.Content.ReadAsStringAsync(Ct));
+        }
+
+        // The order stays (§8.6): no conversation, no reference image from the erased chat, the studio's photos kept.
+        var order = await GetJsonAsync(admin, $"/api/admin/orders/{id}");
+        order.GetProperty("status").GetString().ShouldBe("InProgress");
+        order.GetProperty("customerName").GetString()!.ShouldNotContain("Anna");
+        order.GetProperty("conversationId").ValueKind.ShouldBe(JsonValueKind.Null);
+        order.GetProperty("referenceImage").ValueKind.ShouldBe(JsonValueKind.Null);
+        order.GetProperty("photos").EnumerateArray().Select(photo => photo.GetProperty("id").GetGuid()).ShouldBe([photoId]);
+
+        var list = await GetJsonAsync(admin, "/api/admin/orders");
+        list.GetProperty("items").EnumerateArray().ShouldContain(item => item.GetProperty("id").GetGuid() == id);
+    }
+
     private sealed record Customer(HttpClient Client, string Email, Guid ConversationId, Guid ImageId);
 
     private async Task<HttpClient> AdminAsync()
